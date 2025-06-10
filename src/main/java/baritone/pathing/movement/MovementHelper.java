@@ -52,8 +52,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static baritone.pathing.movement.Movement.HORIZONTALS_BUT_ALSO_DOWN_____SO_EVERY_DIRECTION_EXCEPT_UP;
 import static baritone.pathing.precompute.Ternary.*;
@@ -64,11 +64,39 @@ import static baritone.pathing.precompute.Ternary.*;
  * @author leijurv
  */
 public interface MovementHelper extends ActionCosts, Helper {
-    ItemStack STACK_BUCKET_WATER = new ItemStack(Items.WATER_BUCKET);
-    ItemStack STACK_BUCKET_EMPTY = new ItemStack(Items.BUCKET);
-    ItemStack STACK_LADDER = new ItemStack(Items.LADDER);
-    ItemStack STACK_VINE = new ItemStack(Items.VINE);
-    ItemStack STACK_POWDERED_SNOW = new ItemStack(Items.POWDER_SNOW_BUCKET);
+    ItemStack STACK_EMPTY_BUCKET = new ItemStack(Items.BUCKET);
+
+    enum ClutchItems {
+        // The priority of these items is determined by their order. Less convenient items should go lower in the enum.
+        // Water turned a simple Block variable into a lambda XD
+        WATER(new ItemStack(Items.WATER_BUCKET), (block) -> block.getFluidState().getType() instanceof WaterFluid, true),
+        POWDERED_SNOW(new ItemStack(Items.POWDER_SNOW_BUCKET), (block) -> block.getBlock() == Blocks.POWDER_SNOW, true),
+        LADDER(new ItemStack(Items.LADDER), (block) -> block.getBlock() == Blocks.LADDER, false),
+        VINE(new ItemStack(Items.VINE), (block) -> block.getBlock() == Blocks.VINE, false);
+
+
+        private final ItemStack itemStack;
+        private final Function<BlockState, Boolean> block;
+        private final boolean pickupable;
+
+        ClutchItems(ItemStack itemStack, Function<BlockState, Boolean> block, boolean pickupable) {
+            this.itemStack = itemStack;
+            this.block = block;
+            this.pickupable = pickupable;
+        }
+
+        public ItemStack getItemStack() {
+            return this.itemStack;
+        }
+
+        public boolean compare(BlockState block) {
+            return this.block.apply(block);
+        }
+
+        public boolean isPickupable() {
+            return this.pickupable;
+        }
+    }
 
     static boolean avoidBreaking(BlockStateInterface bsi, int x, int y, int z, BlockState state) {
         if (!bsi.worldBorder.canPlaceAt(x, z)) {

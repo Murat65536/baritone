@@ -30,6 +30,7 @@ import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
 import baritone.pathing.movement.MovementState.MovementTarget;
 import baritone.utils.pathing.MutableMoveResult;
+
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -38,12 +39,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LadderBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.WaterFluid;
 import net.minecraft.world.phys.Vec3;
 
 public class MovementFall extends Movement {
@@ -88,25 +86,25 @@ public class MovementFall extends Movement {
         Rotation toDest = RotationUtils.calcRotationFromVec3d(ctx.playerHead(), VecUtils.getBlockPosCenter(dest), ctx.playerRotations());
         Rotation targetRotation = null;
         BlockState destState = ctx.world().getBlockState(dest);
-        Block destBlock = destState.getBlock();
-        boolean isLandable = destState.getFluidState().getType() instanceof WaterFluid || destBlock == Blocks.LADDER || destBlock == Blocks.VINE || destBlock == Blocks.POWDER_SNOW;
-        boolean isPickupable = destState.getFluidState().getType() instanceof WaterFluid || destBlock == Blocks.POWDER_SNOW;
-        ItemStack clutchItem;
+        boolean isLandable = false;
+        boolean isPickupable = false;
+        ItemStack item = null;
+        for (ClutchItems clutchItem : ClutchItems.values()) {
+            if (item == null && Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(clutchItem.getItemStack()))) {
+                item = clutchItem.getItemStack();
+            }
+            if (!isLandable && clutchItem.compare(destState)) {
+                isLandable = true;
+                isPickupable = clutchItem.isPickupable();
+            }
+        }
         if (!isLandable && willClutch() && !playerFeet.equals(dest)) {
-            if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(MovementHelper.STACK_BUCKET_WATER)) && ctx.world().dimension() != Level.NETHER) {
-                clutchItem = MovementHelper.STACK_BUCKET_WATER;
-            } else if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(MovementHelper.STACK_LADDER))) {
-                clutchItem = MovementHelper.STACK_LADDER;
-            } else if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(MovementHelper.STACK_VINE))) {
-                clutchItem = MovementHelper.STACK_VINE;
-            } else if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(MovementHelper.STACK_POWDERED_SNOW))) {
-                clutchItem = MovementHelper.STACK_POWDERED_SNOW;
-            } else {
+            if (item == null) {
                 return state.setStatus(MovementStatus.UNREACHABLE);
             }
 
             if (ctx.player().position().y - dest.getY() < ctx.playerController().getBlockReachDistance() && !ctx.player().isOnGround()) {
-                ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(clutchItem);
+                ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(item);
 
                 targetRotation = new Rotation(toDest.getYaw(), 90.0F);
 
@@ -122,8 +120,8 @@ public class MovementFall extends Movement {
         }
         if (playerFeet.equals(dest) && (ctx.player().position().y - playerFeet.getY() < 0.094 || isLandable)) { // 0.094 because lilypads
             if (isPickupable) {
-                if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(MovementHelper.STACK_BUCKET_EMPTY))) {
-                    ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(MovementHelper.STACK_BUCKET_EMPTY);
+                if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(MovementHelper.STACK_EMPTY_BUCKET))) {
+                    ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(MovementHelper.STACK_EMPTY_BUCKET);
                     return state.setInput(Input.CLICK_RIGHT, true);
                 } else {
                     if (ctx.player().getDeltaMovement().y >= 0) {

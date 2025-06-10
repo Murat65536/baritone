@@ -97,10 +97,10 @@ public class CalculationContext {
         this.bsi = new BlockStateInterface(baritone.getPlayerContext(), forUseOnAnotherThread);
         this.toolSet = new ToolSet(player);
         this.hasThrowaway = Baritone.settings().allowPlace.value && ((Baritone) baritone).getInventoryBehavior().hasGenericThrowaway();
-        this.hasWaterBucket = Baritone.settings().allowWaterBucketFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(MovementHelper.STACK_BUCKET_WATER)) && world.dimension() != Level.NETHER;
-        this.hasLadder = Baritone.settings().allowLadderFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(MovementHelper.STACK_LADDER));
-        this.hasVine = Baritone.settings().allowVineFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(MovementHelper.STACK_VINE));
-        this.hasPowderedSnow = Baritone.settings().allowPowderedSnowFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(MovementHelper.STACK_POWDERED_SNOW));
+        this.hasWaterBucket = Baritone.settings().allowWaterBucketFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(MovementHelper.ClutchItems.WATER.getItemStack())) && world.dimension() != Level.NETHER;
+        this.hasLadder = Baritone.settings().allowLadderFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(MovementHelper.ClutchItems.LADDER.getItemStack()));
+        this.hasVine = Baritone.settings().allowVineFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(MovementHelper.ClutchItems.VINE.getItemStack()));
+        this.hasPowderedSnow = Baritone.settings().allowPowderedSnowFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(MovementHelper.ClutchItems.POWDERED_SNOW.getItemStack()));
         this.canSprint = Baritone.settings().allowSprint.value && player.getFoodData().getFoodLevel() > 6;
         this.placeBlockCost = Baritone.settings().blockPlacementPenalty.value;
         this.allowBreak = Baritone.settings().allowBreak.value;
