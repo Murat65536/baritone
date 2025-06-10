@@ -446,7 +446,7 @@ public class ElytraProcess extends BaritoneProcessHelper implements IBaritonePro
             super(baritone, true);
             this.allowFallIntoLava = true;
             this.minFallHeight = 8;
-            this.maxFallHeightNoWater = 10000;
+            this.maxFallHeightNoClutch = 10000;
             this.placeBlockCost = COST_INF;
         }
 

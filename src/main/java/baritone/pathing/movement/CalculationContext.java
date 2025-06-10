@@ -49,6 +49,7 @@ public class CalculationContext {
 
     private static final ItemStack STACK_BUCKET_WATER = new ItemStack(Items.WATER_BUCKET);
     private static final ItemStack STACK_LADDER = new ItemStack(Items.LADDER);
+    private static final ItemStack STACK_VINE = new ItemStack(Items.VINE);
 
     public final boolean safeForThreadedUse;
     public final IBaritone baritone;
@@ -58,6 +59,7 @@ public class CalculationContext {
     public final ToolSet toolSet;
     public final boolean hasWaterBucket;
     public final boolean hasLadder;
+    public final boolean hasVine;
     public final boolean hasThrowaway;
     public final boolean canSprint;
     public double placeBlockCost;
@@ -74,9 +76,8 @@ public class CalculationContext {
     public final boolean allowDiagonalAscend;
     public final boolean allowDownward;
     public int minFallHeight;
-    public int maxFallHeightNoWater;
-    public final int maxFallHeightBucket;
-    public final int maxFallHeightLadder;
+    public int maxFallHeightNoClutch;
+    public final int maxFallHeightClutch;
     public final double waterWalkSpeed;
     public final double breakBlockAdditionalCost;
     public double backtrackCostFavoringCoefficient;
@@ -102,6 +103,7 @@ public class CalculationContext {
         this.hasThrowaway = Baritone.settings().allowPlace.value && ((Baritone) baritone).getInventoryBehavior().hasGenericThrowaway();
         this.hasWaterBucket = Baritone.settings().allowWaterBucketFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(STACK_BUCKET_WATER)) && world.dimension() != Level.NETHER;
         this.hasLadder = Baritone.settings().allowLadderFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(STACK_LADDER));
+        this.hasVine = Baritone.settings().allowVineFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(STACK_VINE));
         this.canSprint = Baritone.settings().allowSprint.value && player.getFoodData().getFoodLevel() > 6;
         this.placeBlockCost = Baritone.settings().blockPlacementPenalty.value;
         this.allowBreak = Baritone.settings().allowBreak.value;
@@ -117,9 +119,8 @@ public class CalculationContext {
         this.allowDiagonalAscend = Baritone.settings().allowDiagonalAscend.value;
         this.allowDownward = Baritone.settings().allowDownward.value;
         this.minFallHeight = 3; // Minimum fall height used by MovementFall
-        this.maxFallHeightNoWater = Baritone.settings().maxFallHeightNoWater.value;
-        this.maxFallHeightBucket = Baritone.settings().maxFallHeightBucket.value;
-        this.maxFallHeightLadder = Baritone.settings().maxFallHeightLadder.value;
+        this.maxFallHeightNoClutch = Baritone.settings().maxFallHeightNoClutch.value;
+        this.maxFallHeightClutch = Baritone.settings().maxFallHeightClutch.value;
         int depth = EnchantmentHelper.getDepthStrider(player);
         if (depth > 3) {
             depth = 3;

@@ -154,10 +154,16 @@ public final class Settings {
     public final Setting<Boolean> allowWaterBucketFall = new Setting<>(true);
 
     /**
-     * Allow Baritone to fall arbitrary distances and place a water bucket beneath it.
+     * Allow Baritone to fall arbitrary distances and place a ladder beneath it.
      * Reliability: Don't worry about it.
      */
     public final Setting<Boolean> allowLadderFall = new Setting<>(true);
+
+    /**
+     * Allow Baritone to fall arbitrary distances and place a vine beneath it.
+     * Reliability: Don't worry about it.
+     */
+    public final Setting<Boolean> allowVineFall = new Setting<>(true);
 
     /**
      * Allow Baritone to assume it can walk on still water just like any other block.
@@ -556,23 +562,17 @@ public final class Settings {
     public final Setting<Float> pathingMapLoadFactor = new Setting<>(0.75f);
 
     /**
-     * How far are you allowed to fall onto solid ground (without a water bucket)?
+     * How far are you allowed to fall onto solid ground (without clutching)?
      * 3 won't deal any damage. But if you just want to get down the mountain quickly and you have
      * Feather Falling IV, you might set it a bit higher, like 4 or 5.
      */
-    public final Setting<Integer> maxFallHeightNoWater = new Setting<>(3);
+    public final Setting<Integer> maxFallHeightNoClutch = new Setting<>(3);
 
     /**
-     * How far are you allowed to fall onto solid ground (with a water bucket)?
+     * How far are you allowed to fall onto solid ground (while clutching)?
      * It's not that reliable, so I've set it below what would kill an unarmored player (23)
      */
-    public final Setting<Integer> maxFallHeightBucket = new Setting<>(20);
-
-    /**
-     * How far are you allowed to fall onto solid ground (with a ladder)?
-     * I have no idea how reliable this is.
-     */
-    public final Setting<Integer> maxFallHeightLadder = new Setting<>(20);
+    public final Setting<Integer> maxFallHeightClutch = new Setting<>(20);
 
     /**
      * Is it okay to sprint through a descend followed by a diagonal?

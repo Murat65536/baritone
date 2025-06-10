@@ -202,7 +202,7 @@ public class MovementDescend extends Movement {
             if (MovementHelper.isBottomSlab(ontoBlock)) {
                 return false; // falling onto a half slab is really glitchy, and can cause more fall damage than we'd expect
             }
-            if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightNoWater + 1) {
+            if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightNoClutch + 1) {
                 // fallHeight = 4 means onto.up() is 3 blocks down, which is the max
                 res.x = destX;
                 res.y = newY + 1;
@@ -210,7 +210,7 @@ public class MovementDescend extends Movement {
                 res.cost = tentativeCost;
                 return false;
             }
-            if (reachedMinimum && (context.hasWaterBucket && unprotectedFallHeight <= context.maxFallHeightBucket + 1) || (context.hasLadder && unprotectedFallHeight <= context.maxFallHeightLadder + 1)) {
+            if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightClutch + 1 && (context.hasWaterBucket || context.hasLadder || context.hasVine)) {
                 res.x = destX;
                 res.y = newY + 1;// this is the block we're falling onto, so dest is +1
                 res.z = destZ;
