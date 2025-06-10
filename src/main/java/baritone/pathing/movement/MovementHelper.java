@@ -31,6 +31,8 @@ import baritone.utils.BlockStateInterface;
 import baritone.utils.ToolSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.piston.MovingPistonBlock;
@@ -62,6 +64,11 @@ import static baritone.pathing.precompute.Ternary.*;
  * @author leijurv
  */
 public interface MovementHelper extends ActionCosts, Helper {
+    ItemStack STACK_BUCKET_WATER = new ItemStack(Items.WATER_BUCKET);
+    ItemStack STACK_BUCKET_EMPTY = new ItemStack(Items.BUCKET);
+    ItemStack STACK_LADDER = new ItemStack(Items.LADDER);
+    ItemStack STACK_VINE = new ItemStack(Items.VINE);
+    ItemStack STACK_POWDERED_SNOW = new ItemStack(Items.POWDER_SNOW_BUCKET);
 
     static boolean avoidBreaking(BlockStateInterface bsi, int x, int y, int z, BlockState state) {
         if (!bsi.worldBorder.canPlaceAt(x, z)) {

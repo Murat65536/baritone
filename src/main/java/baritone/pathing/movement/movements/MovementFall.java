@@ -38,7 +38,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -48,13 +47,6 @@ import net.minecraft.world.level.material.WaterFluid;
 import net.minecraft.world.phys.Vec3;
 
 public class MovementFall extends Movement {
-
-    private static final ItemStack STACK_BUCKET_WATER = new ItemStack(Items.WATER_BUCKET);
-    private static final ItemStack STACK_BUCKET_EMPTY = new ItemStack(Items.BUCKET);
-    private static final ItemStack STACK_LADDER = new ItemStack(Items.LADDER);
-    private static final ItemStack STACK_VINE = new ItemStack(Items.VINE);
-    private static final ItemStack STACK_POWDERED_SNOW = new ItemStack(Items.POWDER_SNOW_BUCKET);
-
     public MovementFall(IBaritone baritone, BetterBlockPos src, BetterBlockPos dest) {
         super(baritone, src, dest, MovementFall.buildPositionsToBreak(src, dest));
     }
@@ -101,14 +93,14 @@ public class MovementFall extends Movement {
         boolean isPickupable = destState.getFluidState().getType() instanceof WaterFluid || destBlock == Blocks.POWDER_SNOW;
         ItemStack clutchItem;
         if (!isLandable && willClutch() && !playerFeet.equals(dest)) {
-            if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_BUCKET_WATER)) && ctx.world().dimension() != Level.NETHER) {
-                clutchItem = STACK_BUCKET_WATER;
-            } else if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_LADDER))) {
-                clutchItem = STACK_LADDER;
-            } else if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_VINE))) {
-                clutchItem = STACK_VINE;
-            } else if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_POWDERED_SNOW))) {
-                clutchItem = STACK_POWDERED_SNOW;
+            if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(MovementHelper.STACK_BUCKET_WATER)) && ctx.world().dimension() != Level.NETHER) {
+                clutchItem = MovementHelper.STACK_BUCKET_WATER;
+            } else if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(MovementHelper.STACK_LADDER))) {
+                clutchItem = MovementHelper.STACK_LADDER;
+            } else if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(MovementHelper.STACK_VINE))) {
+                clutchItem = MovementHelper.STACK_VINE;
+            } else if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(MovementHelper.STACK_POWDERED_SNOW))) {
+                clutchItem = MovementHelper.STACK_POWDERED_SNOW;
             } else {
                 return state.setStatus(MovementStatus.UNREACHABLE);
             }
@@ -130,8 +122,8 @@ public class MovementFall extends Movement {
         }
         if (playerFeet.equals(dest) && (ctx.player().position().y - playerFeet.getY() < 0.094 || isLandable)) { // 0.094 because lilypads
             if (isPickupable) {
-                if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_BUCKET_EMPTY))) {
-                    ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(STACK_BUCKET_EMPTY);
+                if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(MovementHelper.STACK_BUCKET_EMPTY))) {
+                    ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(MovementHelper.STACK_BUCKET_EMPTY);
                     return state.setInput(Input.CLICK_RIGHT, true);
                 } else {
                     if (ctx.player().getDeltaMovement().y >= 0) {

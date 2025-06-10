@@ -46,12 +46,6 @@ import static baritone.api.pathing.movement.ActionCosts.COST_INF;
  * @since 8/7/2018
  */
 public class CalculationContext {
-
-    private static final ItemStack STACK_BUCKET_WATER = new ItemStack(Items.WATER_BUCKET);
-    private static final ItemStack STACK_LADDER = new ItemStack(Items.LADDER);
-    private static final ItemStack STACK_VINE = new ItemStack(Items.VINE);
-    private static final ItemStack STACK_POWDERED_SNOW = new ItemStack(Items.POWDER_SNOW_BUCKET);
-
     public final boolean safeForThreadedUse;
     public final IBaritone baritone;
     public final Level world;
@@ -103,10 +97,10 @@ public class CalculationContext {
         this.bsi = new BlockStateInterface(baritone.getPlayerContext(), forUseOnAnotherThread);
         this.toolSet = new ToolSet(player);
         this.hasThrowaway = Baritone.settings().allowPlace.value && ((Baritone) baritone).getInventoryBehavior().hasGenericThrowaway();
-        this.hasWaterBucket = Baritone.settings().allowWaterBucketFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(STACK_BUCKET_WATER)) && world.dimension() != Level.NETHER;
-        this.hasLadder = Baritone.settings().allowLadderFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(STACK_LADDER));
-        this.hasVine = Baritone.settings().allowVineFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(STACK_VINE));
-        this.hasPowderedSnow = Baritone.settings().allowPowderedSnowFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(STACK_POWDERED_SNOW));
+        this.hasWaterBucket = Baritone.settings().allowWaterBucketFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(MovementHelper.STACK_BUCKET_WATER)) && world.dimension() != Level.NETHER;
+        this.hasLadder = Baritone.settings().allowLadderFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(MovementHelper.STACK_LADDER));
+        this.hasVine = Baritone.settings().allowVineFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(MovementHelper.STACK_VINE));
+        this.hasPowderedSnow = Baritone.settings().allowPowderedSnowFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(MovementHelper.STACK_POWDERED_SNOW));
         this.canSprint = Baritone.settings().allowSprint.value && player.getFoodData().getFoodLevel() > 6;
         this.placeBlockCost = Baritone.settings().blockPlacementPenalty.value;
         this.allowBreak = Baritone.settings().allowBreak.value;
