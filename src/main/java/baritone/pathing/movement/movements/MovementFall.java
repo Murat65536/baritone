@@ -53,6 +53,7 @@ public class MovementFall extends Movement {
     private static final ItemStack STACK_BUCKET_EMPTY = new ItemStack(Items.BUCKET);
     private static final ItemStack STACK_LADDER = new ItemStack(Items.LADDER);
     private static final ItemStack STACK_VINE = new ItemStack(Items.VINE);
+    private static final ItemStack STACK_POWDERED_SNOW = new ItemStack(Items.POWDER_SNOW_BUCKET);
 
     public MovementFall(IBaritone baritone, BetterBlockPos src, BetterBlockPos dest) {
         super(baritone, src, dest, MovementFall.buildPositionsToBreak(src, dest));
@@ -105,6 +106,8 @@ public class MovementFall extends Movement {
                 clutchItem = STACK_LADDER;
             } else if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_VINE))) {
                 clutchItem = STACK_VINE;
+            } else if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_POWDERED_SNOW))) {
+                clutchItem = STACK_POWDERED_SNOW;
             } else {
                 return state.setStatus(MovementStatus.UNREACHABLE);
             }

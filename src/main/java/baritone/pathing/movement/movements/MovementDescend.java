@@ -210,7 +210,7 @@ public class MovementDescend extends Movement {
                 res.cost = tentativeCost;
                 return false;
             }
-            if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightClutch + 1 && (context.hasWaterBucket || context.hasLadder || context.hasVine)) {
+            if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightClutch + 1 && (context.hasWaterBucket || context.hasLadder || context.hasVine || context.hasPowderedSnow)) {
                 res.x = destX;
                 res.y = newY + 1;// this is the block we're falling onto, so dest is +1
                 res.z = destZ;

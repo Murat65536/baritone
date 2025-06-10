@@ -166,6 +166,12 @@ public final class Settings {
     public final Setting<Boolean> allowVineFall = new Setting<>(true);
 
     /**
+     * Allow Baritone to fall arbitrary distances and place powdered snow beneath it.
+     * Reliability: Don't worry about it.
+     */
+    public final Setting<Boolean> allowPowderedSnowFall = new Setting<>(true);
+
+    /**
      * Allow Baritone to assume it can walk on still water just like any other block.
      * This functionality is assumed to be provided by a separate library that might have imported Baritone.
      * <p>

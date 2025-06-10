@@ -50,6 +50,7 @@ public class CalculationContext {
     private static final ItemStack STACK_BUCKET_WATER = new ItemStack(Items.WATER_BUCKET);
     private static final ItemStack STACK_LADDER = new ItemStack(Items.LADDER);
     private static final ItemStack STACK_VINE = new ItemStack(Items.VINE);
+    private static final ItemStack STACK_POWDERED_SNOW = new ItemStack(Items.POWDER_SNOW_BUCKET);
 
     public final boolean safeForThreadedUse;
     public final IBaritone baritone;
@@ -60,6 +61,7 @@ public class CalculationContext {
     public final boolean hasWaterBucket;
     public final boolean hasLadder;
     public final boolean hasVine;
+    public final boolean hasPowderedSnow;
     public final boolean hasThrowaway;
     public final boolean canSprint;
     public double placeBlockCost;
@@ -104,6 +106,7 @@ public class CalculationContext {
         this.hasWaterBucket = Baritone.settings().allowWaterBucketFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(STACK_BUCKET_WATER)) && world.dimension() != Level.NETHER;
         this.hasLadder = Baritone.settings().allowLadderFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(STACK_LADDER));
         this.hasVine = Baritone.settings().allowVineFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(STACK_VINE));
+        this.hasPowderedSnow = Baritone.settings().allowPowderedSnowFall.value && Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(STACK_POWDERED_SNOW));
         this.canSprint = Baritone.settings().allowSprint.value && player.getFoodData().getFoodLevel() > 6;
         this.placeBlockCost = Baritone.settings().blockPlacementPenalty.value;
         this.allowBreak = Baritone.settings().allowBreak.value;
