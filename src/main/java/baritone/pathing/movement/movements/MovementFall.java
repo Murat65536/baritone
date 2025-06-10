@@ -97,9 +97,10 @@ public class MovementFall extends Movement {
         Rotation targetRotation = null;
         BlockState destState = ctx.world().getBlockState(dest);
         Block destBlock = destState.getBlock();
-        boolean isWater = destState.getFluidState().getType() instanceof WaterFluid;
+        boolean isLandable = destState.getFluidState().getType() instanceof WaterFluid || destBlock == Blocks.LADDER || destBlock == Blocks.VINE || destBlock == Blocks.POWDER_SNOW;
+        boolean isPickupable = destState.getFluidState().getType() instanceof WaterFluid || destBlock == Blocks.POWDER_SNOW;
         ItemStack clutchItem;
-        if (!isWater && willClutch() && !playerFeet.equals(dest)) {
+        if (!isLandable && willClutch() && !playerFeet.equals(dest)) {
             if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_BUCKET_WATER)) && ctx.world().dimension() != Level.NETHER) {
                 clutchItem = STACK_BUCKET_WATER;
             } else if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_LADDER))) {
@@ -127,15 +128,11 @@ public class MovementFall extends Movement {
         } else {
             state.setTarget(new MovementTarget(toDest, false));
         }
-        if (playerFeet.equals(dest) && (ctx.player().position().y - playerFeet.getY() < 0.094 || isWater)) { // 0.094 because lilypads
-            if (isWater) { // only match water, not flowing water (which we cannot pick up with a bucket)
+        if (playerFeet.equals(dest) && (ctx.player().position().y - playerFeet.getY() < 0.094 || isLandable)) { // 0.094 because lilypads
+            if (isPickupable) {
                 if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_BUCKET_EMPTY))) {
                     ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(STACK_BUCKET_EMPTY);
-                    if (ctx.player().getDeltaMovement().y >= 0) {
-                        return state.setInput(Input.CLICK_RIGHT, true);
-                    } else {
-                        return state;
-                    }
+                    return state.setInput(Input.CLICK_RIGHT, true);
                 } else {
                     if (ctx.player().getDeltaMovement().y >= 0) {
                         return state.setStatus(MovementStatus.SUCCESS);
