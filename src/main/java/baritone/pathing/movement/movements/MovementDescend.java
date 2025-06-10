@@ -210,11 +210,11 @@ public class MovementDescend extends Movement {
                 res.cost = tentativeCost;
                 return false;
             }
-            if (reachedMinimum && context.hasWaterBucket && unprotectedFallHeight <= context.maxFallHeightBucket + 1) {
+            if (reachedMinimum && (context.hasWaterBucket && unprotectedFallHeight <= context.maxFallHeightBucket + 1) || (context.hasLadder && unprotectedFallHeight <= context.maxFallHeightLadder + 1)) {
                 res.x = destX;
                 res.y = newY + 1;// this is the block we're falling onto, so dest is +1
                 res.z = destZ;
-                res.cost = tentativeCost + context.placeBucketCost();
+                res.cost = tentativeCost + context.placeBlockCost;
                 return true;
             } else {
                 return false;

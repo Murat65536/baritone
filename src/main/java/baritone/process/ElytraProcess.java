@@ -447,6 +447,7 @@ public class ElytraProcess extends BaritoneProcessHelper implements IBaritonePro
             this.allowFallIntoLava = true;
             this.minFallHeight = 8;
             this.maxFallHeightNoWater = 10000;
+            this.placeBlockCost = COST_INF;
         }
 
         @Override
@@ -456,11 +457,6 @@ public class ElytraProcess extends BaritoneProcessHelper implements IBaritonePro
 
         @Override
         public double breakCostMultiplierAt(int x, int y, int z, BlockState current) {
-            return COST_INF;
-        }
-
-        @Override
-        public double placeBucketCost() {
             return COST_INF;
         }
     }

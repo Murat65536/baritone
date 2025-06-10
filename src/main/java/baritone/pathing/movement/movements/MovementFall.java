@@ -51,6 +51,7 @@ public class MovementFall extends Movement {
 
     private static final ItemStack STACK_BUCKET_WATER = new ItemStack(Items.WATER_BUCKET);
     private static final ItemStack STACK_BUCKET_EMPTY = new ItemStack(Items.BUCKET);
+    private static final ItemStack STACK_LADDER = new ItemStack(Items.LADDER);
 
     public MovementFall(IBaritone baritone, BetterBlockPos src, BetterBlockPos dest) {
         super(baritone, src, dest, MovementFall.buildPositionsToBreak(src, dest));
@@ -76,7 +77,7 @@ public class MovementFall extends Movement {
         return set;
     }
 
-    private boolean willPlaceBucket() {
+    private boolean willClutch() {
         CalculationContext context = new CalculationContext(baritone);
         MutableMoveResult result = new MutableMoveResult();
         return MovementDescend.dynamicFallCost(context, src.x, src.y, src.z, dest.x, dest.z, 0, context.get(dest.x, src.y - 2, dest.z), result);
@@ -95,13 +96,18 @@ public class MovementFall extends Movement {
         BlockState destState = ctx.world().getBlockState(dest);
         Block destBlock = destState.getBlock();
         boolean isWater = destState.getFluidState().getType() instanceof WaterFluid;
-        if (!isWater && willPlaceBucket() && !playerFeet.equals(dest)) {
-            if (!Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_BUCKET_WATER)) || ctx.world().dimension() == Level.NETHER) {
+        ItemStack clutchItem;
+        if (!isWater && willClutch() && !playerFeet.equals(dest)) {
+            if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_BUCKET_WATER)) && ctx.world().dimension() != Level.NETHER) {
+                clutchItem = STACK_BUCKET_WATER;
+            } else if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_LADDER))) {
+                clutchItem = STACK_LADDER;
+            } else {
                 return state.setStatus(MovementStatus.UNREACHABLE);
             }
 
             if (ctx.player().position().y - dest.getY() < ctx.playerController().getBlockReachDistance() && !ctx.player().isOnGround()) {
-                ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(STACK_BUCKET_WATER);
+                ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(clutchItem);
 
                 targetRotation = new Rotation(toDest.getYaw(), 90.0F);
 

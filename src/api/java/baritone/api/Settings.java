@@ -154,6 +154,12 @@ public final class Settings {
     public final Setting<Boolean> allowWaterBucketFall = new Setting<>(true);
 
     /**
+     * Allow Baritone to fall arbitrary distances and place a water bucket beneath it.
+     * Reliability: Don't worry about it.
+     */
+    public final Setting<Boolean> allowLadderFall = new Setting<>(true);
+
+    /**
      * Allow Baritone to assume it can walk on still water just like any other block.
      * This functionality is assumed to be provided by a separate library that might have imported Baritone.
      * <p>
@@ -561,6 +567,12 @@ public final class Settings {
      * It's not that reliable, so I've set it below what would kill an unarmored player (23)
      */
     public final Setting<Integer> maxFallHeightBucket = new Setting<>(20);
+
+    /**
+     * How far are you allowed to fall onto solid ground (with a ladder)?
+     * I have no idea how reliable this is.
+     */
+    public final Setting<Integer> maxFallHeightLadder = new Setting<>(20);
 
     /**
      * Is it okay to sprint through a descend followed by a diagonal?
