@@ -1,0 +1,47 @@
+/*
+ * This file is part of Baritone.
+ *
+ * Baritone is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Baritone is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Baritone.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package baritone.pathing.movement.clutches;
+
+import baritone.Baritone;
+import baritone.api.utils.BetterBlockPos;
+import baritone.api.utils.IPlayerContext;
+import baritone.pathing.movement.CalculationContext;
+import baritone.pathing.movement.Clutch;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.AirBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockState;
+
+public final class PowderedSnowClutch extends Clutch {
+    public static final Clutch INSTANCE = new PowderedSnowClutch();
+
+    private PowderedSnowClutch() {
+        super(new ItemStack(Items.POWDER_SNOW_BUCKET), true);
+    }
+    public boolean compare(BlockState state) {
+        return state.is(Blocks.POWDER_SNOW);
+    }
+    public boolean clutchable(IPlayerContext ctx, int x, int y, int z) {
+        Block below = ctx.world().getBlockState(new BetterBlockPos(x, y - 1, z)).getBlock();
+        return Baritone.settings().allowPowderedSnowFall.value && Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(getItemStack())) && !(below instanceof AirBlock || below instanceof LiquidBlock);
+    }
+}

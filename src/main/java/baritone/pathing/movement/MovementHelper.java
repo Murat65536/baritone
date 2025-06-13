@@ -26,6 +26,8 @@ import baritone.api.utils.*;
 import baritone.api.utils.Rotation;
 import baritone.api.utils.input.Input;
 import baritone.pathing.movement.MovementState.MovementTarget;
+import baritone.pathing.movement.clutches.PowderedSnowClutch;
+import baritone.pathing.movement.clutches.WaterClutch;
 import baritone.pathing.precompute.Ternary;
 import baritone.utils.BlockStateInterface;
 import baritone.utils.ToolSet;
@@ -64,39 +66,11 @@ import static baritone.pathing.precompute.Ternary.*;
  * @author leijurv
  */
 public interface MovementHelper extends ActionCosts, Helper {
+    Clutch[] clutches = new Clutch[]{
+            PowderedSnowClutch.INSTANCE,
+            WaterClutch.INSTANCE,
+    };
     ItemStack STACK_EMPTY_BUCKET = new ItemStack(Items.BUCKET);
-
-    enum ClutchItems {
-        // The priority of these items is determined by their order. Less convenient items should go lower in the enum.
-        // Water turned a simple Block variable into a lambda XD
-        WATER(new ItemStack(Items.WATER_BUCKET), (block) -> block.getFluidState().getType() instanceof WaterFluid, true),
-        POWDERED_SNOW(new ItemStack(Items.POWDER_SNOW_BUCKET), (block) -> block.getBlock() == Blocks.POWDER_SNOW, true),
-        LADDER(new ItemStack(Items.LADDER), (block) -> block.getBlock() == Blocks.LADDER, false),
-        VINE(new ItemStack(Items.VINE), (block) -> block.getBlock() == Blocks.VINE, false);
-
-
-        private final ItemStack itemStack;
-        private final Function<BlockState, Boolean> block;
-        private final boolean pickupable;
-
-        ClutchItems(ItemStack itemStack, Function<BlockState, Boolean> block, boolean pickupable) {
-            this.itemStack = itemStack;
-            this.block = block;
-            this.pickupable = pickupable;
-        }
-
-        public ItemStack getItemStack() {
-            return this.itemStack;
-        }
-
-        public boolean compare(BlockState block) {
-            return this.block.apply(block);
-        }
-
-        public boolean isPickupable() {
-            return this.pickupable;
-        }
-    }
 
     static boolean avoidBreaking(BlockStateInterface bsi, int x, int y, int z, BlockState state) {
         if (!bsi.worldBorder.canPlaceAt(x, z)) {

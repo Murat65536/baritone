@@ -155,19 +155,16 @@ public final class Settings {
 
     /**
      * Allow Baritone to fall arbitrary distances and place a ladder beneath it.
-     * Reliability: Don't worry about it.
      */
     public final Setting<Boolean> allowLadderFall = new Setting<>(true);
 
     /**
      * Allow Baritone to fall arbitrary distances and place a vine beneath it.
-     * Reliability: Don't worry about it.
      */
     public final Setting<Boolean> allowVineFall = new Setting<>(true);
 
     /**
      * Allow Baritone to fall arbitrary distances and place powdered snow beneath it.
-     * Reliability: Don't worry about it.
      */
     public final Setting<Boolean> allowPowderedSnowFall = new Setting<>(true);
 

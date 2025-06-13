@@ -24,10 +24,7 @@ import baritone.api.utils.Rotation;
 import baritone.api.utils.RotationUtils;
 import baritone.api.utils.VecUtils;
 import baritone.api.utils.input.Input;
-import baritone.pathing.movement.CalculationContext;
-import baritone.pathing.movement.Movement;
-import baritone.pathing.movement.MovementHelper;
-import baritone.pathing.movement.MovementState;
+import baritone.pathing.movement.*;
 import baritone.pathing.movement.MovementState.MovementTarget;
 import baritone.utils.pathing.MutableMoveResult;
 
@@ -38,7 +35,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LadderBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -54,7 +50,7 @@ public class MovementFall extends Movement {
         MutableMoveResult result = new MutableMoveResult();
         MovementDescend.cost(context, src.x, src.y, src.z, dest.x, dest.z, result);
         if (result.y != dest.y) {
-            return COST_INF; // doesn't apply to us, this position is a descend not a fall
+            return COST_INF; // doesn't apply to us, this position is a descent not a fall
         }
         return result.cost;
     }
@@ -69,12 +65,6 @@ public class MovementFall extends Movement {
         return set;
     }
 
-    private boolean willClutch() {
-        CalculationContext context = new CalculationContext(baritone);
-        MutableMoveResult result = new MutableMoveResult();
-        return MovementDescend.dynamicFallCost(context, src.x, src.y, src.z, dest.x, dest.z, 0, context.get(dest.x, src.y - 2, dest.z), result);
-    }
-
     @Override
     public MovementState updateState(MovementState state) {
         super.updateState(state);
@@ -86,51 +76,33 @@ public class MovementFall extends Movement {
         Rotation toDest = RotationUtils.calcRotationFromVec3d(ctx.playerHead(), VecUtils.getBlockPosCenter(dest), ctx.playerRotations());
         Rotation targetRotation = null;
         BlockState destState = ctx.world().getBlockState(dest);
-        boolean isLandable = false;
-        boolean isPickupable = false;
-        ItemStack item = null;
-        for (ClutchItems clutchItem : ClutchItems.values()) {
-            if (item == null && Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(clutchItem.getItemStack()))) {
-                item = clutchItem.getItemStack();
-            }
-            if (!isLandable && clutchItem.compare(destState)) {
-                isLandable = true;
-                isPickupable = clutchItem.isPickupable();
-            }
-        }
-        if (!isLandable && willClutch() && !playerFeet.equals(dest)) {
-            if (item == null) {
-                return state.setStatus(MovementStatus.UNREACHABLE);
-            }
-
-            if (ctx.player().position().y - dest.getY() < ctx.playerController().getBlockReachDistance() && !ctx.player().isOnGround()) {
-                ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(item);
-
+        if (!playerFeet.equals(dest.above())) {
+            if (MovementDescend.clutch != null && !MovementDescend.clutch.compare(destState)) {
+                ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(MovementDescend.clutch.getItemStack());
                 targetRotation = new Rotation(toDest.getYaw(), 90.0F);
-
-                if (ctx.isLookingAt(dest) || ctx.isLookingAt(dest.below())) {
+                if (ctx.player().position().y - dest.getY() < ctx.playerController().getBlockReachDistance() && !ctx.player().isOnGround() && (ctx.isLookingAt(dest) || ctx.isLookingAt(dest.above()))) {
                     state.setInput(Input.CLICK_RIGHT, true);
                 }
             }
-        }
-        if (targetRotation != null) {
-            state.setTarget(new MovementTarget(targetRotation, true));
         } else {
-            state.setTarget(new MovementTarget(toDest, false));
-        }
-        if (playerFeet.equals(dest) && (ctx.player().position().y - playerFeet.getY() < 0.094 || isLandable)) { // 0.094 because lilypads
-            if (isPickupable) {
+            if (MovementDescend.clutch != null && MovementDescend.clutch.isPickupable()) {
                 if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(MovementHelper.STACK_EMPTY_BUCKET))) {
                     ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(MovementHelper.STACK_EMPTY_BUCKET);
                     return state.setInput(Input.CLICK_RIGHT, true);
                 } else {
-                    if (ctx.player().getDeltaMovement().y >= 0) {
-                        return state.setStatus(MovementStatus.SUCCESS);
-                    } // don't else return state; we need to stay centered because this water might be flowing under the surface
+                    MovementDescend.clutch = null;
+                    return state.setStatus(MovementStatus.SUCCESS);
                 }
             } else {
+                MovementDescend.clutch = null;
                 return state.setStatus(MovementStatus.SUCCESS);
             }
+        }
+        if (targetRotation != null) {
+            state.setTarget(new MovementTarget(targetRotation, true));
+        }
+        else {
+            state.setTarget(new MovementTarget(toDest, false));
         }
         Vec3 destCenter = VecUtils.getBlockPosCenter(dest); // we are moving to the 0.5 center not the edge (like if we were falling on a ladder)
         if (Math.abs(ctx.player().position().x + ctx.player().getDeltaMovement().x - destCenter.x) > 0.1 || Math.abs(ctx.player().position().z + ctx.player().getDeltaMovement().z - destCenter.z) > 0.1) {
