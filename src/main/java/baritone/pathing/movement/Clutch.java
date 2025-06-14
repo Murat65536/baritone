@@ -37,8 +37,5 @@ public abstract class Clutch {
         return pickupable;
     }
     public abstract boolean compare(BlockState state);
-    public abstract boolean clutchable(IPlayerContext ctx, int x, int y, int z);
-    public boolean clutchable(CalculationContext context, int x, int y, int z) {
-        return this.clutchable(context.baritone.getPlayerContext(), x, y, z);
-    }
+    public abstract boolean clutchable(CalculationContext context, int x, int y, int z);
 }

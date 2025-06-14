@@ -35,12 +35,16 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LadderBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 public class MovementFall extends Movement {
+    ItemStack STACK_EMPTY_BUCKET = new ItemStack(Items.BUCKET);
+
     public MovementFall(IBaritone baritone, BetterBlockPos src, BetterBlockPos dest) {
         super(baritone, src, dest, MovementFall.buildPositionsToBreak(src, dest));
     }
@@ -76,18 +80,18 @@ public class MovementFall extends Movement {
         Rotation toDest = RotationUtils.calcRotationFromVec3d(ctx.playerHead(), VecUtils.getBlockPosCenter(dest), ctx.playerRotations());
         Rotation targetRotation = null;
         BlockState destState = ctx.world().getBlockState(dest);
-        if (!playerFeet.equals(dest.above())) {
+        if (!playerFeet.equals(dest)) {
             if (MovementDescend.clutch != null && !MovementDescend.clutch.compare(destState)) {
                 ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(MovementDescend.clutch.getItemStack());
                 targetRotation = new Rotation(toDest.getYaw(), 90.0F);
-                if (ctx.player().position().y - dest.getY() < ctx.playerController().getBlockReachDistance() && !ctx.player().isOnGround() && (ctx.isLookingAt(dest) || ctx.isLookingAt(dest.above()))) {
+                if (ctx.player().position().y - dest.getY() < ctx.playerController().getBlockReachDistance() && !ctx.player().isOnGround() && (ctx.isLookingAt(dest) || ctx.isLookingAt(dest.below()))) {
                     state.setInput(Input.CLICK_RIGHT, true);
                 }
             }
         } else {
             if (MovementDescend.clutch != null && MovementDescend.clutch.isPickupable()) {
-                if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(MovementHelper.STACK_EMPTY_BUCKET))) {
-                    ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(MovementHelper.STACK_EMPTY_BUCKET);
+                if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_EMPTY_BUCKET))) {
+                    ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(STACK_EMPTY_BUCKET);
                     return state.setInput(Input.CLICK_RIGHT, true);
                 } else {
                     MovementDescend.clutch = null;

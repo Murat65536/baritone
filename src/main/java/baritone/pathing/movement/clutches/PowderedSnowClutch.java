@@ -22,6 +22,7 @@ import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.IPlayerContext;
 import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.Clutch;
+import baritone.pathing.movement.MovementHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -40,8 +41,10 @@ public final class PowderedSnowClutch extends Clutch {
     public boolean compare(BlockState state) {
         return state.is(Blocks.POWDER_SNOW);
     }
-    public boolean clutchable(IPlayerContext ctx, int x, int y, int z) {
-        Block below = ctx.world().getBlockState(new BetterBlockPos(x, y - 1, z)).getBlock();
-        return Baritone.settings().allowPowderedSnowFall.value && Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(getItemStack())) && !(below instanceof AirBlock || below instanceof LiquidBlock);
+    public boolean clutchable(CalculationContext context, int x, int y, int z) {
+        BlockState below = context.get(x, y, z);
+        return Baritone.settings().allowPowderedSnowFall.value &&
+                Inventory.isHotbarSlot(context.getBaritone().getPlayerContext().player().getInventory().findSlotMatchingItem(getItemStack())) &&
+                MovementHelper.canPlaceAgainst(context.bsi, x, y, z, below);
     }
 }

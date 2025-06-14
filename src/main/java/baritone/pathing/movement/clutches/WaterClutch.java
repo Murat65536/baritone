@@ -22,6 +22,7 @@ import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.IPlayerContext;
 import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.Clutch;
+import baritone.pathing.movement.MovementHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -42,8 +43,12 @@ public final class WaterClutch extends Clutch {
     public boolean compare(BlockState state) {
         return state.getFluidState().getType() instanceof WaterFluid;
     }
-    public boolean clutchable(IPlayerContext ctx, int x, int y, int z) {
-        Block below = ctx.world().getBlockState(new BetterBlockPos(x, y - 1, z)).getBlock();
-        return Baritone.settings().allowWaterBucketFall.value && Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(getItemStack())) && !(below instanceof SimpleWaterloggedBlock || below instanceof AirBlock || below instanceof LiquidBlock) && ctx.world().dimension() != Level.NETHER;
+    public boolean clutchable(CalculationContext context, int x, int y, int z) {
+        BlockState below = context.get(x, y, z);
+        return Baritone.settings().allowWaterBucketFall.value &&
+                Inventory.isHotbarSlot(context.getBaritone().getPlayerContext().player().getInventory().findSlotMatchingItem(getItemStack())) &&
+                !(below.getBlock() instanceof SimpleWaterloggedBlock) &&
+                MovementHelper.canPlaceAgainst(context.bsi, x, y, z, below) &&
+                context.world.dimension() != Level.NETHER;
     }
 }

@@ -66,12 +66,6 @@ import static baritone.pathing.precompute.Ternary.*;
  * @author leijurv
  */
 public interface MovementHelper extends ActionCosts, Helper {
-    Clutch[] clutches = new Clutch[]{
-            PowderedSnowClutch.INSTANCE,
-            WaterClutch.INSTANCE,
-    };
-    ItemStack STACK_EMPTY_BUCKET = new ItemStack(Items.BUCKET);
-
     static boolean avoidBreaking(BlockStateInterface bsi, int x, int y, int z, BlockState state) {
         if (!bsi.worldBorder.canPlaceAt(x, z)) {
             return true;

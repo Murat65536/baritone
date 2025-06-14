@@ -214,10 +214,10 @@ public class MovementDescend extends Movement {
             }
             if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightClutch + 1) {
                 Clutch newClutch = null;
-                if (WaterClutch.INSTANCE.clutchable(context, destX, newY + 1, destZ)) {
+                if (WaterClutch.INSTANCE.clutchable(context, destX, newY, destZ)) {
                     newClutch = WaterClutch.INSTANCE;
                 }
-                else if (PowderedSnowClutch.INSTANCE.clutchable(context, destX, newY + 1, destZ)) {
+                else if (PowderedSnowClutch.INSTANCE.clutchable(context, destX, newY, destZ)) {
                     newClutch = PowderedSnowClutch.INSTANCE;
                 }
                 if (newClutch != null) {
@@ -228,6 +228,7 @@ public class MovementDescend extends Movement {
                 }
                 clutch = newClutch;
             }
+            return;
         }
     }
 
