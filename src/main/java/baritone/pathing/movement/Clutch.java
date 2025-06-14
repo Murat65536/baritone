@@ -17,25 +17,32 @@
 
 package baritone.pathing.movement;
 
-import baritone.api.utils.IPlayerContext;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class Clutch {
-    private final ItemStack stack;
+    private final ItemStack[] stack;
     private final boolean pickupable;
 
-    protected Clutch(ItemStack stack, boolean pickupable) {
-        this.stack = stack;
+    protected Clutch(boolean pickupable, ItemStack... stack) {
         this.pickupable = pickupable;
+        this.stack = stack;
     }
-    public ItemStack getItemStack() {
+    public ItemStack[] getItemStack() {
         return stack;
     }
     public boolean isPickupable() {
         return pickupable;
     }
+    public ItemStack getClutchingItem(CalculationContext context) {
+        for (ItemStack item : stack) {
+            if (Inventory.isHotbarSlot(context.getBaritone().getPlayerContext().player().getInventory().findSlotMatchingItem(item))) {
+                return item;
+            }
+        }
+        return null;
+    }
     public abstract boolean compare(BlockState state);
-    public abstract boolean clutchable(CalculationContext context, int x, int y, int z);
+    public abstract ItemStack getAvailableItem(CalculationContext context, int x, int y, int z);
 }

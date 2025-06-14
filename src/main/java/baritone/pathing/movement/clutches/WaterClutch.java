@@ -18,18 +18,12 @@
 package baritone.pathing.movement.clutches;
 
 import baritone.Baritone;
-import baritone.api.utils.BetterBlockPos;
-import baritone.api.utils.IPlayerContext;
 import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.Clutch;
 import baritone.pathing.movement.MovementHelper;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.AirBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.WaterFluid;
@@ -38,17 +32,19 @@ public final class WaterClutch extends Clutch {
     public static final Clutch INSTANCE = new WaterClutch();
 
     private WaterClutch() {
-        super(new ItemStack(Items.WATER_BUCKET), true);
+        super(true, new ItemStack(Items.WATER_BUCKET));
     }
     public boolean compare(BlockState state) {
         return state.getFluidState().getType() instanceof WaterFluid;
     }
-    public boolean clutchable(CalculationContext context, int x, int y, int z) {
+    public ItemStack getAvailableItem(CalculationContext context, int x, int y, int z) {
         BlockState block = context.get(x, y, z);
-        return Baritone.settings().allowWaterBucketFall.value &&
-                Inventory.isHotbarSlot(context.getBaritone().getPlayerContext().player().getInventory().findSlotMatchingItem(getItemStack())) &&
+        if (Baritone.settings().allowWaterBucketFall.value &&
                 !(block.getBlock() instanceof SimpleWaterloggedBlock) &&
                 MovementHelper.canPlaceAgainst(context.bsi, x, y, z, block) &&
-                context.world.dimension() != Level.NETHER;
+                context.world.dimension() != Level.NETHER) {
+            return getClutchingItem(context);
+        }
+        return null;
     }
 }

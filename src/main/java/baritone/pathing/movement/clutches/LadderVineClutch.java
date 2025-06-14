@@ -21,28 +21,29 @@ import baritone.Baritone;
 import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.Clutch;
 import baritone.pathing.movement.MovementHelper;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-public final class LadderClutch extends Clutch {
-    public static final Clutch INSTANCE = new LadderClutch();
+public final class LadderVineClutch extends Clutch {
+    public static final Clutch INSTANCE = new LadderVineClutch();
 
-    private LadderClutch() {
-        super(new ItemStack(Items.LADDER), false);
+    private LadderVineClutch() {
+        super(false, new ItemStack(Items.LADDER), new ItemStack(Items.VINE));
     }
     public boolean compare(BlockState state) {
-        return state.is(Blocks.LADDER);
+        return state.is(Blocks.LADDER) || state.is(Blocks.VINE);
     }
-    public boolean clutchable(CalculationContext context, int x, int y, int z) {
-        return Baritone.settings().allowLadderFall.value &&
-                Inventory.isHotbarSlot(context.getBaritone().getPlayerContext().player().getInventory().findSlotMatchingItem(getItemStack())) &&
+    public ItemStack getAvailableItem(CalculationContext context, int x, int y, int z) {
+        if (Baritone.settings().allowLadderFall.value &&
                 MovementHelper.canPlaceAgainst(context.bsi, x, y, z) &&
                 (MovementHelper.canPlaceAgainst(context.bsi, x - 1, y + 1, z) ||
                         MovementHelper.canPlaceAgainst(context.bsi, x + 1, y + 1, z) ||
                         MovementHelper.canPlaceAgainst(context.bsi, x, y + 1, z - 1) ||
-                        MovementHelper.canPlaceAgainst(context.bsi, x, y + 1, z + 1));
+                        MovementHelper.canPlaceAgainst(context.bsi, x, y + 1, z + 1))) {
+            return getClutchingItem(context);
+        }
+        return null;
     }
 }

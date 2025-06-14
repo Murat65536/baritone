@@ -18,32 +18,28 @@
 package baritone.pathing.movement.clutches;
 
 import baritone.Baritone;
-import baritone.api.utils.BetterBlockPos;
-import baritone.api.utils.IPlayerContext;
 import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.Clutch;
 import baritone.pathing.movement.MovementHelper;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.AirBlock;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 public final class PowderedSnowClutch extends Clutch {
     public static final Clutch INSTANCE = new PowderedSnowClutch();
 
     private PowderedSnowClutch() {
-        super(new ItemStack(Items.POWDER_SNOW_BUCKET), true);
+        super(true, new ItemStack(Items.POWDER_SNOW_BUCKET));
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.POWDER_SNOW);
     }
-    public boolean clutchable(CalculationContext context, int x, int y, int z) {
-        return Baritone.settings().allowPowderedSnowFall.value &&
-                Inventory.isHotbarSlot(context.getBaritone().getPlayerContext().player().getInventory().findSlotMatchingItem(getItemStack())) &&
-                MovementHelper.canPlaceAgainst(context.bsi, x, y, z);
+    public ItemStack getAvailableItem(CalculationContext context, int x, int y, int z) {
+        if (Baritone.settings().allowPowderedSnowFall.value &&
+                MovementHelper.canPlaceAgainst(context.bsi, x, y, z)) {
+            return getClutchingItem(context);
+        }
+        return null;
     }
 }

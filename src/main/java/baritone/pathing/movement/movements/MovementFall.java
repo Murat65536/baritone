@@ -82,7 +82,7 @@ public class MovementFall extends Movement {
         BlockState destState = ctx.world().getBlockState(dest);
         if (!playerFeet.equals(dest)) {
             if (MovementDescend.clutch != null && !MovementDescend.clutch.compare(destState)) {
-                ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(MovementDescend.clutch.getItemStack());
+                ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(MovementDescend.clutchItem);
                 if (ctx.player().position().y - dest.getY() < ctx.playerController().getBlockReachDistance() && !ctx.player().isOnGround() && (ctx.isLookingAt(dest) || ctx.isLookingAt(dest.below()))) {
                     targetRotation = new Rotation(toDest.getYaw(), 90.0F);
                     state.setInput(Input.CLICK_RIGHT, true);

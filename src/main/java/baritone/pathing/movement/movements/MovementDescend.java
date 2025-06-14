@@ -23,13 +23,14 @@ import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.RotationUtils;
 import baritone.api.utils.input.Input;
 import baritone.pathing.movement.*;
-import baritone.pathing.movement.clutches.LadderClutch;
+import baritone.pathing.movement.clutches.LadderVineClutch;
 import baritone.pathing.movement.clutches.PowderedSnowClutch;
 import baritone.pathing.movement.clutches.WaterClutch;
 import baritone.utils.BlockStateInterface;
 import baritone.utils.pathing.MutableMoveResult;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FallingBlock;
@@ -43,13 +44,14 @@ public class MovementDescend extends Movement {
     private static final Clutch[] clutches = new Clutch[]{
             WaterClutch.INSTANCE,
             PowderedSnowClutch.INSTANCE,
-            LadderClutch.INSTANCE,
+            LadderVineClutch.INSTANCE,
     };
 
     private int numTicks = 0;
     public boolean forceSafeMode = false;
     @Nullable
     public static Clutch clutch = null;
+    public static ItemStack clutchItem = null;
 
     public MovementDescend(IBaritone baritone, BetterBlockPos start, BetterBlockPos end) {
         super(baritone, start, end, new BetterBlockPos[]{end.above(2), end.above(), end}, end.below());
@@ -220,9 +222,12 @@ public class MovementDescend extends Movement {
             }
             if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightClutch + 1) {
                 Clutch newClutch = null;
+                ItemStack newItem = null;
                 for (Clutch currentClutch : clutches) {
-                    if (currentClutch.clutchable(context, destX, newY, destZ)) {
+                    newItem = currentClutch.getAvailableItem(context, destX, newY, destZ);
+                    if (newItem != null) {
                         newClutch = currentClutch;
+                        break;
                     }
                 }
                 if (newClutch != null) {
@@ -232,6 +237,7 @@ public class MovementDescend extends Movement {
                     res.cost = tentativeCost + context.placeBlockCost;
                 }
                 clutch = newClutch;
+                clutchItem = newItem;
             }
             return;
         }
