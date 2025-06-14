@@ -44,11 +44,11 @@ public final class WaterClutch extends Clutch {
         return state.getFluidState().getType() instanceof WaterFluid;
     }
     public boolean clutchable(CalculationContext context, int x, int y, int z) {
-        BlockState below = context.get(x, y, z);
+        BlockState block = context.get(x, y, z);
         return Baritone.settings().allowWaterBucketFall.value &&
                 Inventory.isHotbarSlot(context.getBaritone().getPlayerContext().player().getInventory().findSlotMatchingItem(getItemStack())) &&
-                !(below.getBlock() instanceof SimpleWaterloggedBlock) &&
-                MovementHelper.canPlaceAgainst(context.bsi, x, y, z, below) &&
+                !(block.getBlock() instanceof SimpleWaterloggedBlock) &&
+                MovementHelper.canPlaceAgainst(context.bsi, x, y, z, block) &&
                 context.world.dimension() != Level.NETHER;
     }
 }

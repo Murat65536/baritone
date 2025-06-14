@@ -23,6 +23,7 @@ import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.RotationUtils;
 import baritone.api.utils.input.Input;
 import baritone.pathing.movement.*;
+import baritone.pathing.movement.clutches.LadderClutch;
 import baritone.pathing.movement.clutches.PowderedSnowClutch;
 import baritone.pathing.movement.clutches.WaterClutch;
 import baritone.utils.BlockStateInterface;
@@ -39,6 +40,11 @@ import javax.annotation.Nullable;
 import java.util.Set;
 
 public class MovementDescend extends Movement {
+    private static final Clutch[] clutches = new Clutch[]{
+            WaterClutch.INSTANCE,
+            PowderedSnowClutch.INSTANCE,
+            LadderClutch.INSTANCE,
+    };
 
     private int numTicks = 0;
     public boolean forceSafeMode = false;
@@ -214,11 +220,10 @@ public class MovementDescend extends Movement {
             }
             if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightClutch + 1) {
                 Clutch newClutch = null;
-                if (WaterClutch.INSTANCE.clutchable(context, destX, newY, destZ)) {
-                    newClutch = WaterClutch.INSTANCE;
-                }
-                else if (PowderedSnowClutch.INSTANCE.clutchable(context, destX, newY, destZ)) {
-                    newClutch = PowderedSnowClutch.INSTANCE;
+                for (Clutch currentClutch : clutches) {
+                    if (currentClutch.clutchable(context, destX, newY, destZ)) {
+                        newClutch = currentClutch;
+                    }
                 }
                 if (newClutch != null) {
                     res.x = destX;
