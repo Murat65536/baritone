@@ -27,6 +27,7 @@ import baritone.pathing.movement.clutches.LadderVineClutch;
 import baritone.pathing.movement.clutches.PowderedSnowClutch;
 import baritone.pathing.movement.clutches.WaterClutch;
 import baritone.utils.BlockStateInterface;
+import baritone.utils.pathing.MutableClutchResult;
 import baritone.utils.pathing.MutableMoveResult;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.core.BlockPos;
@@ -49,9 +50,6 @@ public class MovementDescend extends Movement {
 
     private int numTicks = 0;
     public boolean forceSafeMode = false;
-    @Nullable
-    public static Clutch clutch = null;
-    public static ItemStack clutchItem = null;
 
     public MovementDescend(IBaritone baritone, BetterBlockPos start, BetterBlockPos end) {
         super(baritone, start, end, new BetterBlockPos[]{end.above(2), end.above(), end}, end.below());
@@ -119,7 +117,7 @@ public class MovementDescend extends Movement {
 
         BlockState below = context.get(destX, y - 2, destZ);
         if (!MovementHelper.canWalkOn(context, destX, y - 2, destZ, below)) {
-            dynamicFallCost(context, x, y, z, destX, destZ, totalCost, below, res);
+            dynamicFallCost(context, x, y, z, destX, destZ, totalCost, below, res, null);
             return;
         }
 
@@ -143,7 +141,7 @@ public class MovementDescend extends Movement {
         res.cost = totalCost;
     }
 
-    public static void dynamicFallCost(CalculationContext context, int x, int y, int z, int destX, int destZ, double frontBreak, BlockState below, MutableMoveResult res) {
+    public static void dynamicFallCost(CalculationContext context, int x, int y, int z, int destX, int destZ, double frontBreak, BlockState below, MutableMoveResult res, @Nullable MutableClutchResult clutchRes) {
         if (frontBreak != 0 && context.get(destX, y + 2, destZ).getBlock() instanceof FallingBlock) {
             // if frontBreak is 0 we can actually get through this without updating the falling block and making it actually fall
             // but if frontBreak is nonzero, we're breaking blocks in front, so don't let anything fall through this column,
@@ -221,23 +219,25 @@ public class MovementDescend extends Movement {
                 return;
             }
             if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightClutch + 1) {
-                Clutch newClutch = null;
-                ItemStack newItem = null;
-                for (Clutch currentClutch : clutches) {
-                    newItem = currentClutch.getAvailableItem(context, destX, newY, destZ);
-                    if (newItem != null) {
-                        newClutch = currentClutch;
+                Clutch clutch = null;
+                ItemStack stack = null;
+                for (Clutch c : clutches) {
+                    stack = c.getAvailableItem(context, destX, newY, destZ);
+                    if (stack != null) {
+                        clutch = c;
                         break;
                     }
                 }
-                if (newClutch != null) {
+                if (clutch != null) {
                     res.x = destX;
                     res.y = newY + 1;// this is the block we're falling onto, so dest is +1
                     res.z = destZ;
                     res.cost = tentativeCost + context.placeBlockCost;
                 }
-                clutch = newClutch;
-                clutchItem = newItem;
+                if (clutchRes != null) {
+                    clutchRes.clutch = clutch;
+                    clutchRes.stack = stack;
+                }
             }
             return;
         }

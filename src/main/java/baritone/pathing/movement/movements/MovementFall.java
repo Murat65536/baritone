@@ -26,6 +26,10 @@ import baritone.api.utils.VecUtils;
 import baritone.api.utils.input.Input;
 import baritone.pathing.movement.*;
 import baritone.pathing.movement.MovementState.MovementTarget;
+import baritone.pathing.movement.clutches.LadderVineClutch;
+import baritone.pathing.movement.clutches.PowderedSnowClutch;
+import baritone.pathing.movement.clutches.WaterClutch;
+import baritone.utils.pathing.MutableClutchResult;
 import baritone.utils.pathing.MutableMoveResult;
 
 import java.util.HashSet;
@@ -43,7 +47,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 public class MovementFall extends Movement {
-    ItemStack STACK_EMPTY_BUCKET = new ItemStack(Items.BUCKET);
+    private final MutableClutchResult clutch = new MutableClutchResult();
+    private static final ItemStack STACK_EMPTY_BUCKET = new ItemStack(Items.BUCKET);
 
     public MovementFall(IBaritone baritone, BetterBlockPos src, BetterBlockPos dest) {
         super(baritone, src, dest, MovementFall.buildPositionsToBreak(src, dest));
@@ -69,6 +74,12 @@ public class MovementFall extends Movement {
         return set;
     }
 
+    public void updateClutch() {
+        CalculationContext context = new CalculationContext(baritone);
+        MutableMoveResult result = new MutableMoveResult();
+        MovementDescend.dynamicFallCost(context, src.x, src.y, src.z, dest.x, dest.z, 0, context.get(dest.x, src.y - 2, dest.z), result, clutch);
+    }
+
     @Override
     public MovementState updateState(MovementState state) {
         super.updateState(state);
@@ -80,25 +91,28 @@ public class MovementFall extends Movement {
         Rotation toDest = RotationUtils.calcRotationFromVec3d(ctx.playerHead(), VecUtils.getBlockPosCenter(dest), ctx.playerRotations());
         Rotation targetRotation = null;
         BlockState destState = ctx.world().getBlockState(dest);
+        if (clutch.clutch == null && clutch.stack == null) {
+            updateClutch();
+        }
         if (!playerFeet.equals(dest)) {
-            if (MovementDescend.clutch != null && !MovementDescend.clutch.compare(destState)) {
-                ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(MovementDescend.clutchItem);
+            if (clutch.clutch != null && !clutch.clutch.compare(destState)) {
+                ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(clutch.stack);
                 if (ctx.player().position().y - dest.getY() < ctx.playerController().getBlockReachDistance() && !ctx.player().isOnGround() && (ctx.isLookingAt(dest) || ctx.isLookingAt(dest.below()))) {
                     targetRotation = new Rotation(toDest.getYaw(), 90.0F);
                     state.setInput(Input.CLICK_RIGHT, true);
                 }
             }
         } else {
-            if (MovementDescend.clutch != null && MovementDescend.clutch.isPickupable()) {
+            if (clutch.clutch != null && clutch.clutch.isPickupable()) {
                 if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_EMPTY_BUCKET))) {
                     ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(STACK_EMPTY_BUCKET);
                     return state.setInput(Input.CLICK_RIGHT, true);
                 } else {
-                    MovementDescend.clutch = null;
+                    clutch.reset();
                     return state.setStatus(MovementStatus.SUCCESS);
                 }
             } else {
-                MovementDescend.clutch = null;
+                clutch.reset();
                 return state.setStatus(MovementStatus.SUCCESS);
             }
         }
