@@ -26,9 +26,6 @@ import baritone.api.utils.VecUtils;
 import baritone.api.utils.input.Input;
 import baritone.pathing.movement.*;
 import baritone.pathing.movement.MovementState.MovementTarget;
-import baritone.pathing.movement.clutches.LadderVineClutch;
-import baritone.pathing.movement.clutches.PowderedSnowClutch;
-import baritone.pathing.movement.clutches.WaterClutch;
 import baritone.utils.pathing.MutableClutchResult;
 import baritone.utils.pathing.MutableMoveResult;
 

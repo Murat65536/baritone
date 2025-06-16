@@ -23,8 +23,9 @@ import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.RotationUtils;
 import baritone.api.utils.input.Input;
 import baritone.pathing.movement.*;
-import baritone.pathing.movement.clutches.LadderVineClutch;
+import baritone.pathing.movement.clutches.ClimbableClutch;
 import baritone.pathing.movement.clutches.PowderedSnowClutch;
+import baritone.pathing.movement.clutches.TwistingVineClutch;
 import baritone.pathing.movement.clutches.WaterClutch;
 import baritone.utils.BlockStateInterface;
 import baritone.utils.pathing.MutableClutchResult;
@@ -45,7 +46,8 @@ public class MovementDescend extends Movement {
     private static final Clutch[] clutches = new Clutch[]{
             WaterClutch.INSTANCE,
             PowderedSnowClutch.INSTANCE,
-            LadderVineClutch.INSTANCE,
+            ClimbableClutch.INSTANCE,
+            TwistingVineClutch.INSTANCE,
     };
 
     private int numTicks = 0;

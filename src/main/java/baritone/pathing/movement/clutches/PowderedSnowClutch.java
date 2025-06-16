@@ -36,8 +36,7 @@ public final class PowderedSnowClutch extends Clutch {
         return state.is(Blocks.POWDER_SNOW);
     }
     public ItemStack getAvailableItem(CalculationContext context, int x, int y, int z) {
-        if (Baritone.settings().allowPowderedSnowFall.value &&
-                MovementHelper.canPlaceAgainst(context.bsi, x, y, z)) {
+        if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z)) {
             return getClutchingItem(context);
         }
         return null;

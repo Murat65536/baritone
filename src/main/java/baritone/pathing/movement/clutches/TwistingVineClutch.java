@@ -17,7 +17,6 @@
 
 package baritone.pathing.movement.clutches;
 
-import baritone.Baritone;
 import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.Clutch;
 import baritone.pathing.movement.MovementHelper;
@@ -26,22 +25,17 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-public final class LadderVineClutch extends Clutch {
-    public static final Clutch INSTANCE = new LadderVineClutch();
+public final class TwistingVineClutch extends Clutch {
+    public static final TwistingVineClutch INSTANCE = new TwistingVineClutch();
 
-    private LadderVineClutch() {
-        super(false, new ItemStack(Items.LADDER), new ItemStack(Items.VINE));
+    private TwistingVineClutch() {
+        super(false, new ItemStack(Items.TWISTING_VINES));
     }
     public boolean compare(BlockState state) {
-        return state.is(Blocks.LADDER) || state.is(Blocks.VINE);
+        return state.is(Blocks.TWISTING_VINES);
     }
     public ItemStack getAvailableItem(CalculationContext context, int x, int y, int z) {
-        if (Baritone.settings().allowLadderFall.value &&
-                MovementHelper.canPlaceAgainst(context.bsi, x, y, z) &&
-                (MovementHelper.canPlaceAgainst(context.bsi, x - 1, y + 1, z) ||
-                        MovementHelper.canPlaceAgainst(context.bsi, x + 1, y + 1, z) ||
-                        MovementHelper.canPlaceAgainst(context.bsi, x, y + 1, z - 1) ||
-                        MovementHelper.canPlaceAgainst(context.bsi, x, y + 1, z + 1))) {
+        if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z)) {
             return getClutchingItem(context);
         }
         return null;

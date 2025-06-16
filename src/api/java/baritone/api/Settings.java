@@ -148,27 +148,6 @@ public final class Settings {
     public final Setting<Boolean> strictLiquidCheck = new Setting<>(false);
 
     /**
-     * Allow Baritone to fall arbitrary distances and place a water bucket beneath it.
-     * Reliability: questionable.
-     */
-    public final Setting<Boolean> allowWaterBucketFall = new Setting<>(true);
-
-    /**
-     * Allow Baritone to fall arbitrary distances and place a ladder beneath it.
-     */
-    public final Setting<Boolean> allowLadderFall = new Setting<>(true);
-
-    /**
-     * Allow Baritone to fall arbitrary distances and place a vine beneath it.
-     */
-    public final Setting<Boolean> allowVineFall = new Setting<>(true);
-
-    /**
-     * Allow Baritone to fall arbitrary distances and place powdered snow beneath it.
-     */
-    public final Setting<Boolean> allowPowderedSnowFall = new Setting<>(true);
-
-    /**
      * Allow Baritone to assume it can walk on still water just like any other block.
      * This functionality is assumed to be provided by a separate library that might have imported Baritone.
      * <p>

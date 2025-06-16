@@ -17,31 +17,29 @@
 
 package baritone.pathing.movement.clutches;
 
-import baritone.Baritone;
 import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.Clutch;
 import baritone.pathing.movement.MovementHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.WaterFluid;
 
-public final class WaterClutch extends Clutch {
-    public static final Clutch INSTANCE = new WaterClutch();
+public final class ClimbableClutch extends Clutch {
+    public static final Clutch INSTANCE = new ClimbableClutch();
 
-    private WaterClutch() {
-        super(true, new ItemStack(Items.WATER_BUCKET));
+    private ClimbableClutch() {
+        super(false, new ItemStack(Items.LADDER), new ItemStack(Items.VINE));
     }
     public boolean compare(BlockState state) {
-        return state.getFluidState().getType() instanceof WaterFluid;
+        return state.is(Blocks.LADDER) || state.is(Blocks.VINE);
     }
     public ItemStack getAvailableItem(CalculationContext context, int x, int y, int z) {
-        BlockState block = context.get(x, y, z);
-        if (!(block.getBlock() instanceof SimpleWaterloggedBlock) &&
-                MovementHelper.canPlaceAgainst(context.bsi, x, y, z, block) &&
-                context.world.dimension() != Level.NETHER) {
+        if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z) &&
+                (MovementHelper.canPlaceAgainst(context.bsi, x - 1, y + 1, z) ||
+                        MovementHelper.canPlaceAgainst(context.bsi, x + 1, y + 1, z) ||
+                        MovementHelper.canPlaceAgainst(context.bsi, x, y + 1, z - 1) ||
+                        MovementHelper.canPlaceAgainst(context.bsi, x, y + 1, z + 1))) {
             return getClutchingItem(context);
         }
         return null;
