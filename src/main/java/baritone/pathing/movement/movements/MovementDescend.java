@@ -233,10 +233,10 @@ public class MovementDescend extends Movement {
                     res.y = newY + 1;// this is the block we're falling onto, so dest is +1
                     res.z = destZ;
                     res.cost = tentativeCost + context.placeBlockCost;
-                }
-                if (clutchRes != null) {
-                    clutchRes.clutch = clutch;
-                    clutchRes.stack = stack;
+                    if (clutchRes != null) {
+                        clutchRes.clutch = clutch;
+                        clutchRes.stack = stack;
+                    }
                 }
             }
             return;

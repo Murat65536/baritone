@@ -91,9 +91,7 @@ public class MovementFall extends Movement {
         Rotation toDest = RotationUtils.calcRotationFromVec3d(ctx.playerHead(), VecUtils.getBlockPosCenter(dest), ctx.playerRotations());
         Rotation targetRotation = null;
         BlockState destState = ctx.world().getBlockState(dest);
-        if (clutch.clutch == null && clutch.stack == null) {
-            updateClutch();
-        }
+        updateClutch();
         if (!playerFeet.equals(dest)) {
             if (clutch.clutch != null && !clutch.clutch.compare(destState)) {
                 ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(clutch.stack);
