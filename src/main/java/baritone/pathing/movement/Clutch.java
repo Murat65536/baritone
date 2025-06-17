@@ -17,13 +17,14 @@
 
 package baritone.pathing.movement;
 
+import baritone.utils.pathing.MutableClutchResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class Clutch {
-    private final ItemStack[] stack;
     private final boolean pickupable;
+    private final ItemStack[] stack;
 
     protected Clutch(boolean pickupable, ItemStack... stack) {
         this.pickupable = pickupable;
@@ -44,5 +45,5 @@ public abstract class Clutch {
         return null;
     }
     public abstract boolean compare(BlockState state);
-    public abstract ItemStack getAvailableItem(CalculationContext context, int x, int y, int z);
+    public abstract boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result);
 }

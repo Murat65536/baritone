@@ -20,28 +20,35 @@ package baritone.pathing.movement.clutches;
 import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.Clutch;
 import baritone.pathing.movement.MovementHelper;
+import baritone.utils.pathing.MutableClutchResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-public final class ClimbableClutch extends Clutch {
-    public static final Clutch INSTANCE = new ClimbableClutch();
+public final class LadderClutch extends Clutch {
+    public static final Clutch INSTANCE = new LadderClutch();
 
-    private ClimbableClutch() {
+    private LadderClutch() {
         super(false, new ItemStack(Items.LADDER), new ItemStack(Items.VINE));
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.LADDER) || state.is(Blocks.VINE);
     }
-    public ItemStack getAvailableItem(CalculationContext context, int x, int y, int z) {
+    public boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
+        ItemStack item = getClutchingItem(context);
         if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z) &&
                 (MovementHelper.canPlaceAgainst(context.bsi, x - 1, y + 1, z) ||
                         MovementHelper.canPlaceAgainst(context.bsi, x + 1, y + 1, z) ||
                         MovementHelper.canPlaceAgainst(context.bsi, x, y + 1, z - 1) ||
-                        MovementHelper.canPlaceAgainst(context.bsi, x, y + 1, z + 1))) {
-            return getClutchingItem(context);
+                        MovementHelper.canPlaceAgainst(context.bsi, x, y + 1, z + 1)) &&
+            item != null) {
+            if (result != null) {
+                result.clutch = INSTANCE;
+                result.stack = item;
+            }
+            return true;
         }
-        return null;
+        return false;
     }
 }

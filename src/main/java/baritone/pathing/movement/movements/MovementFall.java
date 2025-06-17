@@ -98,10 +98,15 @@ public class MovementFall extends Movement {
                 }
             }
         } else {
-            if (clutch.clutch != null && clutch.clutch.isPickupable()) {
-                if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_EMPTY_BUCKET))) {
-                    ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(STACK_EMPTY_BUCKET);
-                    return state.setInput(Input.CLICK_RIGHT, true);
+            if (clutch.clutch != null) {
+                if (clutch.clutch.isPickupable()) {
+                    if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_EMPTY_BUCKET))) {
+                        ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(STACK_EMPTY_BUCKET);
+                        return state.setInput(Input.CLICK_RIGHT, true);
+                    } else {
+                        clutch.reset();
+                        return state.setStatus(MovementStatus.SUCCESS);
+                    }
                 } else {
                     clutch.reset();
                     return state.setStatus(MovementStatus.SUCCESS);

@@ -17,10 +17,10 @@
 
 package baritone.pathing.movement.clutches;
 
-import baritone.Baritone;
 import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.Clutch;
 import baritone.pathing.movement.MovementHelper;
+import baritone.utils.pathing.MutableClutchResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -37,13 +37,19 @@ public final class WaterClutch extends Clutch {
     public boolean compare(BlockState state) {
         return state.getFluidState().getType() instanceof WaterFluid;
     }
-    public ItemStack getAvailableItem(CalculationContext context, int x, int y, int z) {
+    public boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
+        ItemStack item = getClutchingItem(context);
         BlockState block = context.get(x, y, z);
         if (!(block.getBlock() instanceof SimpleWaterloggedBlock) &&
                 MovementHelper.canPlaceAgainst(context.bsi, x, y, z, block) &&
-                context.world.dimension() != Level.NETHER) {
-            return getClutchingItem(context);
+                context.world.dimension() != Level.NETHER &&
+                item != null) {
+            if (result != null) {
+                result.clutch = INSTANCE;
+                result.stack = item;
+            }
+            return true;
         }
-        return null;
+        return false;
     }
 }

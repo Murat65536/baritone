@@ -23,10 +23,7 @@ import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.RotationUtils;
 import baritone.api.utils.input.Input;
 import baritone.pathing.movement.*;
-import baritone.pathing.movement.clutches.ClimbableClutch;
-import baritone.pathing.movement.clutches.PowderedSnowClutch;
-import baritone.pathing.movement.clutches.TwistingVineClutch;
-import baritone.pathing.movement.clutches.WaterClutch;
+import baritone.pathing.movement.clutches.*;
 import baritone.utils.BlockStateInterface;
 import baritone.utils.pathing.MutableClutchResult;
 import baritone.utils.pathing.MutableMoveResult;
@@ -46,7 +43,8 @@ public class MovementDescend extends Movement {
     private static final Clutch[] clutches = new Clutch[]{
             WaterClutch.INSTANCE,
             PowderedSnowClutch.INSTANCE,
-            ClimbableClutch.INSTANCE,
+            LadderClutch.INSTANCE,
+            VineClutch.INSTANCE,
             TwistingVineClutch.INSTANCE,
     };
 
@@ -155,13 +153,8 @@ public class MovementDescend extends Movement {
         }
         double costSoFar = 0;
         int effectiveStartHeight = y;
-        for (int fallHeight = 3; true; fallHeight++) {
-            int newY = y - fallHeight;
-            if (newY < context.world.getMinBuildHeight()) {
-                // when pathing in the end, where you could plausibly fall into the void
-                // this check prevents it from getting the block at y=(below whatever the minimum height is) and crashing
-                return;
-            }
+        int newY;
+        for (int fallHeight = 3; (newY = y - fallHeight) >= context.world.getMinBuildHeight(); fallHeight++) {
             boolean reachedMinimum = fallHeight >= context.minFallHeight;
             BlockState ontoBlock = context.get(destX, newY, destZ);
             int unprotectedFallHeight = fallHeight - (y - effectiveStartHeight); // equal to fallHeight - y + effectiveFallHeight, which is equal to -newY + effectiveFallHeight, which is equal to effectiveFallHeight - newY
@@ -187,7 +180,7 @@ public class MovementDescend extends Movement {
                 res.cost = tentativeCost;// TODO incorporate water swim up cost?
                 return;
             }
-            if (reachedMinimum && context.allowFallIntoLava && MovementHelper.isLava(ontoBlock)) {
+            else if (reachedMinimum && context.allowFallIntoLava && MovementHelper.isLava(ontoBlock)) {
                 // found a fall into lava
                 res.x = destX;
                 res.y = newY;
@@ -195,7 +188,7 @@ public class MovementDescend extends Movement {
                 res.cost = tentativeCost;
                 return;
             }
-            if (unprotectedFallHeight <= 11 && (ontoBlock.getBlock() == Blocks.VINE || ontoBlock.getBlock() == Blocks.LADDER)) {
+            else if (unprotectedFallHeight <= 11 && (ontoBlock.getBlock() == Blocks.VINE || ontoBlock.getBlock() == Blocks.LADDER)) {
                 // if fall height is greater than or equal to 11, we don't actually grab on to vines or ladders. the more you know
                 // this effectively "resets" our falling speed
                 costSoFar += FALL_N_BLOCKS_COST[unprotectedFallHeight - 1];// we fall until the top of this block (not including this block)
@@ -203,16 +196,16 @@ public class MovementDescend extends Movement {
                 effectiveStartHeight = newY;
                 continue;
             }
-            if (MovementHelper.canWalkThrough(context, destX, newY, destZ, ontoBlock)) {
+            else if (MovementHelper.canWalkThrough(context, destX, newY, destZ, ontoBlock)) {
                 continue;
             }
-            if (!MovementHelper.canWalkOn(context, destX, newY, destZ, ontoBlock)) {
+            else if (!MovementHelper.canWalkOn(context, destX, newY, destZ, ontoBlock)) {
                 return;
             }
-            if (MovementHelper.isBottomSlab(ontoBlock)) {
+            else if (MovementHelper.isBottomSlab(ontoBlock)) {
                 return; // falling onto a half slab is really glitchy, and can cause more fall damage than we'd expect
             }
-            if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightNoClutch + 1) {
+            else if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightNoClutch + 1) {
                 // fallHeight = 4 means onto.up() is 3 blocks down, which is the max
                 res.x = destX;
                 res.y = newY + 1;
@@ -220,26 +213,21 @@ public class MovementDescend extends Movement {
                 res.cost = tentativeCost;
                 return;
             }
-            if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightClutch + 1) {
-                Clutch clutch = null;
-                ItemStack stack = null;
+            else if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightClutch + 1) {
+                boolean canClutch = false;
                 for (Clutch c : clutches) {
-                    stack = c.getAvailableItem(context, destX, newY, destZ);
-                    if (stack != null) {
-                        clutch = c;
+                    if (c.clutchable(context, destX, newY, destZ, clutchRes)) {
+                        canClutch = true;
                         break;
                     }
                 }
-                if (clutch != null) {
+                if (canClutch) {
                     res.x = destX;
                     res.y = newY + 1;// this is the block we're falling onto, so dest is +1
                     res.z = destZ;
                     res.cost = tentativeCost + context.placeBlockCost;
-                    if (clutchRes != null) {
-                        clutchRes.clutch = clutch;
-                        clutchRes.stack = stack;
-                    }
                 }
+                return;
             }
             return;
         }
