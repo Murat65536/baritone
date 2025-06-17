@@ -161,24 +161,24 @@ public class MovementDescend extends Movement {
             double tentativeCost = WALK_OFF_BLOCK_COST + FALL_N_BLOCKS_COST[unprotectedFallHeight] + frontBreak + costSoFar;
             if (reachedMinimum && MovementHelper.isWater(ontoBlock)) {
                 if (!MovementHelper.canWalkThrough(context, destX, newY, destZ, ontoBlock)) {
-                    return;
+                    break;
                 }
-                if (context.assumeWalkOnWater) {
-                    return; // TODO fix
+                else if (context.assumeWalkOnWater) {
+                    break; // TODO fix
                 }
-                if (MovementHelper.isFlowing(destX, newY, destZ, ontoBlock, context.bsi)) {
-                    return; // TODO flowing check required here?
+                else if (MovementHelper.isFlowing(destX, newY, destZ, ontoBlock, context.bsi)) {
+                    break; // TODO flowing check required here?
                 }
-                if (!MovementHelper.canWalkOn(context, destX, newY - 1, destZ)) {
+                else if (!MovementHelper.canWalkOn(context, destX, newY - 1, destZ)) {
                     // we could punch right through the water into something else
-                    return;
+                    break;
                 }
                 // found a fall into water
                 res.x = destX;
                 res.y = newY;
                 res.z = destZ;
                 res.cost = tentativeCost;// TODO incorporate water swim up cost?
-                return;
+                break;
             }
             else if (reachedMinimum && context.allowFallIntoLava && MovementHelper.isLava(ontoBlock)) {
                 // found a fall into lava
@@ -186,7 +186,7 @@ public class MovementDescend extends Movement {
                 res.y = newY;
                 res.z = destZ;
                 res.cost = tentativeCost;
-                return;
+                break;
             }
             else if (unprotectedFallHeight <= 11 && (ontoBlock.getBlock() == Blocks.VINE || ontoBlock.getBlock() == Blocks.LADDER)) {
                 // if fall height is greater than or equal to 11, we don't actually grab on to vines or ladders. the more you know
@@ -200,10 +200,10 @@ public class MovementDescend extends Movement {
                 continue;
             }
             else if (!MovementHelper.canWalkOn(context, destX, newY, destZ, ontoBlock)) {
-                return;
+                break;
             }
             else if (MovementHelper.isBottomSlab(ontoBlock)) {
-                return; // falling onto a half slab is really glitchy, and can cause more fall damage than we'd expect
+                break; // falling onto a half slab is really glitchy, and can cause more fall damage than we'd expect
             }
             else if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightNoClutch + 1) {
                 // fallHeight = 4 means onto.up() is 3 blocks down, which is the max
@@ -211,7 +211,7 @@ public class MovementDescend extends Movement {
                 res.y = newY + 1;
                 res.z = destZ;
                 res.cost = tentativeCost;
-                return;
+                break;
             }
             else if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightClutch + 1) {
                 boolean canClutch = false;
@@ -227,9 +227,11 @@ public class MovementDescend extends Movement {
                     res.z = destZ;
                     res.cost = tentativeCost + context.placeBlockCost;
                 }
-                return;
+                break;
             }
-            return;
+            else {
+                break;
+            }
         }
     }
 
