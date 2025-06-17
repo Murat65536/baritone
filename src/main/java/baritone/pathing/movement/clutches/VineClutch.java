@@ -46,8 +46,7 @@ public final class VineClutch extends Clutch {
         if (direction == Direction.DOWN) {
             return false;
         } else {
-            BlockPos lv = pos.relative(direction);
-            if (VineBlock.isAcceptableNeighbour(level, lv, direction)) {
+            if (VineBlock.isAcceptableNeighbour(level, pos, direction)) {
                 return true;
             } else if (direction.getAxis() == Direction.Axis.Y) {
                 return false;
@@ -55,9 +54,8 @@ public final class VineClutch extends Clutch {
                 // If there's a vine block above it, you can still place more vine blocks below it. IDK why this would be useful for clutching since you can just land on the top vine block.
                 // This timing is going to be so tight XD.
                 // Imma need to align the cursor to the middle of the AABB or something.
-                BooleanProperty lv2 = VineBlock.PROPERTY_BY_DIRECTION.get(direction);
                 BlockState lv3 = level.getBlockState(pos.above());
-                return lv3.is(Blocks.VINE) && lv3.getValue(lv2);
+                return lv3.is(Blocks.VINE) && lv3.getValue(VineBlock.PROPERTY_BY_DIRECTION.get(direction));
             }
         }
     }
