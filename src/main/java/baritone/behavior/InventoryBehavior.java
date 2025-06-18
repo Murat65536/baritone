@@ -167,17 +167,22 @@ public final class InventoryBehavior extends Behavior implements Helper {
         return false;
     }
 
-    public boolean selectThrowawayForLocation(boolean select, int x, int y, int z) {
+    public boolean selectThrowawayForLocation(boolean select, int x, int y, int z, Item customItem) {
         BlockState maybe = baritone.getBuilderProcess().placeAt(x, y, z, baritone.bsi.get0(x, y, z));
-        if (maybe != null && throwaway(select, stack -> stack.getItem() instanceof BlockItem && maybe.equals(((BlockItem) stack.getItem()).getBlock().getStateForPlacement(new BlockPlaceContext(new UseOnContext(ctx.world(), ctx.player(), InteractionHand.MAIN_HAND, stack, new BlockHitResult(new Vec3(ctx.player().position().x, ctx.player().position().y, ctx.player().position().z), Direction.UP, ctx.playerFeet(), false)) {}))))) {
+        if (maybe != null && throwaway(select, stack -> stack.getItem() instanceof BlockItem && maybe.equals(((BlockItem) stack.getItem()).getBlock().getStateForPlacement(new BlockPlaceContext(ctx.player(), InteractionHand.MAIN_HAND, stack, new BlockHitResult(new Vec3(ctx.player().position().x, ctx.player().position().y, ctx.player().position().z), Direction.UP, ctx.playerFeet(), false)))))) {
             return true; // gotem
         }
         if (maybe != null && throwaway(select, stack -> stack.getItem() instanceof BlockItem && ((BlockItem) stack.getItem()).getBlock().equals(maybe.getBlock()))) {
             return true;
         }
-        for (Item item : Baritone.settings().acceptableThrowawayItems.value) {
-            if (throwaway(select, stack -> item.equals(stack.getItem()))) {
-                return true;
+        if (customItem != null) {
+            return throwaway(select, stack -> stack.is(customItem));
+        }
+        else {
+            for (Item item : Baritone.settings().acceptableThrowawayItems.value) {
+                if (throwaway(select, stack -> item.equals(stack.getItem()))) {
+                    return true;
+                }
             }
         }
         return false;

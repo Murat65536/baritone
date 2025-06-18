@@ -31,6 +31,7 @@ import baritone.utils.BlockStateInterface;
 import baritone.utils.ToolSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.piston.MovingPistonBlock;
@@ -738,18 +739,18 @@ public interface MovementHelper extends ActionCosts, Helper {
         return false;
     }
 
-    static PlaceResult attemptToPlaceABlock(MovementState state, IBaritone baritone, BlockPos placeAt, boolean preferDown, boolean wouldSneak) {
+    static PlaceResult attemptToPlaceABlock(MovementState state, IBaritone baritone, BlockPos placeAt, boolean allowDown, boolean preferDown, boolean wouldSneak, Item customItem) {
         IPlayerContext ctx = baritone.getPlayerContext();
-        Optional<Rotation> direct = RotationUtils.reachable(ctx, placeAt, wouldSneak); // we assume that if there is a block there, it must be replacable
+        Optional<Rotation> direct = RotationUtils.reachable(ctx, placeAt, wouldSneak); // we assume that if there is a block there, it must be replaceable
         boolean found = false;
         if (direct.isPresent()) {
             state.setTarget(new MovementTarget(direct.get(), true));
             found = true;
         }
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < (allowDown ? 5 : 4); i++) {
             BlockPos against1 = placeAt.relative(HORIZONTALS_BUT_ALSO_DOWN_____SO_EVERY_DIRECTION_EXCEPT_UP[i]);
             if (MovementHelper.canPlaceAgainst(ctx, against1)) {
-                if (!((Baritone) baritone).getInventoryBehavior().selectThrowawayForLocation(false, placeAt.getX(), placeAt.getY(), placeAt.getZ())) { // get ready to place a throwaway block
+                if (!((Baritone) baritone).getInventoryBehavior().selectThrowawayForLocation(false, placeAt.getX(), placeAt.getY(), placeAt.getZ(), customItem)) { // get ready to place a throwaway block
                     Helper.HELPER.logDebug("bb pls get me some blocks. dirt, netherrack, cobble");
                     state.setStatus(MovementStatus.UNREACHABLE);
                     return PlaceResult.NO_OPTION;
@@ -764,7 +765,7 @@ public interface MovementHelper extends ActionCosts, Helper {
                     state.setTarget(new MovementTarget(place, true));
                     found = true;
 
-                    if (!preferDown) {
+                    if (!allowDown || !preferDown) { // Wait... why don't we just have Direction.DOWN be the first thing so it skips the extra cycles for everything else when prefer down is true? Whatever, I'll leave it for someone else to consider I guess. IDK about side effects and stuff but shouldn't affect anything.
                         // if preferDown is true, we want the last option
                         // if preferDown is false, we want the first
                         break;
@@ -775,12 +776,12 @@ public interface MovementHelper extends ActionCosts, Helper {
         if (ctx.getSelectedBlock().isPresent()) {
             BlockPos selectedBlock = ctx.getSelectedBlock().get();
             Direction side = ((BlockHitResult) ctx.objectMouseOver()).getDirection();
-            // only way for selectedBlock.equals(placeAt) to be true is if it's replacable
+            // only way for selectedBlock.equals(placeAt) to be true is if it's replaceable
             if (selectedBlock.equals(placeAt) || (MovementHelper.canPlaceAgainst(ctx, selectedBlock) && selectedBlock.relative(side).equals(placeAt))) {
                 if (wouldSneak) {
                     state.setInput(Input.SNEAK, true);
                 }
-                ((Baritone) baritone).getInventoryBehavior().selectThrowawayForLocation(true, placeAt.getX(), placeAt.getY(), placeAt.getZ());
+                ((Baritone) baritone).getInventoryBehavior().selectThrowawayForLocation(true, placeAt.getX(), placeAt.getY(), placeAt.getZ(), customItem);
                 return PlaceResult.READY_TO_PLACE;
             }
         }
@@ -788,7 +789,7 @@ public interface MovementHelper extends ActionCosts, Helper {
             if (wouldSneak) {
                 state.setInput(Input.SNEAK, true);
             }
-            ((Baritone) baritone).getInventoryBehavior().selectThrowawayForLocation(true, placeAt.getX(), placeAt.getY(), placeAt.getZ());
+            ((Baritone) baritone).getInventoryBehavior().selectThrowawayForLocation(true, placeAt.getX(), placeAt.getY(), placeAt.getZ(), customItem);
             return PlaceResult.ATTEMPTING;
         }
         return PlaceResult.NO_OPTION;

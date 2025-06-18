@@ -44,7 +44,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 public class MovementFall extends Movement {
-    private final MutableClutchResult clutch = new MutableClutchResult();
+    private final MutableClutchResult clutchResult = new MutableClutchResult();
     private static final ItemStack STACK_EMPTY_BUCKET = new ItemStack(Items.BUCKET);
 
     public MovementFall(IBaritone baritone, BetterBlockPos src, BetterBlockPos dest) {
@@ -74,7 +74,7 @@ public class MovementFall extends Movement {
     public void updateClutch() {
         CalculationContext context = new CalculationContext(baritone);
         MutableMoveResult result = new MutableMoveResult();
-        MovementDescend.dynamicFallCost(context, src.x, src.y, src.z, dest.x, dest.z, 0, context.get(dest.x, src.y - 2, dest.z), result, clutch);
+        MovementDescend.dynamicFallCost(context, src.x, src.y, src.z, dest.x, dest.z, 0, context.get(dest.x, src.y - 2, dest.z), result, clutchResult);
     }
 
     @Override
@@ -86,42 +86,34 @@ public class MovementFall extends Movement {
 
         BlockPos playerFeet = ctx.playerFeet();
         Rotation toDest = RotationUtils.calcRotationFromVec3d(ctx.playerHead(), VecUtils.getBlockPosCenter(dest), ctx.playerRotations());
-        Rotation targetRotation = null;
         BlockState destState = ctx.world().getBlockState(dest);
         updateClutch();
         if (!playerFeet.equals(dest)) {
-            if (clutch.clutch != null && !clutch.clutch.compare(destState)) {
-                ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(clutch.stack);
-                if (ctx.player().position().y - dest.getY() < ctx.playerController().getBlockReachDistance() && !ctx.player().isOnGround() && (ctx.isLookingAt(dest) || ctx.isLookingAt(dest.below()))) {
-                    targetRotation = new Rotation(toDest.getYaw(), 90.0F);
+            if (clutchResult.clutch != null && !clutchResult.clutch.compare(destState)) {
+                if (MovementHelper.attemptToPlaceABlock(state, baritone, dest, true, true, false, clutchResult.stack.getItem()) == PlaceResult.READY_TO_PLACE) {
                     state.setInput(Input.CLICK_RIGHT, true);
                 }
             }
         } else {
-            if (clutch.clutch != null) {
-                if (clutch.clutch.isPickupable()) {
+            if (clutchResult.clutch != null) {
+                if (clutchResult.clutch.isPickupable()) {
                     if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_EMPTY_BUCKET))) {
                         ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(STACK_EMPTY_BUCKET);
                         return state.setInput(Input.CLICK_RIGHT, true);
                     } else {
-                        clutch.reset();
+                        clutchResult.reset();
                         return state.setStatus(MovementStatus.SUCCESS);
                     }
                 } else {
-                    clutch.reset();
+                    clutchResult.reset();
                     return state.setStatus(MovementStatus.SUCCESS);
                 }
             } else {
-                clutch.reset();
+                clutchResult.reset();
                 return state.setStatus(MovementStatus.SUCCESS);
             }
         }
-        if (targetRotation != null) {
-            state.setTarget(new MovementTarget(targetRotation, true));
-        }
-        else {
-            state.setTarget(new MovementTarget(toDest, false));
-        }
+        state.setTarget(new MovementTarget(toDest, false));
         Vec3 destCenter = VecUtils.getBlockPosCenter(dest); // we are moving to the 0.5 center not the edge (like if we were falling on a ladder)
         if (Math.abs(ctx.player().position().x + ctx.player().getDeltaMovement().x - destCenter.x) > 0.1 || Math.abs(ctx.player().position().z + ctx.player().getDeltaMovement().z - destCenter.z) > 0.1) {
             if (!ctx.player().isOnGround() && Math.abs(ctx.player().getDeltaMovement().y) > 0.4) {
@@ -140,11 +132,8 @@ public class MovementFall extends Movement {
                 state.setInput(Input.SNEAK, false);
             }
         }
-        if (targetRotation == null) {
-            Vec3 destCenterOffset = new Vec3(destCenter.x + 0.125 * avoid.getX(), destCenter.y, destCenter.z + 0.125 * avoid.getZ());
-            state.setTarget(new MovementTarget(RotationUtils.calcRotationFromVec3d(ctx.playerHead(), destCenterOffset, ctx.playerRotations()), false));
-        }
-        return state;
+        Vec3 destCenterOffset = new Vec3(destCenter.x + 0.125 * avoid.getX(), destCenter.y, destCenter.z + 0.125 * avoid.getZ());
+        return state.setTarget(new MovementTarget(RotationUtils.calcRotationFromVec3d(ctx.playerHead(), destCenterOffset, ctx.playerRotations()), false));
     }
 
     private Direction avoid() {
