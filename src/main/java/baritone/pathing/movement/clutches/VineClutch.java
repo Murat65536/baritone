@@ -35,7 +35,7 @@ public final class VineClutch extends Clutch {
     public static final Clutch INSTANCE = new VineClutch();
 
     private VineClutch() {
-        super(false, new ItemStack(Items.VINE), new ItemStack(Items.VINE));
+        super(false, new ItemStack(Items.VINE));
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.VINE);

@@ -30,9 +30,6 @@ public abstract class Clutch {
         this.pickupable = pickupable;
         this.stack = stack;
     }
-    public ItemStack[] getItemStack() {
-        return stack;
-    }
     public boolean isPickupable() {
         return pickupable;
     }

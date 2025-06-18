@@ -21,6 +21,8 @@ import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.Clutch;
 import baritone.pathing.movement.MovementHelper;
 import baritone.utils.pathing.MutableClutchResult;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -30,18 +32,18 @@ public final class LadderClutch extends Clutch {
     public static final Clutch INSTANCE = new LadderClutch();
 
     private LadderClutch() {
-        super(false, new ItemStack(Items.LADDER), new ItemStack(Items.VINE));
+        super(false, new ItemStack(Items.LADDER));
     }
     public boolean compare(BlockState state) {
-        return state.is(Blocks.LADDER) || state.is(Blocks.VINE);
+        return state.is(Blocks.LADDER);
     }
     public boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
         ItemStack item = getClutchingItem(context);
         if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z) &&
-                (MovementHelper.canPlaceAgainst(context.bsi, x - 1, y + 1, z) ||
-                        MovementHelper.canPlaceAgainst(context.bsi, x + 1, y + 1, z) ||
-                        MovementHelper.canPlaceAgainst(context.bsi, x, y + 1, z - 1) ||
-                        MovementHelper.canPlaceAgainst(context.bsi, x, y + 1, z + 1)) &&
+                (context.get(x - 1, y + 1, z).isFaceSturdy(context.bsi.access, new BlockPos(x - 1, y + 1, z), Direction.EAST) ||
+                        context.get(x + 1, y + 1, z).isFaceSturdy(context.bsi.access, new BlockPos(x + 1, y + 1, z), Direction.WEST) ||
+                        context.get(x, y + 1, z - 1).isFaceSturdy(context.bsi.access, new BlockPos(x, y + 1, z - 1), Direction.SOUTH) ||
+                        context.get(x, y + 1, z + 1).isFaceSturdy(context.bsi.access, new BlockPos(x, y + 1, z + 1), Direction.NORTH)) &&
             item != null) {
             if (result != null) {
                 result.clutch = INSTANCE;
