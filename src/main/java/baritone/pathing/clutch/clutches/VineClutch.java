@@ -15,10 +15,10 @@
  * along with Baritone.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package baritone.pathing.movement.clutches;
+package baritone.pathing.clutch.clutches;
 
 import baritone.pathing.movement.CalculationContext;
-import baritone.pathing.movement.Clutch;
+import baritone.pathing.clutch.Clutch;
 import baritone.pathing.movement.MovementHelper;
 import baritone.utils.pathing.MutableClutchResult;
 import net.minecraft.core.BlockPos;
@@ -29,13 +29,14 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
+
+import java.util.Set;
 
 public final class VineClutch extends Clutch {
     public static final Clutch INSTANCE = new VineClutch();
 
     private VineClutch() {
-        super(false, new ItemStack(Items.VINE));
+        super(Set.of(new ItemStack(Items.VINE)), Set.of(Property.NO_BOTTOM_BLOCK_SUPPORT));
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.VINE);

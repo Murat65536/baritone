@@ -15,10 +15,10 @@
  * along with Baritone.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package baritone.pathing.movement.clutches;
+package baritone.pathing.clutch.clutches;
 
 import baritone.pathing.movement.CalculationContext;
-import baritone.pathing.movement.Clutch;
+import baritone.pathing.clutch.Clutch;
 import baritone.pathing.movement.MovementHelper;
 import baritone.utils.pathing.MutableClutchResult;
 import net.minecraft.world.item.ItemStack;
@@ -26,11 +26,13 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Set;
+
 public final class PowderedSnowClutch extends Clutch {
     public static final Clutch INSTANCE = new PowderedSnowClutch();
 
     private PowderedSnowClutch() {
-        super(true, new ItemStack(Items.POWDER_SNOW_BUCKET));
+        super(Set.of(new ItemStack(Items.POWDER_SNOW_BUCKET)), Set.of(Property.PICKUPABLE));
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.POWDER_SNOW);

@@ -24,6 +24,7 @@ import baritone.api.utils.Rotation;
 import baritone.api.utils.RotationUtils;
 import baritone.api.utils.VecUtils;
 import baritone.api.utils.input.Input;
+import baritone.pathing.clutch.Clutch;
 import baritone.pathing.movement.*;
 import baritone.pathing.movement.MovementState.MovementTarget;
 import baritone.utils.pathing.MutableClutchResult;
@@ -89,14 +90,12 @@ public class MovementFall extends Movement {
         BlockState destState = ctx.world().getBlockState(dest);
         updateClutch();
         if (!playerFeet.equals(dest)) {
-            if (clutchResult.clutch != null && !clutchResult.clutch.compare(destState)) {
-                if (MovementHelper.attemptToPlaceABlock(state, baritone, dest, true, true, false, clutchResult.stack.getItem()) == PlaceResult.READY_TO_PLACE) {
-                    state.setInput(Input.CLICK_RIGHT, true);
-                }
+            if (clutchResult.clutch != null && !clutchResult.clutch.compare(destState) && MovementHelper.attemptToPlaceABlock(state, baritone, dest, !clutchResult.clutch.containsProperty(Clutch.Property.NO_BOTTOM_BLOCK_SUPPORT), true, false, clutchResult.stack.getItem()) == PlaceResult.READY_TO_PLACE) {
+                state.setInput(Input.CLICK_RIGHT, true);
             }
         } else {
             if (clutchResult.clutch != null) {
-                if (clutchResult.clutch.isPickupable()) {
+                if (clutchResult.clutch.containsProperty(Clutch.Property.PICKUPABLE)) {
                     if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_EMPTY_BUCKET))) {
                         ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(STACK_EMPTY_BUCKET);
                         return state.setInput(Input.CLICK_RIGHT, true);

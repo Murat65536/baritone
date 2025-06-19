@@ -796,7 +796,7 @@ public interface MovementHelper extends ActionCosts, Helper {
     }
 
     enum PlaceResult {
-        READY_TO_PLACE, ATTEMPTING, NO_OPTION;
+        READY_TO_PLACE, ATTEMPTING, NO_OPTION
     }
 
     static boolean isTransparent(Block b) {

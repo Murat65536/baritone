@@ -17,10 +17,8 @@
 
 package baritone.utils.pathing;
 
-import baritone.pathing.movement.Clutch;
+import baritone.pathing.clutch.Clutch;
 import net.minecraft.world.item.ItemStack;
-
-import javax.annotation.Nullable;
 
 public final class MutableClutchResult {
     public Clutch clutch;

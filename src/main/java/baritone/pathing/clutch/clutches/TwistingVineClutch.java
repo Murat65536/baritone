@@ -15,35 +15,31 @@
  * along with Baritone.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package baritone.pathing.movement.clutches;
+package baritone.pathing.clutch.clutches;
 
 import baritone.pathing.movement.CalculationContext;
-import baritone.pathing.movement.Clutch;
+import baritone.pathing.clutch.Clutch;
 import baritone.pathing.movement.MovementHelper;
 import baritone.utils.pathing.MutableClutchResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.WaterFluid;
 
-public final class WaterClutch extends Clutch {
-    public static final Clutch INSTANCE = new WaterClutch();
+import java.util.Set;
 
-    private WaterClutch() {
-        super(true, new ItemStack(Items.WATER_BUCKET));
+public final class TwistingVineClutch extends Clutch {
+    public static final TwistingVineClutch INSTANCE = new TwistingVineClutch();
+
+    private TwistingVineClutch() {
+        super(Set.of(new ItemStack(Items.TWISTING_VINES)), Set.of());
     }
     public boolean compare(BlockState state) {
-        return state.getFluidState().getType() instanceof WaterFluid;
+        return state.is(Blocks.TWISTING_VINES);
     }
     public boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
         ItemStack item = getClutchingItem(context);
-        BlockState block = context.get(x, y, z);
-        if (!(block.getBlock() instanceof SimpleWaterloggedBlock) &&
-                MovementHelper.canPlaceAgainst(context.bsi, x, y, z, block) &&
-                context.world.dimension() != Level.NETHER &&
-                item != null) {
+        if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z) && item != null) {
             if (result != null) {
                 result.clutch = INSTANCE;
                 result.stack = item;

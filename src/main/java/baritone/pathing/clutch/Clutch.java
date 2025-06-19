@@ -15,23 +15,26 @@
  * along with Baritone.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package baritone.pathing.movement;
+package baritone.pathing.clutch;
 
+import baritone.pathing.movement.CalculationContext;
 import baritone.utils.pathing.MutableClutchResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
-public abstract class Clutch {
-    private final boolean pickupable;
-    private final ItemStack[] stack;
+import java.util.Set;
 
-    protected Clutch(boolean pickupable, ItemStack... stack) {
-        this.pickupable = pickupable;
+public abstract class Clutch {
+    private final Set<ItemStack> stack;
+    private final Set<Property> properties;
+
+    protected Clutch(Set<ItemStack> stack, Set<Property> properties) {
         this.stack = stack;
+        this.properties = properties;
     }
-    public boolean isPickupable() {
-        return pickupable;
+    public boolean containsProperty(Property property) {
+        return properties.contains(property);
     }
     public ItemStack getClutchingItem(CalculationContext context) {
         for (ItemStack item : stack) {
@@ -43,4 +46,8 @@ public abstract class Clutch {
     }
     public abstract boolean compare(BlockState state);
     public abstract boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result);
+    public enum Property {
+        PICKUPABLE,
+        NO_BOTTOM_BLOCK_SUPPORT
+    }
 }

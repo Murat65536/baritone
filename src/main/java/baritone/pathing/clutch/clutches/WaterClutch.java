@@ -15,36 +15,37 @@
  * along with Baritone.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package baritone.pathing.movement.clutches;
+package baritone.pathing.clutch.clutches;
 
 import baritone.pathing.movement.CalculationContext;
-import baritone.pathing.movement.Clutch;
+import baritone.pathing.clutch.Clutch;
 import baritone.pathing.movement.MovementHelper;
 import baritone.utils.pathing.MutableClutchResult;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.WaterFluid;
 
-public final class LadderClutch extends Clutch {
-    public static final Clutch INSTANCE = new LadderClutch();
+import java.util.Set;
 
-    private LadderClutch() {
-        super(false, new ItemStack(Items.LADDER));
+public final class WaterClutch extends Clutch {
+    public static final Clutch INSTANCE = new WaterClutch();
+
+    private WaterClutch() {
+        super(Set.of(new ItemStack(Items.WATER_BUCKET)), Set.of(Property.PICKUPABLE));
     }
     public boolean compare(BlockState state) {
-        return state.is(Blocks.LADDER);
+        return state.getFluidState().getType() instanceof WaterFluid;
     }
     public boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
         ItemStack item = getClutchingItem(context);
-        if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z) &&
-                (context.get(x - 1, y + 1, z).isFaceSturdy(context.bsi.access, new BlockPos(x - 1, y + 1, z), Direction.EAST) ||
-                        context.get(x + 1, y + 1, z).isFaceSturdy(context.bsi.access, new BlockPos(x + 1, y + 1, z), Direction.WEST) ||
-                        context.get(x, y + 1, z - 1).isFaceSturdy(context.bsi.access, new BlockPos(x, y + 1, z - 1), Direction.SOUTH) ||
-                        context.get(x, y + 1, z + 1).isFaceSturdy(context.bsi.access, new BlockPos(x, y + 1, z + 1), Direction.NORTH)) &&
-            item != null) {
+        BlockState block = context.get(x, y, z);
+        if (!(block.getBlock() instanceof SimpleWaterloggedBlock) &&
+                MovementHelper.canPlaceAgainst(context.bsi, x, y, z, block) &&
+                context.world.dimension() != Level.NETHER &&
+                item != null) {
             if (result != null) {
                 result.clutch = INSTANCE;
                 result.stack = item;
