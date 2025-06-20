@@ -17,6 +17,7 @@
 
 package baritone.pathing.clutch;
 
+import baritone.Baritone;
 import baritone.pathing.movement.CalculationContext;
 import baritone.utils.pathing.MutableClutchResult;
 import net.minecraft.world.entity.player.Inventory;
@@ -38,7 +39,8 @@ public abstract class Clutch {
     }
     public ItemStack getClutchingItem(CalculationContext context) {
         for (ItemStack item : stack) {
-            if (Inventory.isHotbarSlot(context.getBaritone().getPlayerContext().player().getInventory().findSlotMatchingItem(item))) {
+            int slot = context.getBaritone().getPlayerContext().player().getInventory().findSlotMatchingItem(item);
+            if (Inventory.isHotbarSlot(slot) || (Baritone.settings().allowInventory.value && slot != -1)) {
                 return item;
             }
         }
@@ -46,6 +48,7 @@ public abstract class Clutch {
     }
     public abstract boolean compare(BlockState state);
     public abstract boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result);
+
     public enum Property {
         PICKUPABLE,
         NO_BOTTOM_BLOCK_SUPPORT

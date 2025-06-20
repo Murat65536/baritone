@@ -214,18 +214,14 @@ public class MovementDescend extends Movement {
                 break;
             }
             else if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightClutch + 1) {
-                boolean canClutch = false;
                 for (Clutch c : clutches) {
                     if (c.clutchable(context, destX, newY, destZ, clutchRes)) {
-                        canClutch = true;
+                        res.x = destX;
+                        res.y = newY + 1;// this is the block we're falling onto, so dest is +1
+                        res.z = destZ;
+                        res.cost = tentativeCost + context.placeBlockCost;
                         break;
                     }
-                }
-                if (canClutch) {
-                    res.x = destX;
-                    res.y = newY + 1;// this is the block we're falling onto, so dest is +1
-                    res.z = destZ;
-                    res.cost = tentativeCost + context.placeBlockCost;
                 }
                 break;
             }
