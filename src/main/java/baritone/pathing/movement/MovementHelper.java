@@ -765,7 +765,7 @@ public interface MovementHelper extends ActionCosts, Helper {
                     state.setTarget(new MovementTarget(place, true));
                     found = true;
 
-                    if (!allowDown || !preferDown) { // Wait... why don't we just have Direction.DOWN be the first thing so it skips the extra cycles for everything else when prefer down is true? Whatever, I'll leave it for someone else to consider I guess. IDK about side effects and stuff but shouldn't affect anything.
+                    if (!allowDown || !preferDown) {
                         // if preferDown is true, we want the last option
                         // if preferDown is false, we want the first
                         break;

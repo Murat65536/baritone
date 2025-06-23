@@ -230,8 +230,7 @@ public final class InventoryBehavior extends Behavior implements Helper {
             for (int i = 9; i < 36; i++) {
                 if (desired.test(inv.get(i))) {
                     if (select) {
-                        requestSwapWithHotBar(i, 7);
-                        p.getInventory().selected = 7;
+                        requestSwapWithHotBar(i, p.getInventory().selected);
                     }
                     return true;
                 }
