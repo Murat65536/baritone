@@ -18,9 +18,11 @@
 package baritone.pathing.clutch;
 
 import baritone.Baritone;
+import baritone.api.IBaritone;
 import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.IPlayerContext;
 import baritone.pathing.movement.CalculationContext;
+import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
 import net.minecraft.world.entity.player.Inventory;
@@ -32,14 +34,9 @@ import java.util.Set;
 
 public abstract class Clutch {
     private final Set<ItemStack> stack;
-    private final Set<Property> properties;
 
-    protected Clutch(Set<ItemStack> stack, Set<Property> properties) {
+    protected Clutch(Set<ItemStack> stack) {
         this.stack = stack;
-        this.properties = properties;
-    }
-    public boolean containsProperty(Property property) {
-        return properties.contains(property);
     }
     public ItemStack getClutchingItem(CalculationContext context) {
         for (ItemStack item : stack) {
@@ -52,15 +49,13 @@ public abstract class Clutch {
     }
     public abstract boolean compare(BlockState state);
     public abstract boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result);
+    public void clutch(IBaritone baritone, MovementState state, BetterBlockPos dest, MutableClutchResult result) {
+        ClutchHelper.blockClutch(baritone, state, dest, result, true);
+    }
     public boolean clutched(IPlayerContext ctx, BetterBlockPos dest) {
         return ctx.player().getBoundingBox().intersects(Vec3.atLowerCornerOf(dest), Vec3.atLowerCornerWithOffset(dest, 1, 1, 1));
     }
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
         return true;
-    }
-
-    public enum Property {
-        PICKUPABLE,
-        NO_BOTTOM_BLOCK_SUPPORT
     }
 }

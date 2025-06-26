@@ -17,8 +17,11 @@
 
 package baritone.pathing.clutch;
 
+import baritone.api.IBaritone;
+import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.input.Input;
 import baritone.pathing.clutch.clutches.*;
+import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
 import net.minecraft.world.entity.player.Inventory;
@@ -29,15 +32,22 @@ public interface ClutchHelper {
     Clutch[] clutches = new Clutch[]{
             WaterClutch.INSTANCE,
             PowderedSnowClutch.INSTANCE,
-            LadderClutch.INSTANCE,
-            VineClutch.INSTANCE,
             TwistingVineClutch.INSTANCE,
+            VineClutch.INSTANCE,
+            LadderClutch.INSTANCE,
+            ScaffoldingClutch.INSTANCE,
             SlimeClutch.INSTANCE,
     };
 
     ItemStack STACK_EMPTY_BUCKET = new ItemStack(Items.BUCKET);
 
-    static boolean bucketPickup(MovementState state, Inventory inventory, MutableClutchResult result) {
+    static void blockClutch(IBaritone baritone, MovementState state, BetterBlockPos dest, MutableClutchResult result, boolean allowDown) {
+        if (MovementHelper.attemptToPlaceABlock(state, baritone, dest, allowDown, true, false, result.stack.getItem()) == MovementHelper.PlaceResult.READY_TO_PLACE) {
+            state.setInput(Input.CLICK_RIGHT, true);
+        }
+    }
+
+    static boolean bucketPickup(MovementState state, Inventory inventory) {
         int slot = inventory.findSlotMatchingItem(STACK_EMPTY_BUCKET);
         if (Inventory.isHotbarSlot(slot)) {
             inventory.selected = slot;

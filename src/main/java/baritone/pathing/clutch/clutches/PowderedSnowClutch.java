@@ -36,7 +36,7 @@ public final class PowderedSnowClutch extends Clutch {
     public static final Clutch INSTANCE = new PowderedSnowClutch();
 
     private PowderedSnowClutch() {
-        super(Set.of(new ItemStack(Items.POWDER_SNOW_BUCKET)), Set.of(Property.PICKUPABLE));
+        super(Set.of(new ItemStack(Items.POWDER_SNOW_BUCKET)));
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.POWDER_SNOW);
@@ -55,6 +55,6 @@ public final class PowderedSnowClutch extends Clutch {
 
     @Override
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
-        return ClutchHelper.bucketPickup(state, ctx.player().getInventory(), result);
+        return ClutchHelper.bucketPickup(state, ctx.player().getInventory());
     }
 }

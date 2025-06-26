@@ -17,16 +17,14 @@
 
 package baritone.pathing.clutch.clutches;
 
-import baritone.api.IBaritone;
 import baritone.api.utils.BetterBlockPos;
-import baritone.pathing.clutch.ClutchHelper;
-import baritone.pathing.movement.CalculationContext;
+import baritone.api.utils.IPlayerContext;
+import baritone.api.utils.input.Input;
 import baritone.pathing.clutch.Clutch;
+import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -34,23 +32,19 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Set;
 
-public final class LadderClutch extends Clutch {
-    public static final Clutch INSTANCE = new LadderClutch();
+public final class ScaffoldingClutch extends Clutch {
+    public static final ScaffoldingClutch INSTANCE = new ScaffoldingClutch();
 
-    private LadderClutch() {
-        super(Set.of(new ItemStack(Items.LADDER)));
+    private ScaffoldingClutch() {
+        super(Set.of(new ItemStack(Items.SCAFFOLDING)));
     }
+
     public boolean compare(BlockState state) {
-        return state.is(Blocks.LADDER);
+        return state.is(Blocks.SCAFFOLDING);
     }
     public boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
         ItemStack item = getClutchingItem(context);
-        if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z) &&
-                (context.get(x - 1, y + 1, z).isFaceSturdy(context.bsi.access, new BlockPos(x - 1, y + 1, z), Direction.EAST) ||
-                        context.get(x + 1, y + 1, z).isFaceSturdy(context.bsi.access, new BlockPos(x + 1, y + 1, z), Direction.WEST) ||
-                        context.get(x, y + 1, z - 1).isFaceSturdy(context.bsi.access, new BlockPos(x, y + 1, z - 1), Direction.SOUTH) ||
-                        context.get(x, y + 1, z + 1).isFaceSturdy(context.bsi.access, new BlockPos(x, y + 1, z + 1), Direction.NORTH)) &&
-            item != null) {
+        if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z) && item != null) {
             if (result != null) {
                 result.clutch = INSTANCE;
                 result.stack = item;
@@ -61,7 +55,13 @@ public final class LadderClutch extends Clutch {
     }
 
     @Override
-    public void clutch(IBaritone baritone, MovementState state, BetterBlockPos dest, MutableClutchResult result) {
-        ClutchHelper.blockClutch(baritone, state, dest, result, false);
+    public boolean clutched(IPlayerContext ctx, BetterBlockPos dest) {
+        return super.clutched(ctx, dest.above());
+    }
+
+    @Override
+    public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
+        state.setInput(Input.SNEAK, true);
+        return ctx.world().getBlockState(ctx.playerFeet()).is(Blocks.SCAFFOLDING);
     }
 }

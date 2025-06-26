@@ -17,9 +17,13 @@
 
 package baritone.pathing.clutch.clutches;
 
+import baritone.api.IBaritone;
+import baritone.api.utils.BetterBlockPos;
+import baritone.pathing.clutch.ClutchHelper;
 import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.clutch.Clutch;
 import baritone.pathing.movement.MovementHelper;
+import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -36,7 +40,7 @@ public final class VineClutch extends Clutch {
     public static final Clutch INSTANCE = new VineClutch();
 
     private VineClutch() {
-        super(Set.of(new ItemStack(Items.VINE)), Set.of(Property.NO_BOTTOM_BLOCK_SUPPORT));
+        super(Set.of(new ItemStack(Items.VINE)));
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.VINE);
@@ -73,5 +77,10 @@ public final class VineClutch extends Clutch {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void clutch(IBaritone baritone, MovementState state, BetterBlockPos dest, MutableClutchResult result) {
+        ClutchHelper.blockClutch(baritone, state, dest, result, false);
     }
 }

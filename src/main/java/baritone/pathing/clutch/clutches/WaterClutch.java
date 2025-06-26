@@ -37,7 +37,7 @@ public final class WaterClutch extends Clutch {
     public static final Clutch INSTANCE = new WaterClutch();
 
     private WaterClutch() {
-        super(Set.of(new ItemStack(Items.WATER_BUCKET)), Set.of(Property.PICKUPABLE));
+        super(Set.of(new ItemStack(Items.WATER_BUCKET)));
     }
     public boolean compare(BlockState state) {
         return state.getFluidState().getType() instanceof WaterFluid;
@@ -62,6 +62,6 @@ public final class WaterClutch extends Clutch {
 
     @Override
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
-        return ClutchHelper.bucketPickup(state, ctx.player().getInventory(), result);
+        return ClutchHelper.bucketPickup(state, ctx.player().getInventory());
     }
 }

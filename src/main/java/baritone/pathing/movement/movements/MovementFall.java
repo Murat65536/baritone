@@ -96,8 +96,8 @@ public class MovementFall extends Movement {
                 }
             }
             else {
-                if (clutchResult.clutch != null && !clutchResult.clutch.compare(destState) && MovementHelper.attemptToPlaceABlock(state, baritone, dest, !clutchResult.clutch.containsProperty(Clutch.Property.NO_BOTTOM_BLOCK_SUPPORT), true, false, clutchResult.stack.getItem()) == PlaceResult.READY_TO_PLACE) {
-                    state.setInput(Input.CLICK_RIGHT, true);
+                if (clutchResult.clutch != null && !clutchResult.clutch.compare(destState)) {
+                    clutchResult.clutch.clutch(baritone, state, dest, clutchResult);
                 }
             }
         }
