@@ -23,6 +23,7 @@ import net.minecraft.world.item.ItemStack;
 public final class MutableClutchResult {
     public Clutch clutch;
     public ItemStack stack;
+    public int phase;
 
     public MutableClutchResult() {
         reset();
@@ -31,5 +32,6 @@ public final class MutableClutchResult {
     public void reset() {
         clutch = null;
         stack = null;
+        phase = 0;
     }
 }

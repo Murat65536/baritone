@@ -23,6 +23,7 @@ import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.RotationUtils;
 import baritone.api.utils.input.Input;
 import baritone.pathing.clutch.Clutch;
+import baritone.pathing.clutch.ClutchHelper;
 import baritone.pathing.clutch.clutches.*;
 import baritone.pathing.movement.*;
 import baritone.utils.BlockStateInterface;
@@ -40,14 +41,6 @@ import javax.annotation.Nullable;
 import java.util.Set;
 
 public class MovementDescend extends Movement {
-    private static final Clutch[] clutches = new Clutch[]{
-            WaterClutch.INSTANCE,
-            PowderedSnowClutch.INSTANCE,
-            LadderClutch.INSTANCE,
-            VineClutch.INSTANCE,
-            TwistingVineClutch.INSTANCE,
-    };
-
     private int numTicks = 0;
     public boolean forceSafeMode = false;
 
@@ -214,7 +207,7 @@ public class MovementDescend extends Movement {
                 break;
             }
             else if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightClutch + 1) {
-                for (Clutch c : clutches) {
+                for (Clutch c : ClutchHelper.clutches) {
                     if (c.clutchable(context, destX, newY, destZ, clutchRes)) {
                         res.x = destX;
                         res.y = newY + 1;// this is the block we're falling onto, so dest is +1

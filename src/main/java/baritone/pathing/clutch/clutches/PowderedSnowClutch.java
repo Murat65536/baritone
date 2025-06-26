@@ -17,10 +17,14 @@
 
 package baritone.pathing.clutch.clutches;
 
+import baritone.api.utils.IPlayerContext;
+import baritone.pathing.clutch.ClutchHelper;
 import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.clutch.Clutch;
 import baritone.pathing.movement.MovementHelper;
+import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -47,5 +51,10 @@ public final class PowderedSnowClutch extends Clutch {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
+        return ClutchHelper.bucketPickup(state, ctx.player().getInventory(), result);
     }
 }

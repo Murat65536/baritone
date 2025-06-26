@@ -17,51 +17,59 @@
 
 package baritone.pathing.clutch.clutches;
 
+import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.IPlayerContext;
-import baritone.pathing.clutch.ClutchHelper;
-import baritone.pathing.movement.CalculationContext;
+import baritone.api.utils.input.Input;
 import baritone.pathing.clutch.Clutch;
+import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.WaterFluid;
 
 import java.util.Set;
 
-public final class WaterClutch extends Clutch {
-    public static final Clutch INSTANCE = new WaterClutch();
+public final class SlimeClutch extends Clutch {
+    public static final Clutch INSTANCE = new SlimeClutch();
 
-    private WaterClutch() {
-        super(Set.of(new ItemStack(Items.WATER_BUCKET)), Set.of(Property.PICKUPABLE));
+    private SlimeClutch() {
+        super(Set.of(new ItemStack(Items.SLIME_BLOCK)), Set.of());
     }
     public boolean compare(BlockState state) {
-        return state.getFluidState().getType() instanceof WaterFluid;
+        return state.is(Blocks.SLIME_BLOCK);
     }
     public boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
         ItemStack item = getClutchingItem(context);
-        BlockState block = context.get(x, y, z);
-        if (!(block.getBlock() instanceof SimpleWaterloggedBlock) &&
-                MovementHelper.canPlaceAgainst(context.bsi, x, y, z, block) &&
-                context.world.dimension() != Level.NETHER &&
-                item != null) {
+        if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z) && item != null) {
             if (result != null) {
                 result.clutch = INSTANCE;
                 result.stack = item;
             }
             return true;
         }
-        else {
-            return false;
-        }
+        return false;
+    }
+
+    @Override
+    public boolean clutched(IPlayerContext ctx, BetterBlockPos dest) {
+        return super.clutched(ctx, dest.above());
     }
 
     @Override
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
-        return ClutchHelper.bucketPickup(state, ctx.player().getInventory(), result);
+        if (result.phase == 0) {
+            state.setInput(Input.JUMP, true);
+            if (ctx.player().isOnGround()) {
+                result.phase = 1;
+            }
+            return false;
+        }
+        else {
+            state.setInput(Input.SNEAK, true);
+            return ctx.player().isOnGround();
+        }
     }
 }

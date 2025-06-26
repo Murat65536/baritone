@@ -36,9 +36,6 @@ import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LadderBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -46,7 +43,6 @@ import net.minecraft.world.phys.Vec3;
 
 public class MovementFall extends Movement {
     private final MutableClutchResult clutchResult = new MutableClutchResult();
-    private static final ItemStack STACK_EMPTY_BUCKET = new ItemStack(Items.BUCKET);
 
     public MovementFall(IBaritone baritone, BetterBlockPos src, BetterBlockPos dest) {
         super(baritone, src, dest, MovementFall.buildPositionsToBreak(src, dest));
@@ -72,10 +68,10 @@ public class MovementFall extends Movement {
         return set;
     }
 
-    public void updateClutch() {
+    public void updateClutch(MutableClutchResult clutch) {
         CalculationContext context = new CalculationContext(baritone);
         MutableMoveResult result = new MutableMoveResult();
-        MovementDescend.dynamicFallCost(context, src.x, src.y, src.z, dest.x, dest.z, 0, context.get(dest.x, src.y - 2, dest.z), result, clutchResult);
+        MovementDescend.dynamicFallCost(context, src.x, src.y, src.z, dest.x, dest.z, 0, context.get(dest.x, src.y - 2, dest.z), result, clutch);
     }
 
     @Override
@@ -88,28 +84,21 @@ public class MovementFall extends Movement {
         BlockPos playerFeet = ctx.playerFeet();
         Rotation toDest = RotationUtils.calcRotationFromVec3d(ctx.playerHead(), VecUtils.getBlockPosCenter(dest), ctx.playerRotations());
         BlockState destState = ctx.world().getBlockState(dest);
-        updateClutch();
-        if (!playerFeet.equals(dest)) {
-            if (clutchResult.clutch != null && !clutchResult.clutch.compare(destState) && MovementHelper.attemptToPlaceABlock(state, baritone, dest, !clutchResult.clutch.containsProperty(Clutch.Property.NO_BOTTOM_BLOCK_SUPPORT), true, false, clutchResult.stack.getItem()) == PlaceResult.READY_TO_PLACE) {
-                state.setInput(Input.CLICK_RIGHT, true);
-            }
-        } else {
-            if (clutchResult.clutch != null) {
-                if (clutchResult.clutch.containsProperty(Clutch.Property.PICKUPABLE)) {
-                    if (Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_EMPTY_BUCKET))) {
-                        ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(STACK_EMPTY_BUCKET);
-                        return state.setInput(Input.CLICK_RIGHT, true);
-                    } else {
-                        clutchResult.reset();
-                        return state.setStatus(MovementStatus.SUCCESS);
-                    }
-                } else {
+        updateClutch(clutchResult);
+        if (clutchResult.clutch != null) {
+            if (clutchResult.clutch.clutched(ctx, dest)) {
+                if (clutchResult.clutch.finished(ctx, state, clutchResult)) {
                     clutchResult.reset();
                     return state.setStatus(MovementStatus.SUCCESS);
                 }
-            } else {
-                clutchResult.reset();
-                return state.setStatus(MovementStatus.SUCCESS);
+                else {
+                    return state;
+                }
+            }
+            else {
+                if (clutchResult.clutch != null && !clutchResult.clutch.compare(destState) && MovementHelper.attemptToPlaceABlock(state, baritone, dest, !clutchResult.clutch.containsProperty(Clutch.Property.NO_BOTTOM_BLOCK_SUPPORT), true, false, clutchResult.stack.getItem()) == PlaceResult.READY_TO_PLACE) {
+                    state.setInput(Input.CLICK_RIGHT, true);
+                }
             }
         }
         state.setTarget(new MovementTarget(toDest, false));
@@ -132,7 +121,7 @@ public class MovementFall extends Movement {
             }
         }
         Vec3 destCenterOffset = new Vec3(destCenter.x + 0.125 * avoid.getX(), destCenter.y, destCenter.z + 0.125 * avoid.getZ());
-        return state.setTarget(new MovementTarget(RotationUtils.calcRotationFromVec3d(ctx.playerHead(), destCenterOffset, ctx.playerRotations()), false));
+        return state.setTarget(new MovementTarget(RotationUtils.calcRotationFromVec3d(ctx.playerHead(), destCenterOffset, ctx.playerRotations()), true));
     }
 
     private Direction avoid() {

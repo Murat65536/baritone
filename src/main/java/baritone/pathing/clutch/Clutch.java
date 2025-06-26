@@ -18,11 +18,15 @@
 package baritone.pathing.clutch;
 
 import baritone.Baritone;
+import baritone.api.utils.BetterBlockPos;
+import baritone.api.utils.IPlayerContext;
 import baritone.pathing.movement.CalculationContext;
+import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Set;
 
@@ -48,6 +52,12 @@ public abstract class Clutch {
     }
     public abstract boolean compare(BlockState state);
     public abstract boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result);
+    public boolean clutched(IPlayerContext ctx, BetterBlockPos dest) {
+        return ctx.player().getBoundingBox().intersects(Vec3.atLowerCornerOf(dest), Vec3.atLowerCornerWithOffset(dest, 1, 1, 1));
+    }
+    public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
+        return true;
+    }
 
     public enum Property {
         PICKUPABLE,
