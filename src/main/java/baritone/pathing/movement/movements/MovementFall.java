@@ -24,7 +24,6 @@ import baritone.api.utils.Rotation;
 import baritone.api.utils.RotationUtils;
 import baritone.api.utils.VecUtils;
 import baritone.api.utils.input.Input;
-import baritone.pathing.clutch.Clutch;
 import baritone.pathing.movement.*;
 import baritone.pathing.movement.MovementState.MovementTarget;
 import baritone.utils.pathing.MutableClutchResult;
@@ -100,6 +99,9 @@ public class MovementFall extends Movement {
                     clutchResult.clutch.clutch(baritone, state, dest, clutchResult);
                 }
             }
+        }
+        else if (playerFeet.equals(dest)) {
+            return state.setStatus(MovementStatus.SUCCESS);
         }
         state.setTarget(new MovementTarget(toDest, false));
         Vec3 destCenter = VecUtils.getBlockPosCenter(dest); // we are moving to the 0.5 center not the edge (like if we were falling on a ladder)

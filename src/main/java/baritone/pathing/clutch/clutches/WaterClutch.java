@@ -24,6 +24,7 @@ import baritone.pathing.clutch.Clutch;
 import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -31,13 +32,11 @@ import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.WaterFluid;
 
-import java.util.Set;
-
 public final class WaterClutch extends Clutch {
-    public static final Clutch INSTANCE = new WaterClutch();
+    public static final WaterClutch INSTANCE = new WaterClutch();
 
     private WaterClutch() {
-        super(Set.of(new ItemStack(Items.WATER_BUCKET)));
+        super(ImmutableSet.of(new ItemStack(Items.WATER_BUCKET)), 0f);
     }
     public boolean compare(BlockState state) {
         return state.getFluidState().getType() instanceof WaterFluid;

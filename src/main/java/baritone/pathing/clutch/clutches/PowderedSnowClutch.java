@@ -24,19 +24,17 @@ import baritone.pathing.clutch.Clutch;
 import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
-import net.minecraft.client.player.LocalPlayer;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Set;
-
 public final class PowderedSnowClutch extends Clutch {
-    public static final Clutch INSTANCE = new PowderedSnowClutch();
+    public static final PowderedSnowClutch INSTANCE = new PowderedSnowClutch();
 
     private PowderedSnowClutch() {
-        super(Set.of(new ItemStack(Items.POWDER_SNOW_BUCKET)));
+        super(ImmutableSet.of(new ItemStack(Items.POWDER_SNOW_BUCKET)), 0f);
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.POWDER_SNOW);

@@ -21,18 +21,17 @@ import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.clutch.Clutch;
 import baritone.pathing.movement.MovementHelper;
 import baritone.utils.pathing.MutableClutchResult;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Set;
-
 public final class TwistingVineClutch extends Clutch {
     public static final TwistingVineClutch INSTANCE = new TwistingVineClutch();
 
     private TwistingVineClutch() {
-        super(Set.of(new ItemStack(Items.TWISTING_VINES)));
+        super(ImmutableSet.of(new ItemStack(Items.TWISTING_VINES)), 0f);
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.TWISTING_VINES);

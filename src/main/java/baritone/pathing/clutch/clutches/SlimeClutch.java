@@ -25,18 +25,17 @@ import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Set;
-
 public final class SlimeClutch extends Clutch {
-    public static final Clutch INSTANCE = new SlimeClutch();
+    public static final SlimeClutch INSTANCE = new SlimeClutch();
 
     private SlimeClutch() {
-        super(Set.of(new ItemStack(Items.SLIME_BLOCK)));
+        super(ImmutableSet.of(new ItemStack(Items.SLIME_BLOCK)), 0f);
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.SLIME_BLOCK);

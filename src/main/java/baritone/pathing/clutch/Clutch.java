@@ -22,23 +22,23 @@ import baritone.api.IBaritone;
 import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.IPlayerContext;
 import baritone.pathing.movement.CalculationContext;
-import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.Set;
-
 public abstract class Clutch {
-    private final Set<ItemStack> stack;
+    private final ImmutableSet<ItemStack> stack;
+    private final float fallDamageModifier;
 
-    protected Clutch(Set<ItemStack> stack) {
+    protected Clutch(ImmutableSet<ItemStack> stack, float fallDamage) {
         this.stack = stack;
+        this.fallDamageModifier = fallDamage;
     }
-    public ItemStack getClutchingItem(CalculationContext context) {
+    public final ItemStack getClutchingItem(CalculationContext context) {
         for (ItemStack item : stack) {
             int slot = context.getBaritone().getPlayerContext().player().getInventory().findSlotMatchingItem(item);
             if (Inventory.isHotbarSlot(slot) || (Baritone.settings().allowInventory.value && slot != -1)) {
@@ -46,6 +46,9 @@ public abstract class Clutch {
             }
         }
         return null;
+    }
+    public final float getFallDamageModifier() {
+        return fallDamageModifier;
     }
     public abstract boolean compare(BlockState state);
     public abstract boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result);

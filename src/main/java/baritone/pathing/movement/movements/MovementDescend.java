@@ -24,7 +24,6 @@ import baritone.api.utils.RotationUtils;
 import baritone.api.utils.input.Input;
 import baritone.pathing.clutch.Clutch;
 import baritone.pathing.clutch.ClutchHelper;
-import baritone.pathing.clutch.clutches.*;
 import baritone.pathing.movement.*;
 import baritone.utils.BlockStateInterface;
 import baritone.utils.pathing.MutableClutchResult;
@@ -208,7 +207,7 @@ public class MovementDescend extends Movement {
             }
             else if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightClutch + 1) {
                 for (Clutch c : ClutchHelper.clutches) {
-                    if (c.clutchable(context, destX, newY, destZ, clutchRes)) {
+                    if (c.clutchable(context, destX, newY, destZ, clutchRes) && unprotectedFallHeight * c.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1) {
                         res.x = destX;
                         res.y = newY + 1;// this is the block we're falling onto, so dest is +1
                         res.z = destZ;

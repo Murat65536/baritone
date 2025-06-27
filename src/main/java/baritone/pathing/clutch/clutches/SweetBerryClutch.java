@@ -18,23 +18,21 @@
 package baritone.pathing.clutch.clutches;
 
 import baritone.api.utils.BetterBlockPos;
-import baritone.api.utils.IPlayerContext;
 import baritone.pathing.clutch.Clutch;
 import baritone.pathing.movement.CalculationContext;
 import baritone.utils.pathing.MutableClutchResult;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Set;
-
 public final class SweetBerryClutch extends Clutch {
     public static final SweetBerryClutch INSTANCE = new SweetBerryClutch();
 
     private SweetBerryClutch() {
-        super(Set.of(new ItemStack(Items.SWEET_BERRIES)));
+        super(ImmutableSet.of(new ItemStack(Items.SWEET_BERRIES)), 0f);
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.SWEET_BERRY_BUSH);

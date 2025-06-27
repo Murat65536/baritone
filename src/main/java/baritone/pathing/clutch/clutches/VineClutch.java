@@ -25,6 +25,7 @@ import baritone.pathing.clutch.Clutch;
 import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -34,13 +35,11 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Set;
-
 public final class VineClutch extends Clutch {
-    public static final Clutch INSTANCE = new VineClutch();
+    public static final VineClutch INSTANCE = new VineClutch();
 
     private VineClutch() {
-        super(Set.of(new ItemStack(Items.VINE)));
+        super(ImmutableSet.of(new ItemStack(Items.VINE)), 0f);
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.VINE);

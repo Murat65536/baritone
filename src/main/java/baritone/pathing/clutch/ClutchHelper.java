@@ -38,6 +38,7 @@ public interface ClutchHelper {
             LadderClutch.INSTANCE,
             ScaffoldingClutch.INSTANCE,
             SlimeClutch.INSTANCE,
+            HayBaleClutch.INSTANCE,
     };
 
     ItemStack STACK_EMPTY_BUCKET = new ItemStack(Items.BUCKET);
