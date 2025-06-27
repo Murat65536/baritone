@@ -56,6 +56,7 @@ public final class VineClutch extends Clutch {
             } else if (direction.getAxis() == Direction.Axis.Y) {
                 return false;
             } else {
+                // Will never use this
                 BlockState lv3 = level.getBlockState(pos.above());
                 return lv3.is(Blocks.VINE) && lv3.getValue(VineBlock.PROPERTY_BY_DIRECTION.get(direction));
             }
@@ -65,10 +66,10 @@ public final class VineClutch extends Clutch {
     public boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
         ItemStack item = getClutchingItem(context);
         if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z) &&
-                (canSupportAtFace(context.bsi.access, new BlockPos(x - 1, y + 1, z), Direction.WEST) ||
-                        canSupportAtFace(context.bsi.access, new BlockPos(x + 1, y + 1, z), Direction.EAST) ||
-                        canSupportAtFace(context.bsi.access, new BlockPos(x, y + 1, z - 1), Direction.NORTH) ||
-                        canSupportAtFace(context.bsi.access, new BlockPos(x, y + 1, z + 1), Direction.SOUTH)) &&
+                (canSupportAtFace(context.bsi.access, new BetterBlockPos(x - 1, y + 1, z), Direction.WEST) ||
+                        canSupportAtFace(context.bsi.access, new BetterBlockPos(x + 1, y + 1, z), Direction.EAST) ||
+                        canSupportAtFace(context.bsi.access, new BetterBlockPos(x, y + 1, z - 1), Direction.NORTH) ||
+                        canSupportAtFace(context.bsi.access, new BetterBlockPos(x, y + 1, z + 1), Direction.SOUTH)) &&
                 item != null) {
             if (result != null) {
                 result.clutch = INSTANCE;

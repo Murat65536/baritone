@@ -33,6 +33,7 @@ public interface ClutchHelper {
             WaterClutch.INSTANCE,
             PowderedSnowClutch.INSTANCE,
             TwistingVineClutch.INSTANCE,
+            SweetBerryClutch.INSTANCE,
             VineClutch.INSTANCE,
             LadderClutch.INSTANCE,
             ScaffoldingClutch.INSTANCE,

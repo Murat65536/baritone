@@ -96,7 +96,7 @@ public class MovementFall extends Movement {
                 }
             }
             else {
-                if (clutchResult.clutch != null && !clutchResult.clutch.compare(destState)) {
+                if (!clutchResult.clutch.compare(destState)) {
                     clutchResult.clutch.clutch(baritone, state, dest, clutchResult);
                 }
             }
