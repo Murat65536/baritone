@@ -34,9 +34,9 @@ public abstract class Clutch {
     private final ImmutableSet<ItemStack> stack;
     private final float fallDamageModifier;
 
-    protected Clutch(ImmutableSet<ItemStack> stack, float fallDamage) {
+    protected Clutch(ImmutableSet<ItemStack> stack, float fallDamageModifier) {
         this.stack = stack;
-        this.fallDamageModifier = fallDamage;
+        this.fallDamageModifier = fallDamageModifier;
     }
     public final ItemStack getClutchingItem(CalculationContext context) {
         for (ItemStack item : stack) {

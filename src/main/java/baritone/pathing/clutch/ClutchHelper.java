@@ -29,8 +29,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 public interface ClutchHelper {
-    Clutch[] clutches = new Clutch[]{
+    Clutch[] CLUTCHES = new Clutch[]{
             WaterClutch.INSTANCE,
+            LavaClutch.INSTANCE,
             PowderedSnowClutch.INSTANCE,
             TwistingVineClutch.INSTANCE,
             SweetBerryClutch.INSTANCE,

@@ -206,8 +206,8 @@ public class MovementDescend extends Movement {
                 break;
             }
             else if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightClutch + 1) {
-                for (Clutch c : ClutchHelper.clutches) {
-                    if (c.clutchable(context, destX, newY, destZ, clutchRes) && unprotectedFallHeight * c.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1) {
+                for (Clutch clutch : ClutchHelper.CLUTCHES) {
+                    if (clutch.clutchable(context, destX, newY, destZ, clutchRes) && unprotectedFallHeight * clutch.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1) {
                         res.x = destX;
                         res.y = newY + 1;// this is the block we're falling onto, so dest is +1
                         res.z = destZ;

@@ -94,10 +94,8 @@ public class MovementFall extends Movement {
                     return state;
                 }
             }
-            else {
-                if (!clutchResult.clutch.compare(destState)) {
-                    clutchResult.clutch.clutch(baritone, state, dest, clutchResult);
-                }
+            else if (!clutchResult.clutch.compare(destState)) {
+                clutchResult.clutch.clutch(baritone, state, dest, clutchResult);
             }
         }
         else if (playerFeet.equals(dest)) {
