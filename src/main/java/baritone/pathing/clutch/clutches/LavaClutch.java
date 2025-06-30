@@ -40,20 +40,14 @@ public final class LavaClutch extends Clutch {
     public boolean compare(BlockState state) {
         return state.getFluidState().getType() instanceof LavaFluid;
     }
-    public boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
-        ItemStack item = getClutchingItem(context);
+    public ItemStack clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
         BlockState block = context.get(x, y, z);
         if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z, block) &&
-                (!context.considerPotionEffects || context.getBaritone().getPlayerContext().player().hasEffect(MobEffects.FIRE_RESISTANCE)) &&
-                item != null) {
-            if (result != null) {
-                result.clutch = INSTANCE;
-                result.stack = item;
-            }
-            return true;
+                (!context.considerPotionEffects || context.getBaritone().getPlayerContext().player().hasEffect(MobEffects.FIRE_RESISTANCE))) {
+            return getClutchingItem(context);
         }
         else {
-            return false;
+            return null;
         }
     }
 

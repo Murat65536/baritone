@@ -38,16 +38,11 @@ public final class SweetBerryClutch extends Clutch {
         return state.is(Blocks.SWEET_BERRY_BUSH);
     }
 
-    public boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
-        ItemStack item = getClutchingItem(context);
+    public ItemStack clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
         BlockState state = context.world.getBlockState(new BetterBlockPos(x, y, z));
-        if ((state.is(BlockTags.DIRT) || state.is(Blocks.FARMLAND)) && item != null) {
-            if (result != null) {
-                result.clutch = INSTANCE;
-                result.stack = item;
-            }
-            return true;
+        if ((state.is(BlockTags.DIRT) || state.is(Blocks.FARMLAND))) {
+            return getClutchingItem(context);
         }
-        return false;
+        return null;
     }
 }

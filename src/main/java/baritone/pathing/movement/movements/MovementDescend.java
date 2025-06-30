@@ -30,6 +30,7 @@ import baritone.utils.pathing.MutableClutchResult;
 import baritone.utils.pathing.MutableMoveResult;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FallingBlock;
@@ -207,7 +208,12 @@ public class MovementDescend extends Movement {
             }
             else if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightClutch + 1) {
                 for (Clutch clutch : ClutchHelper.CLUTCHES) {
-                    if (clutch.clutchable(context, destX, newY, destZ, clutchRes) && unprotectedFallHeight * clutch.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1) {
+                    ItemStack item = clutch.clutchable(context, destX, newY, destZ, clutchRes);
+                    if (item != null && unprotectedFallHeight * clutch.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1) {
+                        if (clutchRes != null) {
+                            clutchRes.clutch = clutch;
+                            clutchRes.stack = item;
+                        }
                         res.x = destX;
                         res.y = newY + 1;// this is the block we're falling onto, so dest is +1
                         res.z = destZ;

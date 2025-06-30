@@ -51,7 +51,7 @@ public abstract class Clutch {
         return fallDamageModifier;
     }
     public abstract boolean compare(BlockState state);
-    public abstract boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result);
+    public abstract ItemStack clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result);
     public void clutch(IBaritone baritone, MovementState state, BetterBlockPos dest, MutableClutchResult result) {
         ClutchHelper.blockClutch(baritone, state, dest, result, true);
     }

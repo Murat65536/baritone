@@ -41,21 +41,17 @@ public final class LadderClutch extends Clutch {
     public boolean compare(BlockState state) {
         return state.is(Blocks.LADDER);
     }
-    public boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
-        ItemStack item = getClutchingItem(context);
+    public ItemStack clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
         if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z) &&
                 (context.get(x - 1, y + 1, z).isFaceSturdy(context.bsi.access, new BetterBlockPos(x - 1, y + 1, z), Direction.EAST) ||
                         context.get(x + 1, y + 1, z).isFaceSturdy(context.bsi.access, new BetterBlockPos(x + 1, y + 1, z), Direction.WEST) ||
                         context.get(x, y + 1, z - 1).isFaceSturdy(context.bsi.access, new BetterBlockPos(x, y + 1, z - 1), Direction.SOUTH) ||
-                        context.get(x, y + 1, z + 1).isFaceSturdy(context.bsi.access, new BetterBlockPos(x, y + 1, z + 1), Direction.NORTH)) &&
-            item != null) {
-            if (result != null) {
-                result.clutch = INSTANCE;
-                result.stack = item;
-            }
-            return true;
+                        context.get(x, y + 1, z + 1).isFaceSturdy(context.bsi.access, new BetterBlockPos(x, y + 1, z + 1), Direction.NORTH))) {
+            return getClutchingItem(context);
         }
-        return false;
+        else {
+            return null;
+        }
     }
 
     @Override

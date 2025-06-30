@@ -41,21 +41,15 @@ public final class WaterClutch extends Clutch {
     public boolean compare(BlockState state) {
         return state.getFluidState().getType() instanceof WaterFluid;
     }
-    public boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
-        ItemStack item = getClutchingItem(context);
+    public ItemStack clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
         BlockState block = context.get(x, y, z);
         if (!(block.getBlock() instanceof SimpleWaterloggedBlock) &&
                 MovementHelper.canPlaceAgainst(context.bsi, x, y, z, block) &&
-                context.world.dimension() != Level.NETHER &&
-                item != null) {
-            if (result != null) {
-                result.clutch = INSTANCE;
-                result.stack = item;
-            }
-            return true;
+                context.world.dimension() != Level.NETHER) {
+            return getClutchingItem(context);
         }
         else {
-            return false;
+            return null;
         }
     }
 

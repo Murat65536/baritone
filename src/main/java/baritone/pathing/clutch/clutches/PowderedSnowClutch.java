@@ -39,16 +39,13 @@ public final class PowderedSnowClutch extends Clutch {
     public boolean compare(BlockState state) {
         return state.is(Blocks.POWDER_SNOW);
     }
-    public boolean clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
-        ItemStack item = getClutchingItem(context);
-        if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z) && item != null) {
-            if (result != null) {
-                result.clutch = INSTANCE;
-                result.stack = item;
-            }
-            return true;
+    public ItemStack clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
+        if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z)) {
+            return getClutchingItem(context);
         }
-        return false;
+        else {
+            return null;
+        }
     }
 
     @Override
