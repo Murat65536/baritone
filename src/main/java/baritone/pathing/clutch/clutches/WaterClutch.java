@@ -41,18 +41,13 @@ public final class WaterClutch extends Clutch {
     public boolean compare(BlockState state) {
         return state.getFluidState().getType() instanceof WaterFluid;
     }
-    public ItemStack clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
+    @Override
+    public boolean clutchable(CalculationContext context, int x, int y, int z) {
         BlockState block = context.get(x, y, z);
-        if (!(block.getBlock() instanceof SimpleWaterloggedBlock) &&
+        return !(block.getBlock() instanceof SimpleWaterloggedBlock) &&
                 MovementHelper.canPlaceAgainst(context.bsi, x, y, z, block) &&
-                context.world.dimension() != Level.NETHER) {
-            return getClutchingItem(context);
-        }
-        else {
-            return null;
-        }
+                context.world.dimension() != Level.NETHER;
     }
-
     @Override
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
         return ClutchHelper.bucketPickup(state, ctx.player().getInventory());

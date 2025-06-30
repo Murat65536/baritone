@@ -41,20 +41,10 @@ public final class ScaffoldingClutch extends Clutch {
     public boolean compare(BlockState state) {
         return state.is(Blocks.SCAFFOLDING);
     }
-    public ItemStack clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
-        if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z)) {
-            return getClutchingItem(context);
-        }
-        else {
-            return null;
-        }
-    }
-
     @Override
     public boolean clutched(IPlayerContext ctx, BetterBlockPos dest) {
         return super.clutched(ctx, dest.above());
     }
-
     @Override
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
         state.setInput(Input.SNEAK, true);

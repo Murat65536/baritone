@@ -36,10 +36,4 @@ public final class TwistingVineClutch extends Clutch {
     public boolean compare(BlockState state) {
         return state.is(Blocks.TWISTING_VINES);
     }
-    public ItemStack clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
-        if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z)) {
-            return getClutchingItem(context);
-        }
-        return null;
-    }
 }

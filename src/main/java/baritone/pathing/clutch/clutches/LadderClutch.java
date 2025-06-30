@@ -41,19 +41,14 @@ public final class LadderClutch extends Clutch {
     public boolean compare(BlockState state) {
         return state.is(Blocks.LADDER);
     }
-    public ItemStack clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
-        if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z) &&
+    @Override
+    public boolean clutchable(CalculationContext context, int x, int y, int z) {
+        return MovementHelper.canPlaceAgainst(context.bsi, x, y, z) &&
                 (context.get(x - 1, y + 1, z).isFaceSturdy(context.bsi.access, new BetterBlockPos(x - 1, y + 1, z), Direction.EAST) ||
                         context.get(x + 1, y + 1, z).isFaceSturdy(context.bsi.access, new BetterBlockPos(x + 1, y + 1, z), Direction.WEST) ||
                         context.get(x, y + 1, z - 1).isFaceSturdy(context.bsi.access, new BetterBlockPos(x, y + 1, z - 1), Direction.SOUTH) ||
-                        context.get(x, y + 1, z + 1).isFaceSturdy(context.bsi.access, new BetterBlockPos(x, y + 1, z + 1), Direction.NORTH))) {
-            return getClutchingItem(context);
-        }
-        else {
-            return null;
-        }
+                        context.get(x, y + 1, z + 1).isFaceSturdy(context.bsi.access, new BetterBlockPos(x, y + 1, z + 1), Direction.NORTH));
     }
-
     @Override
     public void clutch(IBaritone baritone, MovementState state, BetterBlockPos dest, MutableClutchResult result) {
         ClutchHelper.blockClutch(baritone, state, dest, result, false);

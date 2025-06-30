@@ -208,8 +208,10 @@ public class MovementDescend extends Movement {
             }
             else if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightClutch + 1) {
                 for (Clutch clutch : ClutchHelper.CLUTCHES) {
-                    ItemStack item = clutch.clutchable(context, destX, newY, destZ, clutchRes);
-                    if (item != null && unprotectedFallHeight * clutch.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1) {
+                    ItemStack item = clutch.getClutchingItem(context);
+                    if (clutch.clutchable(context, destX, newY, destZ) &&
+                            item != null &&
+                            unprotectedFallHeight * clutch.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1) {
                         if (clutchRes != null) {
                             clutchRes.clutch = clutch;
                             clutchRes.stack = item;

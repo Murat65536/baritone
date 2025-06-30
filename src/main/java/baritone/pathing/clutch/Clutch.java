@@ -22,6 +22,7 @@ import baritone.api.IBaritone;
 import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.IPlayerContext;
 import baritone.pathing.movement.CalculationContext;
+import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
 import com.google.common.collect.ImmutableSet;
@@ -51,7 +52,9 @@ public abstract class Clutch {
         return fallDamageModifier;
     }
     public abstract boolean compare(BlockState state);
-    public abstract ItemStack clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result);
+    public boolean clutchable(CalculationContext context, int x, int y, int z) {
+        return MovementHelper.canPlaceAgainst(context.bsi, x, y, z);
+    }
     public void clutch(IBaritone baritone, MovementState state, BetterBlockPos dest, MutableClutchResult result) {
         ClutchHelper.blockClutch(baritone, state, dest, result, true);
     }

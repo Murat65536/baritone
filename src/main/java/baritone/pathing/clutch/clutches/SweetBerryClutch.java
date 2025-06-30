@@ -37,12 +37,9 @@ public final class SweetBerryClutch extends Clutch {
     public boolean compare(BlockState state) {
         return state.is(Blocks.SWEET_BERRY_BUSH);
     }
-
-    public ItemStack clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
+    @Override
+    public boolean clutchable(CalculationContext context, int x, int y, int z) {
         BlockState state = context.world.getBlockState(new BetterBlockPos(x, y, z));
-        if ((state.is(BlockTags.DIRT) || state.is(Blocks.FARMLAND))) {
-            return getClutchingItem(context);
-        }
-        return null;
+        return state.is(BlockTags.DIRT) || state.is(Blocks.FARMLAND);
     }
 }

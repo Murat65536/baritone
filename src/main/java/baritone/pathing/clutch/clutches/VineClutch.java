@@ -61,20 +61,14 @@ public final class VineClutch extends Clutch {
             }
         }
     }
-
-    public ItemStack clutchable(CalculationContext context, int x, int y, int z, MutableClutchResult result) {
-        if (MovementHelper.canPlaceAgainst(context.bsi, x, y, z) &&
+    @Override
+    public boolean clutchable(CalculationContext context, int x, int y, int z) {
+        return MovementHelper.canPlaceAgainst(context.bsi, x, y, z) &&
                 (canSupportAtFace(context.bsi.access, new BetterBlockPos(x - 1, y + 1, z), Direction.WEST) ||
                         canSupportAtFace(context.bsi.access, new BetterBlockPos(x + 1, y + 1, z), Direction.EAST) ||
                         canSupportAtFace(context.bsi.access, new BetterBlockPos(x, y + 1, z - 1), Direction.NORTH) ||
-                        canSupportAtFace(context.bsi.access, new BetterBlockPos(x, y + 1, z + 1), Direction.SOUTH))) {
-            return getClutchingItem(context);
-        }
-        else {
-            return null;
-        }
+                        canSupportAtFace(context.bsi.access, new BetterBlockPos(x, y + 1, z + 1), Direction.SOUTH));
     }
-
     @Override
     public void clutch(IBaritone baritone, MovementState state, BetterBlockPos dest, MutableClutchResult result) {
         ClutchHelper.blockClutch(baritone, state, dest, result, false);

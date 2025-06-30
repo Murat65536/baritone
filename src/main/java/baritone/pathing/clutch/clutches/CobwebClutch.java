@@ -17,30 +17,28 @@
 
 package baritone.pathing.clutch.clutches;
 
+import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.IPlayerContext;
-import baritone.pathing.clutch.ClutchHelper;
-import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.clutch.Clutch;
+import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.MovementHelper;
-import baritone.pathing.movement.MovementState;
-import baritone.utils.pathing.MutableClutchResult;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-public final class PowderedSnowClutch extends Clutch {
-    public static final PowderedSnowClutch INSTANCE = new PowderedSnowClutch();
+public final class CobwebClutch extends Clutch {
+    public static final CobwebClutch INSTANCE = new CobwebClutch();
 
-    private PowderedSnowClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.POWDER_SNOW_BUCKET)), 0f);
+    private CobwebClutch() {
+        super(ImmutableSet.of(new ItemStack(Items.COBWEB)), 0f);
     }
     public boolean compare(BlockState state) {
-        return state.is(Blocks.POWDER_SNOW);
+        return state.is(Blocks.COBWEB);
     }
     @Override
-    public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
-        return ClutchHelper.bucketPickup(state, ctx.player().getInventory());
+    public boolean clutched(IPlayerContext ctx, BetterBlockPos dest) {
+        return super.clutched(ctx, dest.above());
     }
 }
