@@ -20,8 +20,6 @@ package baritone.pathing.clutch.clutches;
 import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.IPlayerContext;
 import baritone.pathing.clutch.Clutch;
-import baritone.pathing.movement.CalculationContext;
-import baritone.pathing.movement.MovementHelper;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -32,7 +30,7 @@ public final class CobwebClutch extends Clutch {
     public static final CobwebClutch INSTANCE = new CobwebClutch();
 
     private CobwebClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.COBWEB)), 0f);
+        super(ImmutableSet.of(new ItemStack(Items.COBWEB)), 0f, false, 0d);
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.COBWEB);

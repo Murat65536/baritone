@@ -19,9 +19,7 @@ package baritone.pathing.clutch.clutches;
 
 import baritone.api.utils.IPlayerContext;
 import baritone.pathing.clutch.ClutchHelper;
-import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.clutch.Clutch;
-import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
 import com.google.common.collect.ImmutableSet;
@@ -34,7 +32,7 @@ public final class PowderedSnowClutch extends Clutch {
     public static final PowderedSnowClutch INSTANCE = new PowderedSnowClutch();
 
     private PowderedSnowClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.POWDER_SNOW_BUCKET)), 0f);
+        super(ImmutableSet.of(new ItemStack(Items.POWDER_SNOW_BUCKET)), 0f, false, 0d);
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.POWDER_SNOW);

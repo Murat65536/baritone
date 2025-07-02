@@ -20,7 +20,6 @@ package baritone.pathing.clutch.clutches;
 import baritone.api.utils.BetterBlockPos;
 import baritone.pathing.clutch.Clutch;
 import baritone.pathing.movement.CalculationContext;
-import baritone.utils.pathing.MutableClutchResult;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.ItemStack;
@@ -32,13 +31,13 @@ public final class SweetBerryClutch extends Clutch {
     public static final SweetBerryClutch INSTANCE = new SweetBerryClutch();
 
     private SweetBerryClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.SWEET_BERRIES)), 0f);
+        super(ImmutableSet.of(new ItemStack(Items.SWEET_BERRIES)), 0f, false, 0d);
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.SWEET_BERRY_BUSH);
     }
     @Override
-    public boolean clutchable(CalculationContext context, int x, int y, int z) {
+    public boolean placeable(CalculationContext context, int x, int y, int z) {
         BlockState state = context.world.getBlockState(new BetterBlockPos(x, y, z));
         return state.is(BlockTags.DIRT) || state.is(Blocks.FARMLAND);
     }

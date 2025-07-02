@@ -36,13 +36,13 @@ public final class LadderClutch extends Clutch {
     public static final LadderClutch INSTANCE = new LadderClutch();
 
     private LadderClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.LADDER)), 0f);
+        super(ImmutableSet.of(new ItemStack(Items.LADDER)), 0f, false, 0d);
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.LADDER);
     }
     @Override
-    public boolean clutchable(CalculationContext context, int x, int y, int z) {
+    public boolean placeable(CalculationContext context, int x, int y, int z) {
         return MovementHelper.canPlaceAgainst(context.bsi, x, y, z) &&
                 (context.get(x - 1, y + 1, z).isFaceSturdy(context.bsi.access, new BetterBlockPos(x - 1, y + 1, z), Direction.EAST) ||
                         context.get(x + 1, y + 1, z).isFaceSturdy(context.bsi.access, new BetterBlockPos(x + 1, y + 1, z), Direction.WEST) ||

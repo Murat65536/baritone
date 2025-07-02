@@ -21,8 +21,6 @@ import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.IPlayerContext;
 import baritone.api.utils.input.Input;
 import baritone.pathing.clutch.Clutch;
-import baritone.pathing.movement.CalculationContext;
-import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
 import com.google.common.collect.ImmutableSet;
@@ -35,7 +33,7 @@ public final class ScaffoldingClutch extends Clutch {
     public static final ScaffoldingClutch INSTANCE = new ScaffoldingClutch();
 
     private ScaffoldingClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.SCAFFOLDING)), 0f);
+        super(ImmutableSet.of(new ItemStack(Items.SCAFFOLDING)), 0f, false, 0d);
     }
 
     public boolean compare(BlockState state) {

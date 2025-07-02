@@ -147,47 +147,33 @@ public class MovementDescend extends Movement {
         double costSoFar = 0;
         int effectiveStartHeight = y;
         int newY;
+        fallCalc:
         for (int fallHeight = 3; (newY = y - fallHeight) >= context.world.getMinBuildHeight(); fallHeight++) {
             boolean reachedMinimum = fallHeight >= context.minFallHeight;
             BlockState ontoBlock = context.get(destX, newY, destZ);
             int unprotectedFallHeight = fallHeight - (y - effectiveStartHeight); // equal to fallHeight - y + effectiveFallHeight, which is equal to -newY + effectiveFallHeight, which is equal to effectiveFallHeight - newY
             double tentativeCost = WALK_OFF_BLOCK_COST + FALL_N_BLOCKS_COST[unprotectedFallHeight] + frontBreak + costSoFar;
-            if (reachedMinimum && MovementHelper.isWater(ontoBlock)) {
-                if (!MovementHelper.canWalkThrough(context, destX, newY, destZ, ontoBlock)) {
-                    break;
+            if (reachedMinimum && unprotectedFallHeight > context.maxFallHeightNoClutch) {
+                for (Clutch clutch : ClutchHelper.CLUTCHES) {
+                    if (clutch.clutchable(context) &&
+                            unprotectedFallHeight * clutch.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1 &&
+                            clutch.compare(context.get(destX, newY, destZ))) {
+                        if (clutch.isSolid()) {
+                            if (clutchRes != null) {
+                                clutchRes.clutch = clutch;
+                            }
+                            res.x = destX;
+                            res.y = newY + 1;// this is the block we're falling onto, so dest is +1
+                            res.z = destZ;
+                            res.cost = tentativeCost + clutch.getCost(); // TODO Add cost of falling on block.
+                            break fallCalc;
+                        } else {
+                            costSoFar += FALL_N_BLOCKS_COST[unprotectedFallHeight - 1] + clutch.getCost() * 2; // Player is 2 blocks, so it's slowed on both
+                            effectiveStartHeight = newY; // TODO Player height is 2 blocks
+                            continue fallCalc;
+                        }
+                    }
                 }
-                else if (context.assumeWalkOnWater) {
-                    break; // TODO fix
-                }
-                else if (MovementHelper.isFlowing(destX, newY, destZ, ontoBlock, context.bsi)) {
-                    break; // TODO flowing check required here?
-                }
-                else if (!MovementHelper.canWalkOn(context, destX, newY - 1, destZ)) {
-                    // we could punch right through the water into something else
-                    break;
-                }
-                // found a fall into water
-                res.x = destX;
-                res.y = newY;
-                res.z = destZ;
-                res.cost = tentativeCost;// TODO incorporate water swim up cost?
-                break;
-            }
-            else if (reachedMinimum && context.allowFallIntoLava && MovementHelper.isLava(ontoBlock)) {
-                // found a fall into lava
-                res.x = destX;
-                res.y = newY;
-                res.z = destZ;
-                res.cost = tentativeCost;
-                break;
-            }
-            else if (unprotectedFallHeight <= 11 && (ontoBlock.getBlock() == Blocks.VINE || ontoBlock.getBlock() == Blocks.LADDER)) {
-                // if fall height is greater than or equal to 11, we don't actually grab on to vines or ladders. the more you know
-                // this effectively "resets" our falling speed
-                costSoFar += FALL_N_BLOCKS_COST[unprotectedFallHeight - 1];// we fall until the top of this block (not including this block)
-                costSoFar += LADDER_DOWN_ONE_COST;
-                effectiveStartHeight = newY;
-                continue;
             }
             else if (MovementHelper.canWalkThrough(context, destX, newY, destZ, ontoBlock)) {
                 continue;
@@ -209,18 +195,19 @@ public class MovementDescend extends Movement {
             else if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightClutch + 1) {
                 for (Clutch clutch : ClutchHelper.CLUTCHES) {
                     ItemStack item = clutch.getClutchingItem(context);
-                    if (clutch.clutchable(context, destX, newY, destZ) &&
-                            item != null &&
-                            unprotectedFallHeight * clutch.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1) {
+                    if (clutch.clutchable(context) &&
+                            unprotectedFallHeight * clutch.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1 &&
+                            clutch.placeable(context, destX, newY, destZ) &&
+                            item != null) {
                         if (clutchRes != null) {
                             clutchRes.clutch = clutch;
-                            clutchRes.stack = item;
+                            clutchRes.item = item;
                         }
                         res.x = destX;
                         res.y = newY + 1;// this is the block we're falling onto, so dest is +1
                         res.z = destZ;
                         res.cost = tentativeCost + context.placeBlockCost;
-                        break;
+                        break fallCalc;
                     }
                 }
                 break;

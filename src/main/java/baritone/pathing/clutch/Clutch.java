@@ -34,10 +34,14 @@ import net.minecraft.world.phys.Vec3;
 public abstract class Clutch {
     private final ImmutableSet<ItemStack> stack;
     private final float fallDamageModifier;
+    private final boolean solid;
+    private final double cost;
 
-    protected Clutch(ImmutableSet<ItemStack> stack, float fallDamageModifier) {
+    protected Clutch(ImmutableSet<ItemStack> stack, float fallDamageModifier, boolean solid, double cost) {
         this.stack = stack;
         this.fallDamageModifier = fallDamageModifier;
+        this.solid = solid;
+        this.cost = cost;
     }
     public final ItemStack getClutchingItem(CalculationContext context) {
         for (ItemStack item : stack) {
@@ -51,9 +55,18 @@ public abstract class Clutch {
     public final float getFallDamageModifier() {
         return fallDamageModifier;
     }
+    public final boolean isSolid() {
+        return solid;
+    }
+    public final double getCost() {
+        return cost;
+    }
     public abstract boolean compare(BlockState state);
-    public boolean clutchable(CalculationContext context, int x, int y, int z) {
+    public boolean placeable(CalculationContext context, int x, int y, int z) {
         return MovementHelper.canPlaceAgainst(context.bsi, x, y, z);
+    }
+    public boolean clutchable(CalculationContext context) {
+        return true;
     }
     public void clutch(IBaritone baritone, MovementState state, BetterBlockPos dest, MutableClutchResult result) {
         ClutchHelper.blockClutch(baritone, state, dest, result, true);

@@ -39,7 +39,7 @@ public final class VineClutch extends Clutch {
     public static final VineClutch INSTANCE = new VineClutch();
 
     private VineClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.VINE)), 0f);
+        super(ImmutableSet.of(new ItemStack(Items.VINE)), 0f, false, 0d);
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.VINE);
@@ -62,7 +62,7 @@ public final class VineClutch extends Clutch {
         }
     }
     @Override
-    public boolean clutchable(CalculationContext context, int x, int y, int z) {
+    public boolean placeable(CalculationContext context, int x, int y, int z) {
         return MovementHelper.canPlaceAgainst(context.bsi, x, y, z) &&
                 (canSupportAtFace(context.bsi.access, new BetterBlockPos(x - 1, y + 1, z), Direction.WEST) ||
                         canSupportAtFace(context.bsi.access, new BetterBlockPos(x + 1, y + 1, z), Direction.EAST) ||

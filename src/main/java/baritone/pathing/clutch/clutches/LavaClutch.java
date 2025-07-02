@@ -35,17 +35,14 @@ public final class LavaClutch extends Clutch {
     public static final LavaClutch INSTANCE = new LavaClutch();
 
     private LavaClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.LAVA_BUCKET)), 0f);
+        super(ImmutableSet.of(new ItemStack(Items.LAVA_BUCKET)), 0f, false, 0d);
     }
     public boolean compare(BlockState state) {
         return state.getFluidState().getType() instanceof LavaFluid;
     }
     @Override
-    public boolean clutchable(CalculationContext context, int x, int y, int z) {
-        BlockState block = context.get(x, y, z);
-        return MovementHelper.canPlaceAgainst(context.bsi, x, y, z, block) &&
-                (!context.considerPotionEffects ||
-                        context.getBaritone().getPlayerContext().player().hasEffect(MobEffects.FIRE_RESISTANCE));
+    public boolean clutchable(CalculationContext context) {
+        return !context.considerPotionEffects || context.getBaritone().getPlayerContext().player().hasEffect(MobEffects.FIRE_RESISTANCE);
     }
     @Override
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {

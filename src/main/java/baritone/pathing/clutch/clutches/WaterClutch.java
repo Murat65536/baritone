@@ -36,13 +36,13 @@ public final class WaterClutch extends Clutch {
     public static final WaterClutch INSTANCE = new WaterClutch();
 
     private WaterClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.WATER_BUCKET)), 0f);
+        super(ImmutableSet.of(new ItemStack(Items.WATER_BUCKET)), 0f, false, 0d);
     }
     public boolean compare(BlockState state) {
         return state.getFluidState().getType() instanceof WaterFluid;
     }
     @Override
-    public boolean clutchable(CalculationContext context, int x, int y, int z) {
+    public boolean placeable(CalculationContext context, int x, int y, int z) {
         BlockState block = context.get(x, y, z);
         return !(block.getBlock() instanceof SimpleWaterloggedBlock) &&
                 MovementHelper.canPlaceAgainst(context.bsi, x, y, z, block) &&
