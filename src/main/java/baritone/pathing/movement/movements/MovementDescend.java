@@ -192,7 +192,11 @@ public class MovementDescend extends Movement {
                 res.cost = tentativeCost;
                 break;
             }
-            else if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightClutch + 1) {
+            else if (reachedMinimum &&
+                    unprotectedFallHeight <= context.maxFallHeightClutch + 1 &&
+                    context.allowPlace &&
+                    !context.isPossiblyProtected(destX, newY, destZ) &&
+                    context.worldBorder.canPlaceAt(destX, destZ)) {
                 for (Clutch clutch : ClutchHelper.CLUTCHES) {
                     ItemStack item = clutch.getClutchingItem(context);
                     if (clutch.clutchable(context) &&

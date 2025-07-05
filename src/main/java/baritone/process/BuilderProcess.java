@@ -1146,14 +1146,14 @@ public final class BuilderProcess extends BaritoneProcessHelper implements IBuil
                     // i'm such an idiot that i just tried to copy and paste the epic gamer moment emoji too
                     // get added to unicode when?
                 }
-                if (!hasThrowaway) {
+                if (!(allowPlace && hasThrowaway)) {
                     return COST_INF;
                 }
                 // we want it to be something that we don't have
                 // even more of a pain to place something wrong
                 return placeBlockCost * 1.5 * Baritone.settings().placeIncorrectBlockPenaltyMultiplier.value;
             } else {
-                if (hasThrowaway) {
+                if (allowPlace && hasThrowaway) {
                     return placeBlockCost;
                 } else {
                     return COST_INF;

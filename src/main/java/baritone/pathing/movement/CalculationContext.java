@@ -49,6 +49,7 @@ public class CalculationContext {
     public final WorldData worldData;
     public final BlockStateInterface bsi;
     public final ToolSet toolSet;
+    public final boolean allowPlace;
     public final boolean hasThrowaway;
     public final boolean canSprint;
     public double placeBlockCost;
@@ -90,7 +91,8 @@ public class CalculationContext {
         this.worldData = (WorldData) baritone.getPlayerContext().worldData();
         this.bsi = new BlockStateInterface(baritone.getPlayerContext(), forUseOnAnotherThread);
         this.toolSet = new ToolSet(player);
-        this.hasThrowaway = Baritone.settings().allowPlace.value && ((Baritone) baritone).getInventoryBehavior().hasGenericThrowaway();
+        this.allowPlace = Baritone.settings().allowPlace.value;
+        this.hasThrowaway = ((Baritone) baritone).getInventoryBehavior().hasGenericThrowaway();
         this.canSprint = Baritone.settings().allowSprint.value && player.getFoodData().getFoodLevel() > 6;
         this.placeBlockCost = Baritone.settings().blockPlacementPenalty.value;
         this.allowBreak = Baritone.settings().allowBreak.value;
@@ -146,7 +148,7 @@ public class CalculationContext {
     }
 
     public double costOfPlacingAt(int x, int y, int z, BlockState current) {
-        if (!hasThrowaway) { // only true if allowPlace is true, see constructor
+        if (!(allowPlace && hasThrowaway)) {
             return COST_INF;
         }
         if (isPossiblyProtected(x, y, z)) {
