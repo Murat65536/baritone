@@ -79,7 +79,7 @@ public interface ActionCosts {
     static double velocity(int ticks, double multiplier, double startingVelocity) {
         double velocity = startingVelocity;
         for (int i = 0; i < ticks; i++) {
-            velocity = 0.98 * (velocity - 0.08 * multiplier);
+            velocity = 0.98 * (velocity + 0.08 * multiplier);
         }
         return velocity;
     }
@@ -107,13 +107,12 @@ public interface ActionCosts {
         double tmpDistance = distance;
         int tickCount = 0;
         while (true) {
-            System.out.println("doi");
             double fallDistance;
             if (tmpDistance <= endBlockHeight) {
-                fallDistance = -velocity(tickCount, endBlockSpeedMultiplier, startingVelocity);
+                fallDistance = velocity(tickCount, endBlockSpeedMultiplier, startingVelocity);
             }
             else {
-                fallDistance = -velocity(tickCount, 1, startingVelocity);
+                fallDistance = velocity(tickCount, 1d, startingVelocity);
             }
             if (tmpDistance <= fallDistance) {
                 return tickCount + tmpDistance / fallDistance;

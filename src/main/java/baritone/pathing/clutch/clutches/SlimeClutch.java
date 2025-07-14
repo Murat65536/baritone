@@ -33,10 +33,7 @@ public final class SlimeClutch extends Clutch {
     public static final SlimeClutch INSTANCE = new SlimeClutch();
 
     private SlimeClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.SLIME_BLOCK)), 0f, true);
-    }
-    public boolean compare(BlockState state) {
-        return state.is(Blocks.SLIME_BLOCK);
+        super(ImmutableSet.of(new ItemStack(Items.SLIME_BLOCK)), Blocks.SLIME_BLOCK, true);
     }
     @Override
     public boolean clutched(IPlayerContext ctx, BetterBlockPos dest) {

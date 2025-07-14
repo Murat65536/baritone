@@ -28,17 +28,18 @@ import baritone.utils.pathing.MutableClutchResult;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 public abstract class Clutch {
     private final ImmutableSet<ItemStack> stack;
-    private final float fallDamageModifier;
+    private final Block block;
     private final boolean solid;
 
-    protected Clutch(ImmutableSet<ItemStack> stack, float fallDamageModifier, boolean solid) {
+    protected Clutch(ImmutableSet<ItemStack> stack, Block block, boolean solid) {
         this.stack = stack;
-        this.fallDamageModifier = fallDamageModifier;
+        this.block = block;
         this.solid = solid;
     }
     public final ItemStack getClutchingItem(CalculationContext context) {
@@ -50,13 +51,15 @@ public abstract class Clutch {
         }
         return null;
     }
-    public final float getFallDamageModifier() {
-        return fallDamageModifier;
+    public final Block getBlock() {
+        return block;
     }
     public final boolean isSolid() {
         return solid;
     }
-    public abstract boolean compare(BlockState state);
+    public boolean compare(BlockState state) {
+        return state.is(getBlock());
+    }
     public boolean placeable(CalculationContext context, int x, int y, int z) {
         return MovementHelper.canPlaceAgainst(context.bsi, x, y, z);
     }
@@ -71,6 +74,9 @@ public abstract class Clutch {
     }
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
         return true;
+    }
+    public float getFallDamageModifier() {
+        return 0f;
     }
     public double getAdditionalCost() {
         return 0d;

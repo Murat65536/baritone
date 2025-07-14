@@ -32,10 +32,7 @@ public final class PowderedSnowClutch extends Clutch {
     public static final PowderedSnowClutch INSTANCE = new PowderedSnowClutch();
 
     private PowderedSnowClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.POWDER_SNOW_BUCKET)), 0f, false);
-    }
-    public boolean compare(BlockState state) {
-        return state.is(Blocks.POWDER_SNOW);
+        super(ImmutableSet.of(new ItemStack(Items.POWDER_SNOW_BUCKET)), Blocks.POWDER_SNOW, false);
     }
     @Override
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {

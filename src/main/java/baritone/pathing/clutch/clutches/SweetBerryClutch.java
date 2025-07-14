@@ -31,14 +31,15 @@ public final class SweetBerryClutch extends Clutch {
     public static final SweetBerryClutch INSTANCE = new SweetBerryClutch();
 
     private SweetBerryClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.SWEET_BERRIES)), 0f, false);
-    }
-    public boolean compare(BlockState state) {
-        return state.is(Blocks.SWEET_BERRY_BUSH);
+        super(ImmutableSet.of(new ItemStack(Items.SWEET_BERRIES)), Blocks.SWEET_BERRY_BUSH, false);
     }
     @Override
     public boolean placeable(CalculationContext context, int x, int y, int z) {
         BlockState state = context.world.getBlockState(new BetterBlockPos(x, y, z));
         return state.is(BlockTags.DIRT) || state.is(Blocks.FARMLAND);
+    }
+    @Override
+    public double getCostMultiplier() {
+        return 0.75d;
     }
 }

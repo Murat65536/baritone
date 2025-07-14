@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.WaterFluid;
@@ -36,8 +37,9 @@ public final class WaterClutch extends Clutch {
     public static final WaterClutch INSTANCE = new WaterClutch();
 
     private WaterClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.WATER_BUCKET)), 0f, false);
+        super(ImmutableSet.of(new ItemStack(Items.WATER_BUCKET)), Blocks.WATER, false);
     }
+    @Override
     public boolean compare(BlockState state) {
         return state.getFluidState().getType() instanceof WaterFluid;
     }

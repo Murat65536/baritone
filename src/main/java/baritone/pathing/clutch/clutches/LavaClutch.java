@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.LavaFluid;
 
@@ -35,8 +36,9 @@ public final class LavaClutch extends Clutch {
     public static final LavaClutch INSTANCE = new LavaClutch();
 
     private LavaClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.LAVA_BUCKET)), 0f, false);
+        super(ImmutableSet.of(new ItemStack(Items.LAVA_BUCKET)), Blocks.LAVA, false);
     }
+    @Override
     public boolean compare(BlockState state) {
         return state.getFluidState().getType() instanceof LavaFluid;
     }
