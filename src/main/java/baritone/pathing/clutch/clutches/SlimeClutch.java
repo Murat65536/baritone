@@ -33,7 +33,7 @@ public final class SlimeClutch extends Clutch {
     public static final SlimeClutch INSTANCE = new SlimeClutch();
 
     private SlimeClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.SLIME_BLOCK)), 0f, true, 0d);
+        super(ImmutableSet.of(new ItemStack(Items.SLIME_BLOCK)), 0f, true);
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.SLIME_BLOCK);

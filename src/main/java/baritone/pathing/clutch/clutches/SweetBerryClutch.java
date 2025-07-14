@@ -31,7 +31,7 @@ public final class SweetBerryClutch extends Clutch {
     public static final SweetBerryClutch INSTANCE = new SweetBerryClutch();
 
     private SweetBerryClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.SWEET_BERRIES)), 0f, false, 0d);
+        super(ImmutableSet.of(new ItemStack(Items.SWEET_BERRIES)), 0f, false);
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.SWEET_BERRY_BUSH);

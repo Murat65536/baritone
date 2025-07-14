@@ -30,7 +30,7 @@ public final class HayBaleClutch extends Clutch {
     public static final HayBaleClutch INSTANCE = new HayBaleClutch();
 
     private HayBaleClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.HAY_BLOCK)), 0.2f, true, 0d);
+        super(ImmutableSet.of(new ItemStack(Items.HAY_BLOCK)), 0.2f, true);
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.HAY_BLOCK);

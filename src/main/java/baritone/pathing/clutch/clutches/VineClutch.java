@@ -39,7 +39,7 @@ public final class VineClutch extends Clutch {
     public static final VineClutch INSTANCE = new VineClutch();
 
     private VineClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.VINE)), 0f, false, 0d);
+        super(ImmutableSet.of(new ItemStack(Items.VINE)), 0f, false);
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.VINE);

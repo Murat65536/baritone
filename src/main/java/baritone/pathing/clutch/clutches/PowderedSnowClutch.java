@@ -32,7 +32,7 @@ public final class PowderedSnowClutch extends Clutch {
     public static final PowderedSnowClutch INSTANCE = new PowderedSnowClutch();
 
     private PowderedSnowClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.POWDER_SNOW_BUCKET)), 0f, false, 0d);
+        super(ImmutableSet.of(new ItemStack(Items.POWDER_SNOW_BUCKET)), 0f, false);
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.POWDER_SNOW);

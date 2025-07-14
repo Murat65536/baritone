@@ -28,7 +28,7 @@ public final class TwistingVineClutch extends Clutch {
     public static final TwistingVineClutch INSTANCE = new TwistingVineClutch();
 
     private TwistingVineClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.TWISTING_VINES)), 0f, false, 0d);
+        super(ImmutableSet.of(new ItemStack(Items.TWISTING_VINES)), 0f, false);
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.TWISTING_VINES);

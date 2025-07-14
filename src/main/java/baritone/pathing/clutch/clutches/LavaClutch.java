@@ -35,7 +35,7 @@ public final class LavaClutch extends Clutch {
     public static final LavaClutch INSTANCE = new LavaClutch();
 
     private LavaClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.LAVA_BUCKET)), 0f, false, 0d);
+        super(ImmutableSet.of(new ItemStack(Items.LAVA_BUCKET)), 0f, false);
     }
     public boolean compare(BlockState state) {
         return state.getFluidState().getType() instanceof LavaFluid;

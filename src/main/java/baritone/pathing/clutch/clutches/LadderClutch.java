@@ -36,7 +36,7 @@ public final class LadderClutch extends Clutch {
     public static final LadderClutch INSTANCE = new LadderClutch();
 
     private LadderClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.LADDER)), 0f, false, 0d);
+        super(ImmutableSet.of(new ItemStack(Items.LADDER)), 0f, false);
     }
     public boolean compare(BlockState state) {
         return state.is(Blocks.LADDER);

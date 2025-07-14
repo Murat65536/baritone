@@ -18,6 +18,7 @@
 package baritone.pathing.movement.movements;
 
 import baritone.api.IBaritone;
+import baritone.api.pathing.movement.ActionCosts;
 import baritone.api.pathing.movement.MovementStatus;
 import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.RotationUtils;
@@ -151,13 +152,13 @@ public class MovementDescend extends Movement {
         for (int fallHeight = 3; (newY = y - fallHeight) >= context.world.getMinBuildHeight(); fallHeight++) {
             boolean reachedMinimum = fallHeight >= context.minFallHeight;
             BlockState ontoBlock = context.get(destX, newY, destZ);
-            int unprotectedFallHeight = fallHeight - (y - effectiveStartHeight); // equal to fallHeight - y + effectiveFallHeight, which is equal to -newY + effectiveFallHeight, which is equal to effectiveFallHeight - newY
+            int unprotectedFallHeight = fallHeight - (y - effectiveStartHeight); // equal to fallHeight - y + effectiveStartHeight, which is equal to -newY + effectiveStartHeight, which is equal to effectiveStartHeight - newY
             double tentativeCost = WALK_OFF_BLOCK_COST + FALL_N_BLOCKS_COST[unprotectedFallHeight] + frontBreak + costSoFar;
             if (reachedMinimum && unprotectedFallHeight > context.maxFallHeightNoClutch) {
                 for (Clutch clutch : ClutchHelper.CLUTCHES) {
-                    if (clutch.clutchable(context) &&
-                            unprotectedFallHeight * clutch.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1 &&
-                            clutch.compare(context.get(destX, newY, destZ))) {
+                    if (clutch.compare(context.get(destX, newY, destZ)) &&
+                            clutch.clutchable(context) &&
+                            unprotectedFallHeight * clutch.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1) {
                         if (clutch.isSolid()) {
                             if (clutchRes != null) {
                                 clutchRes.clutch = clutch;
@@ -165,26 +166,26 @@ public class MovementDescend extends Movement {
                             res.x = destX;
                             res.y = newY + 1;// this is the block we're falling onto, so dest is +1
                             res.z = destZ;
-                            res.cost = tentativeCost + clutch.getCost(); // TODO Add cost of falling on block.
+                            res.cost = tentativeCost + clutch.getAdditionalCost();
                             break fallCalc;
                         } else {
-                            costSoFar += FALL_N_BLOCKS_COST[unprotectedFallHeight - 1] + clutch.getCost() * 2; // Player is 2 blocks, so it's slowed on both
-                            effectiveStartHeight = newY; // TODO Player height is 2 blocks
+                            costSoFar += ActionCosts.distanceToTicks(unprotectedFallHeight - 1, 2, clutch.getCostMultiplier(), 0); // Player is 2 blocks, so it's slowed on both
+                            effectiveStartHeight = newY - 1;
                             continue fallCalc;
                         }
                     }
                 }
             }
-            else if (MovementHelper.canWalkThrough(context, destX, newY, destZ, ontoBlock)) {
+            if (MovementHelper.canWalkThrough(context, destX, newY, destZ, ontoBlock)) {
                 continue;
             }
-            else if (!MovementHelper.canWalkOn(context, destX, newY, destZ, ontoBlock)) {
+            if (!MovementHelper.canWalkOn(context, destX, newY, destZ, ontoBlock)) {
                 break;
             }
-            else if (MovementHelper.isBottomSlab(ontoBlock)) {
+            if (MovementHelper.isBottomSlab(ontoBlock)) {
                 break; // falling onto a half slab is really glitchy, and can cause more fall damage than we'd expect
             }
-            else if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightNoClutch + 1) {
+            if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightNoClutch + 1) {
                 // fallHeight = 4 means onto.up() is 3 blocks down, which is the max
                 res.x = destX;
                 res.y = newY + 1;
@@ -192,7 +193,7 @@ public class MovementDescend extends Movement {
                 res.cost = tentativeCost;
                 break;
             }
-            else if (reachedMinimum &&
+            if (reachedMinimum &&
                     unprotectedFallHeight <= context.maxFallHeightClutch + 1 &&
                     context.allowPlace &&
                     !context.isPossiblyProtected(destX, newY, destZ) &&
@@ -207,10 +208,16 @@ public class MovementDescend extends Movement {
                             clutchRes.clutch = clutch;
                             clutchRes.item = item;
                         }
-                        res.x = destX;
-                        res.y = newY + 1;// this is the block we're falling onto, so dest is +1
-                        res.z = destZ;
                         res.cost = tentativeCost + context.placeBlockCost;
+                        res.x = destX;
+                        res.y = newY + 1; // this is the block we're falling onto, so dest is +1
+                        res.z = destZ;
+                        if (clutch.isSolid()) {
+                            res.cost += clutch.getAdditionalCost();
+                        }
+                        else {
+                            res.cost += ActionCosts.distanceToTicks(1, 1, clutch.getCostMultiplier(), ActionCosts.velocity(unprotectedFallHeight));
+                        }
                         break fallCalc;
                     }
                 }

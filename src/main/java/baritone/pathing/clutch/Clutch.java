@@ -35,13 +35,11 @@ public abstract class Clutch {
     private final ImmutableSet<ItemStack> stack;
     private final float fallDamageModifier;
     private final boolean solid;
-    private final double cost;
 
-    protected Clutch(ImmutableSet<ItemStack> stack, float fallDamageModifier, boolean solid, double cost) {
+    protected Clutch(ImmutableSet<ItemStack> stack, float fallDamageModifier, boolean solid) {
         this.stack = stack;
         this.fallDamageModifier = fallDamageModifier;
         this.solid = solid;
-        this.cost = cost;
     }
     public final ItemStack getClutchingItem(CalculationContext context) {
         for (ItemStack item : stack) {
@@ -58,9 +56,6 @@ public abstract class Clutch {
     public final boolean isSolid() {
         return solid;
     }
-    public final double getCost() {
-        return cost;
-    }
     public abstract boolean compare(BlockState state);
     public boolean placeable(CalculationContext context, int x, int y, int z) {
         return MovementHelper.canPlaceAgainst(context.bsi, x, y, z);
@@ -76,5 +71,11 @@ public abstract class Clutch {
     }
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
         return true;
+    }
+    public double getAdditionalCost() {
+        return 0d;
+    }
+    public double getCostMultiplier() {
+        return 1d;
     }
 }

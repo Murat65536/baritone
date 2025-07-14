@@ -33,7 +33,7 @@ public final class ScaffoldingClutch extends Clutch {
     public static final ScaffoldingClutch INSTANCE = new ScaffoldingClutch();
 
     private ScaffoldingClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.SCAFFOLDING)), 0f, false, 0d);
+        super(ImmutableSet.of(new ItemStack(Items.SCAFFOLDING)), 0f, false);
     }
 
     public boolean compare(BlockState state) {

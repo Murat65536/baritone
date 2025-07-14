@@ -76,8 +76,12 @@ public interface ActionCosts {
         return (Math.pow(0.98, ticks) - 1) * -3.92;
     }
 
-    static double oldFormula(double ticks) {
-        return -3.92 * (99 - 49.5 * (Math.pow(0.98, ticks) + 1) - ticks);
+    static double velocity(int ticks, double multiplier, double startingVelocity) {
+        double velocity = startingVelocity;
+        for (int i = 0; i < ticks; i++) {
+            velocity = 0.98 * (velocity - 0.08 * multiplier);
+        }
+        return velocity;
     }
 
     static double distanceToTicks(double distance) {
@@ -88,6 +92,29 @@ public interface ActionCosts {
         int tickCount = 0;
         while (true) {
             double fallDistance = velocity(tickCount);
+            if (tmpDistance <= fallDistance) {
+                return tickCount + tmpDistance / fallDistance;
+            }
+            tmpDistance -= fallDistance;
+            tickCount++;
+        }
+    }
+
+    static double distanceToTicks(double distance, double endBlockHeight, double endBlockSpeedMultiplier, double startingVelocity) {
+        if (distance == 0) {
+            return 0;
+        }
+        double tmpDistance = distance;
+        int tickCount = 0;
+        while (true) {
+            System.out.println("doi");
+            double fallDistance;
+            if (tmpDistance <= endBlockHeight) {
+                fallDistance = -velocity(tickCount, endBlockSpeedMultiplier, startingVelocity);
+            }
+            else {
+                fallDistance = -velocity(tickCount, 1, startingVelocity);
+            }
             if (tmpDistance <= fallDistance) {
                 return tickCount + tmpDistance / fallDistance;
             }
