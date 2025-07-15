@@ -188,9 +188,12 @@ public class MovementDescend extends Movement {
                             if (clutchRes != null) {
                                 clutchRes.clutch = clutch;
                             }
-                            break fallCalc;
-                        } else {
-                            costSoFar += ActionCosts.distanceToTicks(unprotectedFallHeight - 1, 2, clutch.getCostMultiplier(), 0); // Player is 2 blocks, so it's slowed on both
+                            break;
+                        }
+                        else {
+                            // TODO might be falling from one block, through a gap, and onto another. StartingVelocity is not always 0.
+                            // TODO account for falling through multiple blocks in a row. EndBlockHeight should be the number of blocks +1, not always 2.
+                            costSoFar = ActionCosts.distanceToTicks(unprotectedFallHeight - 1, 1, clutch.getCostMultiplier(), 0);
                             effectiveStartHeight = newY - 1;
                             continue fallCalc;
                         }
@@ -208,11 +211,22 @@ public class MovementDescend extends Movement {
                             unprotectedFallHeight * clutch.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1 &&
                             clutch.placeable(context, destX, newY, destZ) &&
                             item != null) {
+                        double newCost = tentativeCost + context.placeBlockCost;
                         if (clutch.isSolid()) {
-                            res.cost = tentativeCost + context.placeBlockCost + clutch.getAdditionalCost();
+                            if ((newCost += clutch.getAdditionalCost()) < res.cost) {
+                                res.cost = newCost;
+                            }
+                            else {
+                                break;
+                            }
                         }
                         else if (MovementHelper.canWalkOn(context, destX, newY, destZ, ontoBlock)) {
-                            res.cost = tentativeCost + context.placeBlockCost + ActionCosts.distanceToTicks(1, 1, clutch.getCostMultiplier(), ActionCosts.velocity(unprotectedFallHeight));
+                            if ((newCost += ActionCosts.distanceToTicks(1, 1, clutch.getCostMultiplier(), ActionCosts.velocity(unprotectedFallHeight))) < res.cost) {
+                                res.cost = newCost;
+                            }
+                            else {
+                                break;
+                            }
                         }
                         else {
                             continue;
@@ -224,10 +238,9 @@ public class MovementDescend extends Movement {
                             clutchRes.clutch = clutch;
                             clutchRes.item = item;
                         }
-                        break fallCalc;
+                        break;
                     }
                 }
-                break;
             }
             break;
         }
