@@ -32,6 +32,7 @@ import baritone.utils.pathing.MutableMoveResult;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.AirBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FallingBlock;
@@ -154,19 +155,39 @@ public class MovementDescend extends Movement {
             BlockState ontoBlock = context.get(destX, newY, destZ);
             int unprotectedFallHeight = fallHeight - (y - effectiveStartHeight); // equal to fallHeight - y + effectiveStartHeight, which is equal to -newY + effectiveStartHeight, which is equal to effectiveStartHeight - newY
             double tentativeCost = WALK_OFF_BLOCK_COST + FALL_N_BLOCKS_COST[unprotectedFallHeight] + frontBreak + costSoFar;
+            if (ontoBlock.getBlock() instanceof AirBlock) {
+                continue;
+            }
+            if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightNoClutch + 1) {
+                if (MovementHelper.canWalkThrough(context, destX, newY, destZ, ontoBlock)) {
+                    continue;
+                }
+                if (!MovementHelper.canWalkOn(context, destX, newY, destZ, ontoBlock)) {
+                    break;
+                }
+                if (MovementHelper.isBottomSlab(ontoBlock)) {
+                    break; // falling onto a half slab is really glitchy, and can cause more fall damage than we'd expect
+                }
+                // fallHeight = 4 means onto.up() is 3 blocks down, which is the max
+                res.x = destX;
+                res.y = newY + 1;
+                res.z = destZ;
+                res.cost = tentativeCost;
+                break;
+            }
             if (reachedMinimum && unprotectedFallHeight > context.maxFallHeightNoClutch) {
                 for (Clutch clutch : ClutchHelper.CLUTCHES) {
                     if (clutch.compare(context.get(destX, newY, destZ)) &&
                             clutch.clutchable(context) &&
                             unprotectedFallHeight * clutch.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1) {
                         if (clutch.isSolid()) {
-                            if (clutchRes != null) {
-                                clutchRes.clutch = clutch;
-                            }
+                            res.cost = tentativeCost + clutch.getAdditionalCost();
                             res.x = destX;
                             res.y = newY + 1;// this is the block we're falling onto, so dest is +1
                             res.z = destZ;
-                            res.cost = tentativeCost + clutch.getAdditionalCost();
+                            if (clutchRes != null) {
+                                clutchRes.clutch = clutch;
+                            }
                             break fallCalc;
                         } else {
                             costSoFar += ActionCosts.distanceToTicks(unprotectedFallHeight - 1, 2, clutch.getCostMultiplier(), 0); // Player is 2 blocks, so it's slowed on both
@@ -175,23 +196,6 @@ public class MovementDescend extends Movement {
                         }
                     }
                 }
-            }
-            if (MovementHelper.canWalkThrough(context, destX, newY, destZ, ontoBlock)) {
-                continue;
-            }
-            if (!MovementHelper.canWalkOn(context, destX, newY, destZ, ontoBlock)) {
-                break;
-            }
-            if (MovementHelper.isBottomSlab(ontoBlock)) {
-                break; // falling onto a half slab is really glitchy, and can cause more fall damage than we'd expect
-            }
-            if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightNoClutch + 1) {
-                // fallHeight = 4 means onto.up() is 3 blocks down, which is the max
-                res.x = destX;
-                res.y = newY + 1;
-                res.z = destZ;
-                res.cost = tentativeCost;
-                break;
             }
             if (reachedMinimum &&
                     unprotectedFallHeight <= context.maxFallHeightClutch + 1 &&
@@ -204,28 +208,28 @@ public class MovementDescend extends Movement {
                             unprotectedFallHeight * clutch.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1 &&
                             clutch.placeable(context, destX, newY, destZ) &&
                             item != null) {
-                        if (clutchRes != null) {
-                            clutchRes.clutch = clutch;
-                            clutchRes.item = item;
+                        if (clutch.isSolid()) {
+                            res.cost = tentativeCost + context.placeBlockCost + clutch.getAdditionalCost();
                         }
-                        res.cost = tentativeCost + context.placeBlockCost;
+                        else if (MovementHelper.canWalkOn(context, destX, newY, destZ, ontoBlock)) {
+                            res.cost = tentativeCost + context.placeBlockCost + ActionCosts.distanceToTicks(1, 1, clutch.getCostMultiplier(), ActionCosts.velocity(unprotectedFallHeight));
+                        }
+                        else {
+                            continue;
+                        }
                         res.x = destX;
                         res.y = newY + 1; // this is the block we're falling onto, so dest is +1
                         res.z = destZ;
-                        if (clutch.isSolid()) {
-                            res.cost += clutch.getAdditionalCost();
-                        }
-                        else {
-                            res.cost += ActionCosts.distanceToTicks(1, 1, clutch.getCostMultiplier(), ActionCosts.velocity(unprotectedFallHeight));
+                        if (clutchRes != null) {
+                            clutchRes.clutch = clutch;
+                            clutchRes.item = item;
                         }
                         break fallCalc;
                     }
                 }
                 break;
             }
-            else {
-                break;
-            }
+            break;
         }
     }
 
