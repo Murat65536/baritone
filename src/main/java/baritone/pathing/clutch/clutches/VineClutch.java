@@ -58,8 +58,8 @@ public final class VineClutch extends Clutch {
         }
     }
     @Override
-    public boolean placeable(CalculationContext context, int x, int y, int z) {
-        return MovementHelper.canPlaceAgainst(context.bsi, x, y, z) &&
+    public boolean placeable(CalculationContext context, int x, int y, int z, BlockState block) {
+        return super.placeable(context, x, y, z, block) &&
                 (canSupportAtFace(context.bsi.access, new BetterBlockPos(x - 1, y + 1, z), Direction.WEST) ||
                         canSupportAtFace(context.bsi.access, new BetterBlockPos(x + 1, y + 1, z), Direction.EAST) ||
                         canSupportAtFace(context.bsi.access, new BetterBlockPos(x, y + 1, z - 1), Direction.NORTH) ||

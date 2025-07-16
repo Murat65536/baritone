@@ -34,9 +34,8 @@ public final class SweetBerryClutch extends Clutch {
         super(ImmutableSet.of(new ItemStack(Items.SWEET_BERRIES)), Blocks.SWEET_BERRY_BUSH, false);
     }
     @Override
-    public boolean placeable(CalculationContext context, int x, int y, int z) {
-        BlockState state = context.world.getBlockState(new BetterBlockPos(x, y, z));
-        return state.is(BlockTags.DIRT) || state.is(Blocks.FARMLAND);
+    public boolean placeable(CalculationContext context, int x, int y, int z, BlockState block) {
+        return block.is(BlockTags.DIRT) || block.is(Blocks.FARMLAND);
     }
     @Override
     public double getCostMultiplier() {

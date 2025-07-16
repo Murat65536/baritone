@@ -153,6 +153,7 @@ public class MovementDescend extends Movement {
         for (int fallHeight = 3; (newY = y - fallHeight) >= context.world.getMinBuildHeight(); fallHeight++) {
             boolean reachedMinimum = fallHeight >= context.minFallHeight;
             BlockState ontoBlock = context.get(destX, newY, destZ);
+            BlockState aboveBlock = context.get(destX, newY + 1, destZ);
             int unprotectedFallHeight = fallHeight - (y - effectiveStartHeight); // equal to fallHeight - y + effectiveStartHeight, which is equal to -newY + effectiveStartHeight, which is equal to effectiveStartHeight - newY
             double tentativeCost = WALK_OFF_BLOCK_COST + FALL_N_BLOCKS_COST[unprotectedFallHeight] + frontBreak + costSoFar;
             if (ontoBlock.getBlock() instanceof AirBlock) {
@@ -193,7 +194,7 @@ public class MovementDescend extends Movement {
                         else {
                             // TODO might be falling from one block, through a gap, and onto another. StartingVelocity is not always 0.
                             // TODO account for falling through multiple blocks in a row. EndBlockHeight should be the number of blocks +1, not always 2.
-                            costSoFar = ActionCosts.distanceToTicks(unprotectedFallHeight - 1, 1, clutch.getCostMultiplier(), 0);
+                            costSoFar = ActionCosts.distanceToTicks(unprotectedFallHeight + 1, 1, clutch.getCostMultiplier(), 0);
                             effectiveStartHeight = newY - 1;
                             continue fallCalc;
                         }
@@ -203,13 +204,14 @@ public class MovementDescend extends Movement {
             if (reachedMinimum &&
                     unprotectedFallHeight <= context.maxFallHeightClutch + 1 &&
                     context.allowPlace &&
-                    !context.isPossiblyProtected(destX, newY, destZ) &&
-                    context.worldBorder.canPlaceAt(destX, destZ)) {
+                    !context.isPossiblyProtected(destX, newY + 1, destZ) &&
+                    context.worldBorder.canPlaceAt(destX, destZ) &&
+                    MovementHelper.isReplaceable(destX, newY + 1, destZ, aboveBlock, context.bsi)) {
                 for (Clutch clutch : ClutchHelper.CLUTCHES) {
                     ItemStack item = clutch.getClutchingItem(context);
                     if (clutch.clutchable(context) &&
                             unprotectedFallHeight * clutch.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1 &&
-                            clutch.placeable(context, destX, newY, destZ) &&
+                            clutch.placeable(context, destX, newY, destZ, ontoBlock) &&
                             item != null) {
                         double newCost = tentativeCost + context.placeBlockCost;
                         if (clutch.isSolid()) {
@@ -221,7 +223,7 @@ public class MovementDescend extends Movement {
                             }
                         }
                         else if (MovementHelper.canWalkOn(context, destX, newY, destZ, ontoBlock)) {
-                            if ((newCost += ActionCosts.distanceToTicks(1, 1, clutch.getCostMultiplier(), ActionCosts.velocity(unprotectedFallHeight))) < res.cost) {
+                            if ((newCost += ActionCosts.distanceToTicks(unprotectedFallHeight, 1, clutch.getCostMultiplier(), 0)) < res.cost) {
                                 res.cost = newCost;
                             }
                             else {
@@ -232,7 +234,7 @@ public class MovementDescend extends Movement {
                             continue;
                         }
                         res.x = destX;
-                        res.y = newY + 1; // this is the block we're falling onto, so dest is +1
+                        res.y = newY + 1; // Should be +2 but +1 seems to work better.
                         res.z = destZ;
                         if (clutchRes != null) {
                             clutchRes.clutch = clutch;

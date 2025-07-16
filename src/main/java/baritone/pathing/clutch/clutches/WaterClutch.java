@@ -44,10 +44,9 @@ public final class WaterClutch extends Clutch {
         return state.getFluidState().getType() instanceof WaterFluid;
     }
     @Override
-    public boolean placeable(CalculationContext context, int x, int y, int z) {
-        BlockState block = context.get(x, y, z);
-        return (!(block.getBlock() instanceof SimpleWaterloggedBlock) || MovementHelper.isBottomSlab(block)) &&
-                MovementHelper.canPlaceAgainst(context.bsi, x, y, z, block) &&
+    public boolean placeable(CalculationContext context, int x, int y, int z, BlockState block) {
+        return super.placeable(context, x, y, z, block) &&
+                (!(block.getBlock() instanceof SimpleWaterloggedBlock) || MovementHelper.isBottomSlab(block)) &&
                 context.world.dimension() != Level.NETHER;
     }
     @Override
