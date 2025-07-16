@@ -70,7 +70,7 @@ public abstract class Clutch {
         ClutchHelper.blockClutch(baritone, state, dest, result, true);
     }
     public boolean clutched(IPlayerContext ctx, BetterBlockPos dest) {
-        return ctx.player().getBoundingBox().intersects(Vec3.atLowerCornerOf(dest.below()), Vec3.atLowerCornerWithOffset(dest.below(), 1, 1, 1));
+        return ctx.player().getBoundingBox().intersects(Vec3.atLowerCornerOf(dest), Vec3.atLowerCornerWithOffset(dest, 1, 1, 1));
     }
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
         return true;

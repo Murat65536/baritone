@@ -41,6 +41,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 public class MovementFall extends Movement {
+    private final MutableMoveResult moveResult = new MutableMoveResult();
     private final MutableClutchResult clutchResult = new MutableClutchResult();
 
     public MovementFall(IBaritone baritone, BetterBlockPos src, BetterBlockPos dest) {
@@ -67,10 +68,9 @@ public class MovementFall extends Movement {
         return set;
     }
 
-    public void updateClutch(MutableClutchResult clutch) {
+    private void updateClutch() {
         CalculationContext context = new CalculationContext(baritone);
-        MutableMoveResult result = new MutableMoveResult();
-        MovementDescend.dynamicFallCost(context, src.x, src.y, src.z, dest.x, dest.z, 0, context.get(dest.x, src.y - 2, dest.z), result, clutch);
+        MovementDescend.dynamicFallCost(context, src.x, src.y, src.z, dest.x, dest.z, 0, context.get(dest.x, src.y - 2, dest.z), moveResult, clutchResult);
     }
 
     @Override
@@ -83,7 +83,10 @@ public class MovementFall extends Movement {
         BlockPos playerFeet = ctx.playerFeet();
         Rotation toDest = RotationUtils.calcRotationFromVec3d(ctx.playerHead(), VecUtils.getBlockPosCenter(dest), ctx.playerRotations());
         BlockState destState = ctx.world().getBlockState(dest);
-        updateClutch(clutchResult);
+        updateClutch();
+        if (moveResult.cost >= COST_INF) {
+            return state.setStatus(MovementStatus.UNREACHABLE);
+        }
         if (clutchResult.clutch != null) {
             if (clutchResult.clutch.clutched(ctx, dest)) {
                 if (clutchResult.clutch.finished(ctx, state, clutchResult)) {
