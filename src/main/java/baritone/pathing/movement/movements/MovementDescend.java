@@ -21,6 +21,7 @@ import baritone.api.IBaritone;
 import baritone.api.pathing.movement.ActionCosts;
 import baritone.api.pathing.movement.MovementStatus;
 import baritone.api.utils.BetterBlockPos;
+import baritone.api.utils.Pair;
 import baritone.api.utils.RotationUtils;
 import baritone.api.utils.input.Input;
 import baritone.pathing.clutch.Clutch;
@@ -40,6 +41,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class MovementDescend extends Movement {
@@ -147,15 +150,19 @@ public class MovementDescend extends Movement {
             return;
         }
         double costSoFar = 0;
+        double velocity = 0;
         int effectiveStartHeight = y;
         int newY;
-        fallCalc:
+
         for (int fallHeight = 3; (newY = y - fallHeight) >= context.world.getMinBuildHeight(); fallHeight++) {
             boolean reachedMinimum = fallHeight >= context.minFallHeight;
             BlockState ontoBlock = context.get(destX, newY, destZ);
             BlockState aboveBlock = context.get(destX, newY + 1, destZ);
             int unprotectedFallHeight = fallHeight - (y - effectiveStartHeight); // equal to fallHeight - y + effectiveStartHeight, which is equal to -newY + effectiveStartHeight, which is equal to effectiveStartHeight - newY
-            double tentativeCost = WALK_OFF_BLOCK_COST + FALL_N_BLOCKS_COST[unprotectedFallHeight] + frontBreak + costSoFar;
+            Pair<Double, Double> fallCostAndVelocity = ActionCosts.distanceToTicks(unprotectedFallHeight, 0d, 1d, velocity);
+            double tentativeCost = WALK_OFF_BLOCK_COST + fallCostAndVelocity.first() + frontBreak + costSoFar;
+            velocity = fallCostAndVelocity.second();
+            Clutch nonSolidClutchBlock = null;
             if (ontoBlock.getBlock() instanceof AirBlock) {
                 continue;
             }
@@ -170,10 +177,12 @@ public class MovementDescend extends Movement {
                     break; // falling onto a half slab is really glitchy, and can cause more fall damage than we'd expect
                 }
                 // fallHeight = 4 means onto.up() is 3 blocks down, which is the max
-                res.x = destX;
-                res.y = newY + 1;
-                res.z = destZ;
-                res.cost = tentativeCost;
+                if (tentativeCost <= res.cost) {
+                    res.cost = tentativeCost;
+                    res.x = destX;
+                    res.y = newY + 1;
+                    res.z = destZ;
+                }
                 break;
             }
             if (reachedMinimum && unprotectedFallHeight > context.maxFallHeightNoClutch) {
@@ -182,21 +191,19 @@ public class MovementDescend extends Movement {
                             clutch.clutchable(context) &&
                             unprotectedFallHeight * clutch.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1) {
                         if (clutch.isSolid()) {
-                            res.cost = tentativeCost + clutch.getAdditionalCost();
-                            res.x = destX;
-                            res.y = newY + 1;// this is the block we're falling onto, so dest is +1
-                            res.z = destZ;
-                            if (clutchRes != null) {
-                                clutchRes.clutch = clutch;
+                            if (tentativeCost + clutch.getAdditionalCost() <= res.cost) {
+                                res.cost = tentativeCost + clutch.getAdditionalCost();
+                                res.x = destX;
+                                res.y = newY + 1;// this is the block we're falling onto, so dest is +1
+                                res.z = destZ;
+                                if (clutchRes != null) {
+                                    clutchRes.clutch = clutch;
+                                }
                             }
                             break;
                         }
                         else {
-                            // TODO might be falling from one block, through a gap, and onto another. StartingVelocity is not always 0.
-                            // TODO account for falling through multiple blocks in a row. EndBlockHeight should be the number of blocks +1, not always 2.
-                            costSoFar = ActionCosts.distanceToTicks(unprotectedFallHeight + 1, 1, clutch.getCostMultiplier(), 0);
-                            effectiveStartHeight = newY - 1;
-                            continue fallCalc;
+                            nonSolidClutchBlock = clutch;
                         }
                     }
                 }
@@ -215,7 +222,7 @@ public class MovementDescend extends Movement {
                             item != null) {
                         double newCost = tentativeCost + context.placeBlockCost;
                         if (clutch.isSolid()) {
-                            if ((newCost += clutch.getAdditionalCost()) < res.cost) {
+                            if ((newCost += clutch.getAdditionalCost()) <= res.cost) {
                                 res.cost = newCost;
                             }
                             else {
@@ -223,7 +230,7 @@ public class MovementDescend extends Movement {
                             }
                         }
                         else if (MovementHelper.canWalkOn(context, destX, newY, destZ, ontoBlock)) {
-                            if ((newCost += ActionCosts.distanceToTicks(unprotectedFallHeight, 1, clutch.getCostMultiplier(), 0)) < res.cost) {
+                            if ((newCost += ActionCosts.distanceToTicks(1, 1, clutch.getCostMultiplier(), velocity).first()) <= res.cost) {
                                 res.cost = newCost;
                             }
                             else {
@@ -243,6 +250,17 @@ public class MovementDescend extends Movement {
                         break;
                     }
                 }
+            }
+            if (nonSolidClutchBlock != null) {
+                // TODO account for falling through multiple blocks in a row.
+                Pair<Double, Double> distanceAndVelocity = ActionCosts.distanceToTicks(1, 1, nonSolidClutchBlock.getCostMultiplier(), velocity);
+                if (distanceAndVelocity.first() >= res.cost) {
+                    break;
+                }
+                costSoFar = distanceAndVelocity.first();
+                velocity = distanceAndVelocity.second();
+                effectiveStartHeight = newY - 1;
+                continue;
             }
             break;
         }

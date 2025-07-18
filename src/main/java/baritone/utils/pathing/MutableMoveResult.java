@@ -35,7 +35,14 @@ public final class MutableMoveResult {
         reset();
     }
 
-    public final void reset() {
+    public MutableMoveResult(int x, int y, int z, double cost) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.cost = cost;
+    }
+
+    public void reset() {
         x = 0;
         y = 0;
         z = 0;

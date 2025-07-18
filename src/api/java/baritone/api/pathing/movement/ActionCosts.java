@@ -17,6 +17,8 @@
 
 package baritone.api.pathing.movement;
 
+import baritone.api.utils.Pair;
+
 public interface ActionCosts {
 
     /**
@@ -100,9 +102,9 @@ public interface ActionCosts {
         }
     }
 
-    static double distanceToTicks(double distance, double endBlockHeight, double endBlockSpeedMultiplier, double startingVelocity) {
+    static Pair<Double, Double> distanceToTicks(double distance, double endBlockHeight, double endBlockSpeedMultiplier, double startingVelocity) {
         if (distance == 0) {
-            return 0;
+            return new Pair<>(0d, 0d);
         }
         double tmpDistance = distance;
         int tickCount = 0;
@@ -115,7 +117,7 @@ public interface ActionCosts {
                 fallDistance = velocity(tickCount, 1d, startingVelocity);
             }
             if (tmpDistance <= fallDistance) {
-                return tickCount + tmpDistance / fallDistance;
+                return new Pair<>(tickCount + tmpDistance / fallDistance, fallDistance);
             }
             tmpDistance -= fallDistance;
             tickCount++;

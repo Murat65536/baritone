@@ -29,6 +29,12 @@ public final class MutableClutchResult {
         reset();
     }
 
+    public MutableClutchResult(Clutch clutch, ItemStack item) {
+        this.clutch = clutch;
+        this.item = item;
+        this.phase = 0;
+    }
+
     public void reset() {
         clutch = null;
         item = null;
