@@ -150,6 +150,7 @@ public class MovementDescend extends Movement {
             return;
         }
         double costSoFar = 0;
+        double fallCost = 0;
         double velocity = 0;
         int effectiveStartHeight = y;
         int newY;
@@ -160,8 +161,9 @@ public class MovementDescend extends Movement {
             BlockState aboveBlock = context.get(destX, newY + 1, destZ);
             int unprotectedFallHeight = fallHeight - (y - effectiveStartHeight); // equal to fallHeight - y + effectiveStartHeight, which is equal to -newY + effectiveStartHeight, which is equal to effectiveStartHeight - newY
             Pair<Double, Double> fallCostAndVelocity = ActionCosts.distanceToTicks(unprotectedFallHeight, 0d, 1d, velocity);
-            double tentativeCost = WALK_OFF_BLOCK_COST + fallCostAndVelocity.first() + frontBreak + costSoFar;
+            fallCost += fallCostAndVelocity.first();
             velocity = fallCostAndVelocity.second();
+            double tentativeCost = WALK_OFF_BLOCK_COST + fallCost + frontBreak + costSoFar;
             Clutch nonSolidClutchBlock = null;
             if (ontoBlock.getBlock() instanceof AirBlock) {
                 continue;
@@ -179,6 +181,7 @@ public class MovementDescend extends Movement {
                 // fallHeight = 4 means onto.up() is 3 blocks down, which is the max
                 if (tentativeCost <= res.cost) {
                     res.cost = tentativeCost;
+                    System.out.println(res.cost);
                     res.x = destX;
                     res.y = newY + 1;
                     res.z = destZ;
@@ -254,10 +257,10 @@ public class MovementDescend extends Movement {
             if (nonSolidClutchBlock != null) {
                 // TODO account for falling through multiple blocks in a row.
                 Pair<Double, Double> distanceAndVelocity = ActionCosts.distanceToTicks(1, 1, nonSolidClutchBlock.getCostMultiplier(), velocity);
-                if (distanceAndVelocity.first() >= res.cost) {
+                if (tentativeCost + distanceAndVelocity.first() >= res.cost) {
                     break;
                 }
-                costSoFar = distanceAndVelocity.first();
+                fallCost += distanceAndVelocity.first();
                 velocity = distanceAndVelocity.second();
                 effectiveStartHeight = newY - 1;
                 continue;
