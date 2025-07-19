@@ -148,6 +148,7 @@ public class MovementDescend extends Movement {
             return;
         }
         double tentativeCost = WALK_OFF_BLOCK_COST + frontBreak;
+        double aboveCost = -1;
         double velocity = 0;
         int effectiveStartHeight = y;
         int newY;
@@ -161,19 +162,17 @@ public class MovementDescend extends Movement {
             tentativeCost += fallCostAndVelocity.first();
             velocity = fallCostAndVelocity.second();
             Clutch nonSolidClutchBlock = null;
-            if (ontoBlock.getBlock() instanceof AirBlock) { // TODO include more than just air (ex. pressure plates, glow lichen)
+            if (MovementHelper.canWalkThrough(context, destX, newY, destZ, ontoBlock)) { // ontoBlock.getBlock() instanceof AirBlock
+                if (aboveCost != -1) {
+                    tentativeCost += aboveCost;
+                    aboveCost = -1;
+                }
                 continue;
             }
-            if (reachedMinimum && unprotectedFallHeight <= context.maxFallHeightNoClutch + 1) {
-                if (MovementHelper.canWalkThrough(context, destX, newY, destZ, ontoBlock)) {
-                    continue;
-                }
-                if (!MovementHelper.canWalkOn(context, destX, newY, destZ, ontoBlock)) {
-                    break;
-                }
-                if (MovementHelper.isBottomSlab(ontoBlock)) {
-                    break; // falling onto a half slab is really glitchy, and can cause more fall damage than we'd expect
-                }
+            if (reachedMinimum &&
+                    unprotectedFallHeight <= context.maxFallHeightNoClutch + 1 &&
+                    MovementHelper.canWalkOn(context, destX, newY, destZ, ontoBlock) &&
+                    !MovementHelper.isBottomSlab(ontoBlock)) {
                 // fallHeight = 4 means onto.up() is 3 blocks down, which is the max
                 if (tentativeCost < res.cost) {
                     res.cost = tentativeCost;
@@ -185,7 +184,7 @@ public class MovementDescend extends Movement {
             }
             if (reachedMinimum && unprotectedFallHeight > context.maxFallHeightNoClutch) {
                 for (Clutch clutch : ClutchHelper.CLUTCHES) {
-                    if (clutch.compare(context.get(destX, newY, destZ)) &&
+                    if (clutch.compare(ontoBlock) &&
                             clutch.clutchable(context) &&
                             unprotectedFallHeight * clutch.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1) {
                         if (clutch.isSolid()) {
@@ -232,7 +231,7 @@ public class MovementDescend extends Movement {
                         if (newCost < res.cost) {
                             res.cost = newCost;
                             res.x = destX;
-                            res.y = newY + 1; // Should be +2 but +1 seems to work better.
+                            res.y = newY + 1; // Should be +2 but +1 seems to work better. I might fix it IDK.
                             res.z = destZ;
                             if (clutchRes != null) {
                                 clutchRes.clutch = clutch;
@@ -244,13 +243,19 @@ public class MovementDescend extends Movement {
                 }
             }
             if (nonSolidClutchBlock != null) {
-                // TODO account for falling through multiple blocks in a row.
                 Pair<Double, Double> ticksAndVelocity = ActionCosts.distanceToTicks(1, 1, nonSolidClutchBlock.getCostMultiplier(), velocity);
-                if ((tentativeCost += ticksAndVelocity.first()) >= res.cost) {
+                if (aboveCost != -1) {
+                    tentativeCost += aboveCost;
+                    aboveCost = -1;
+                }
+                else {
+                    tentativeCost += (aboveCost = ticksAndVelocity.first());
+                }
+                if (tentativeCost >= res.cost) {
                     break;
                 }
                 velocity = ticksAndVelocity.second();
-                effectiveStartHeight = newY; // TODO Should be changed since there is a chance there isn't a solid block under this.
+                effectiveStartHeight = newY;
                 continue;
             }
             break;
