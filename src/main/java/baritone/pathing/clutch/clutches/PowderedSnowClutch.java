@@ -43,4 +43,14 @@ public final class PowderedSnowClutch extends Clutch {
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
         return ClutchHelper.bucketPickup(state, ctx.player().getInventory());
     }
+
+    @Override
+    public double getCostMultiplier() {
+        return 1.5d;
+    }
+
+    @Override
+    public boolean slowsOnTopBlock() {
+        return false;
+    }
 }

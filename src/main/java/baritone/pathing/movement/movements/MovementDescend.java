@@ -40,7 +40,6 @@ import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
-import javax.annotation.Nullable;
 import java.util.Set;
 
 public class MovementDescend extends Movement {
@@ -137,7 +136,7 @@ public class MovementDescend extends Movement {
         res.cost = totalCost;
     }
 
-    public static void dynamicFallCost(CalculationContext context, int x, int y, int z, int destX, int destZ, double frontBreak, BlockState below, MutableMoveResult res, @Nullable MutableClutchResult clutchRes) {
+    public static void dynamicFallCost(CalculationContext context, int x, int y, int z, int destX, int destZ, double frontBreak, BlockState below, MutableMoveResult res, MutableClutchResult clutchRes) {
         if (frontBreak != 0 && context.get(destX, y + 2, destZ).getBlock() instanceof FallingBlock) {
             // if frontBreak is 0 we can actually get through this without updating the falling block and making it actually fall
             // but if frontBreak is nonzero, we're breaking blocks in front, so don't let anything fall through this column,
@@ -198,11 +197,11 @@ public class MovementDescend extends Movement {
                                     clutchRes.clutch = clutch;
                                 }
                             }
-                            break;
                         }
                         else {
                             nonSolidClutchBlock = clutch;
                         }
+                        break;
                     }
                 }
             }
@@ -246,10 +245,13 @@ public class MovementDescend extends Movement {
                 Pair<Double, Double> ticksAndVelocity = ActionCosts.distanceToTicks(1, 1, nonSolidClutchBlock.getCostMultiplier(), velocity);
                 if (aboveCost != -1) {
                     tentativeCost += aboveCost;
-                    aboveCost = -1;
+                    aboveCost = ticksAndVelocity.first();
                 }
                 else {
-                    tentativeCost += (aboveCost = ticksAndVelocity.first());
+                    tentativeCost += ticksAndVelocity.first();
+                    if (nonSolidClutchBlock.slowsOnTopBlock()) {
+                        aboveCost = ticksAndVelocity.first();
+                    }
                 }
                 if (tentativeCost >= res.cost) {
                     break;

@@ -82,4 +82,7 @@ public abstract class Clutch {
     public double getCostMultiplier() {
         return 1d;
     }
+    public boolean slowsOnTopBlock() {
+        return true;
+    }
 }
