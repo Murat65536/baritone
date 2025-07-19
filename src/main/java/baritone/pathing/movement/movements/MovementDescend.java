@@ -232,7 +232,7 @@ public class MovementDescend extends Movement {
                         else if (MovementHelper.canWalkOn(context, destX, newY, destZ, ontoBlock)) {
                             changeVelocity = true;
                             Pair<Double, Double> ticksAndVelocity = ActionCosts.distanceToTicks(1, 1, clutch.getCostMultiplier(), velocity);
-                            newCost += ticksAndVelocity.first(); // TODO velocity isn't transferred. Have something like currentVelocity and velocity.
+                            newCost += ticksAndVelocity.first();
                             newVelocity = ticksAndVelocity.second();
                         }
                         else {
