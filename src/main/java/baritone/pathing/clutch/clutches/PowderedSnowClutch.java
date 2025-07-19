@@ -20,6 +20,7 @@ package baritone.pathing.clutch.clutches;
 import baritone.api.utils.IPlayerContext;
 import baritone.pathing.clutch.ClutchHelper;
 import baritone.pathing.clutch.Clutch;
+import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
 import com.google.common.collect.ImmutableSet;
@@ -32,7 +33,11 @@ public final class PowderedSnowClutch extends Clutch {
     public static final PowderedSnowClutch INSTANCE = new PowderedSnowClutch();
 
     private PowderedSnowClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.POWDER_SNOW_BUCKET)), Blocks.POWDER_SNOW, false);
+        super(ImmutableSet.of(new ItemStack(Items.POWDER_SNOW_BUCKET)), Blocks.POWDER_SNOW);
+    }
+    @Override
+    public boolean isSolid(CalculationContext context) {
+        return context.getBaritone().getPlayerContext().player().getInventory().getArmor(3).is(Items.LEATHER_BOOTS);
     }
     @Override
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {

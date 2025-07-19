@@ -30,7 +30,7 @@ public final class CobwebClutch extends Clutch {
     public static final CobwebClutch INSTANCE = new CobwebClutch();
 
     private CobwebClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.COBWEB)), Blocks.COBWEB, false);
+        super(ImmutableSet.of(new ItemStack(Items.COBWEB)), Blocks.COBWEB);
     }
     @Override
     public boolean clutched(IPlayerContext ctx, BetterBlockPos dest) {

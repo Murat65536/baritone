@@ -35,12 +35,10 @@ import net.minecraft.world.phys.Vec3;
 public abstract class Clutch {
     private final ImmutableSet<ItemStack> stack;
     private final Block block;
-    private final boolean solid;
 
-    protected Clutch(ImmutableSet<ItemStack> stack, Block block, boolean solid) {
+    protected Clutch(ImmutableSet<ItemStack> stack, Block block) {
         this.stack = stack;
         this.block = block;
-        this.solid = solid;
     }
     public final ItemStack getClutchingItem(CalculationContext context) {
         for (ItemStack item : stack) {
@@ -54,8 +52,8 @@ public abstract class Clutch {
     public final Block getBlock() {
         return block;
     }
-    public final boolean isSolid() {
-        return solid;
+    public boolean isSolid(CalculationContext context) {
+        return false;
     }
     public boolean compare(BlockState state) {
         return state.is(getBlock());

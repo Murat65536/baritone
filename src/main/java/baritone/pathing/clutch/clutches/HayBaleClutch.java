@@ -30,7 +30,7 @@ public final class HayBaleClutch extends Clutch {
     public static final HayBaleClutch INSTANCE = new HayBaleClutch();
 
     private HayBaleClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.HAY_BLOCK)), Blocks.HAY_BLOCK, true);
+        super(ImmutableSet.of(new ItemStack(Items.HAY_BLOCK)), Blocks.HAY_BLOCK);
     }
     @Override
     public boolean clutched(IPlayerContext ctx, BetterBlockPos dest) {

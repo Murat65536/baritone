@@ -37,7 +37,7 @@ public final class WaterClutch extends Clutch {
     public static final WaterClutch INSTANCE = new WaterClutch();
 
     private WaterClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.WATER_BUCKET)), Blocks.WATER, false);
+        super(ImmutableSet.of(new ItemStack(Items.WATER_BUCKET)), Blocks.WATER);
     }
     @Override
     public boolean compare(BlockState state) {

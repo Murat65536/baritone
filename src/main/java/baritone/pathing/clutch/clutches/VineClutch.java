@@ -39,7 +39,7 @@ public final class VineClutch extends Clutch {
     public static final VineClutch INSTANCE = new VineClutch();
 
     private VineClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.VINE)), Blocks.VINE, false);
+        super(ImmutableSet.of(new ItemStack(Items.VINE)), Blocks.VINE);
     }
     // Had to yoink this out of VineBlock since it was private
     private boolean canSupportAtFace(BlockGetter level, BlockPos pos, Direction direction) {

@@ -33,7 +33,7 @@ public final class ScaffoldingClutch extends Clutch {
     public static final ScaffoldingClutch INSTANCE = new ScaffoldingClutch();
 
     private ScaffoldingClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.SCAFFOLDING)), Blocks.SCAFFOLDING, false);
+        super(ImmutableSet.of(new ItemStack(Items.SCAFFOLDING)), Blocks.SCAFFOLDING);
     }
     @Override
     public boolean clutched(IPlayerContext ctx, BetterBlockPos dest) {

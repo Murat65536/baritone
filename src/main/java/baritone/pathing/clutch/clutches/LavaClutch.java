@@ -36,7 +36,7 @@ public final class LavaClutch extends Clutch {
     public static final LavaClutch INSTANCE = new LavaClutch();
 
     private LavaClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.LAVA_BUCKET)), Blocks.LAVA, false);
+        super(ImmutableSet.of(new ItemStack(Items.LAVA_BUCKET)), Blocks.LAVA);
     }
     @Override
     public boolean compare(BlockState state) {
