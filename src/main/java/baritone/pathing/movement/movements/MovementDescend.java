@@ -177,7 +177,6 @@ public class MovementDescend extends Movement {
                 // fallHeight = 4 means onto.up() is 3 blocks down, which is the max
                 if (tentativeCost < res.cost) {
                     res.cost = tentativeCost;
-                    System.out.println(res.cost);
                     res.x = destX;
                     res.y = newY + 1;
                     res.z = destZ;
@@ -225,7 +224,7 @@ public class MovementDescend extends Movement {
                             newCost += clutch.getAdditionalCost();
                         }
                         else if (MovementHelper.canWalkOn(context, destX, newY, destZ, ontoBlock)) {
-                            newCost += ActionCosts.distanceToTicks(1, 1, clutch.getCostMultiplier(), velocity).first();
+                            newCost += ActionCosts.distanceToTicks(1, 1, clutch.getCostMultiplier(), velocity).first(); // TODO velocity isn't transferred. Have something like currentVelocity and velocity.
                         }
                         else {
                             continue;
@@ -249,16 +248,17 @@ public class MovementDescend extends Movement {
             }
             if (nonSolidClutchBlock != null) {
                 // TODO account for falling through multiple blocks in a row.
-                Pair<Double, Double> ticksAndVelocity = ActionCosts.distanceToTicks(1, 1, nonSolidClutchBlock.getCostMultiplier(), velocity);
-                if ((tentativeCost += ticksAndVelocity.first()) >= res.cost) {
+                Pair<Double, Double> distanceAndVelocity = ActionCosts.distanceToTicks(1, 1, nonSolidClutchBlock.getCostMultiplier(), velocity);
+                if ((tentativeCost += distanceAndVelocity.first()) >= res.cost) {
                     break;
                 }
-                velocity = ticksAndVelocity.second();
-                effectiveStartHeight = newY; // TODO Should be changed since there is a chance there isn't a solid block under this.e
+                velocity = distanceAndVelocity.second();
+                effectiveStartHeight = newY; // TODO Should be changed since there is a chance there isn't a solid block under this.
                 continue;
             }
             break;
         }
+//        System.out.println(ActionCosts.distanceToTicks(16, 1, 0.05, 0).first());
     }
 
     @Override

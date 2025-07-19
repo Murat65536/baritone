@@ -81,9 +81,9 @@ public interface ActionCosts {
     static double velocity(int ticks, double multiplier, double startingVelocity) {
         double velocity = startingVelocity;
         for (int i = 0; i < ticks; i++) {
-            velocity = 0.98 * (velocity + 0.08) * multiplier;
+            velocity = 0.98 * (velocity + 0.08);
         }
-        return velocity;
+        return velocity * multiplier;
     }
 
     static double distanceToTicks(double distance) {
@@ -111,7 +111,7 @@ public interface ActionCosts {
         while (true) {
             double fallDistance;
             if (tmpDistance < endBlockHeight) {
-                fallDistance = velocity(tickCount, endBlockSpeedMultiplier, 0d);
+                fallDistance = 0.08 * endBlockSpeedMultiplier;
             }
             else {
                 fallDistance = velocity(tickCount, 1d, startingVelocity);
