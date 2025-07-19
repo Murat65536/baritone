@@ -149,6 +149,7 @@ public class MovementDescend extends Movement {
         }
         double tentativeCost = WALK_OFF_BLOCK_COST + frontBreak;
         double velocity = 0;
+        double potentialVelocity = velocity;
         int effectiveStartHeight = y;
         int newY;
 
@@ -157,9 +158,10 @@ public class MovementDescend extends Movement {
             BlockState ontoBlock = context.get(destX, newY, destZ);
             BlockState aboveBlock = context.get(destX, newY + 1, destZ);
             int unprotectedFallHeight = fallHeight - (y - effectiveStartHeight); // equal to fallHeight - y + effectiveStartHeight, which is equal to -newY + effectiveStartHeight, which is equal to effectiveStartHeight - newY
-            Pair<Double, Double> fallCostAndVelocity = ActionCosts.distanceToTicks(unprotectedFallHeight, 0d, 1d, velocity);
+            Pair<Double, Double> fallCostAndVelocity = ActionCosts.distanceToTicks(unprotectedFallHeight, 0d, 1d, potentialVelocity);
             tentativeCost += fallCostAndVelocity.first();
             velocity = fallCostAndVelocity.second();
+            potentialVelocity = velocity;
             Clutch nonSolidClutchBlock = null;
             if (ontoBlock.getBlock() instanceof AirBlock) { // TODO include more than just air (ex. pressure plates, glow lichen)
                 continue;
@@ -180,6 +182,7 @@ public class MovementDescend extends Movement {
                     res.x = destX;
                     res.y = newY + 1;
                     res.z = destZ;
+                    potentialVelocity = velocity;
                 }
                 break;
             }
@@ -195,6 +198,7 @@ public class MovementDescend extends Movement {
                                 res.x = destX;
                                 res.y = newY + 1;// this is the block we're falling onto, so dest is +1
                                 res.z = destZ;
+                                potentialVelocity = velocity;
                                 if (clutchRes != null) {
                                     clutchRes.clutch = clutch;
                                 }
@@ -220,27 +224,32 @@ public class MovementDescend extends Movement {
                             clutch.placeable(context, destX, newY, destZ, ontoBlock) &&
                             item != null) {
                         double newCost = tentativeCost + context.placeBlockCost;
+                        boolean changeVelocity = false;
+                        double newVelocity = 0;
                         if (clutch.isSolid()) {
                             newCost += clutch.getAdditionalCost();
                         }
                         else if (MovementHelper.canWalkOn(context, destX, newY, destZ, ontoBlock)) {
-                            newCost += ActionCosts.distanceToTicks(1, 1, clutch.getCostMultiplier(), velocity).first(); // TODO velocity isn't transferred. Have something like currentVelocity and velocity.
+                            changeVelocity = true;
+                            Pair<Double, Double> ticksAndVelocity = ActionCosts.distanceToTicks(1, 1, clutch.getCostMultiplier(), velocity);
+                            newCost += ticksAndVelocity.first(); // TODO velocity isn't transferred. Have something like currentVelocity and velocity.
+                            newVelocity = ticksAndVelocity.second();
                         }
                         else {
                             continue;
                         }
                         if (newCost < res.cost) {
                             res.cost = newCost;
-                        }
-                        else {
-                            break;
-                        }
-                        res.x = destX;
-                        res.y = newY + 1; // Should be +2 but +1 seems to work better.
-                        res.z = destZ;
-                        if (clutchRes != null) {
-                            clutchRes.clutch = clutch;
-                            clutchRes.item = item;
+                            res.x = destX;
+                            res.y = newY + 1; // Should be +2 but +1 seems to work better.
+                            res.z = destZ;
+                            if (changeVelocity) {
+                                potentialVelocity = newVelocity;
+                            }
+                            if (clutchRes != null) {
+                                clutchRes.clutch = clutch;
+                                clutchRes.item = item;
+                            }
                         }
                         break;
                     }
@@ -248,17 +257,16 @@ public class MovementDescend extends Movement {
             }
             if (nonSolidClutchBlock != null) {
                 // TODO account for falling through multiple blocks in a row.
-                Pair<Double, Double> distanceAndVelocity = ActionCosts.distanceToTicks(1, 1, nonSolidClutchBlock.getCostMultiplier(), velocity);
-                if ((tentativeCost += distanceAndVelocity.first()) >= res.cost) {
+                Pair<Double, Double> ticksAndVelocity = ActionCosts.distanceToTicks(1, 1, nonSolidClutchBlock.getCostMultiplier(), velocity);
+                if ((tentativeCost += ticksAndVelocity.first()) >= res.cost) {
                     break;
                 }
-                velocity = distanceAndVelocity.second();
+                potentialVelocity = ticksAndVelocity.second();
                 effectiveStartHeight = newY; // TODO Should be changed since there is a chance there isn't a solid block under this.
                 continue;
             }
             break;
         }
-//        System.out.println(ActionCosts.distanceToTicks(16, 1, 0.05, 0).first());
     }
 
     @Override
