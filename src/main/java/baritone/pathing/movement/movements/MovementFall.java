@@ -94,6 +94,7 @@ public class MovementFall extends Movement {
                     return state.setStatus(MovementStatus.SUCCESS);
                 }
                 else {
+                    System.out.println(System.nanoTime());
                     return state;
                 }
             }

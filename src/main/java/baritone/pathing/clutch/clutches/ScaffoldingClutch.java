@@ -44,4 +44,8 @@ public final class ScaffoldingClutch extends Clutch {
         state.setInput(Input.SNEAK, true);
         return ctx.world().getBlockState(ctx.playerFeet()).is(Blocks.SCAFFOLDING);
     }
+    @Override
+    public double getCostMultiplier() {
+        return 1.5d;
+    }
 }

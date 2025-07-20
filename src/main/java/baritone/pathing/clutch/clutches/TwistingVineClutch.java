@@ -30,4 +30,8 @@ public final class TwistingVineClutch extends Clutch {
     private TwistingVineClutch() {
         super(ImmutableSet.of(new ItemStack(Items.TWISTING_VINES)), Blocks.TWISTING_VINES);
     }
+    @Override
+    public double getCostMultiplier() {
+        return 1.5d;
+    }
 }

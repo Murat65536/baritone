@@ -161,7 +161,7 @@ public class MovementDescend extends Movement {
             tentativeCost += fallCostAndVelocity.first();
             velocity = fallCostAndVelocity.second();
             Clutch nonSolidClutchBlock = null;
-            if (MovementHelper.canWalkThrough(context, destX, newY, destZ, ontoBlock)) { // ontoBlock.getBlock() instanceof AirBlock
+            if (MovementHelper.canWalkThrough(context, destX, newY, destZ, ontoBlock)) {
                 if (aboveCost != -1) {
                     tentativeCost += aboveCost;
                     aboveCost = -1;
@@ -253,12 +253,11 @@ public class MovementDescend extends Movement {
                         aboveCost = ticksAndVelocity.first();
                     }
                 }
-                if (tentativeCost >= res.cost) {
-                    break;
+                if (res.cost > tentativeCost) {
+                    velocity = ticksAndVelocity.second();
+                    effectiveStartHeight = newY;
+                    continue;
                 }
-                velocity = ticksAndVelocity.second();
-                effectiveStartHeight = newY;
-                continue;
             }
             break;
         }

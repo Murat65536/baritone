@@ -58,4 +58,8 @@ public final class SlimeClutch extends Clutch {
             return ctx.player().isOnGround();
         }
     }
+    @Override
+    public double getAdditionalCost() {
+        return 13.0182684d;
+    }
 }

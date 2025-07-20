@@ -69,4 +69,8 @@ public final class VineClutch extends Clutch {
     public void clutch(IBaritone baritone, MovementState state, BetterBlockPos dest, MutableClutchResult result) {
         ClutchHelper.blockClutch(baritone, state, dest, result, false);
     }
+    @Override
+    public double getCostMultiplier() {
+        return 1.5d;
+    }
 }
