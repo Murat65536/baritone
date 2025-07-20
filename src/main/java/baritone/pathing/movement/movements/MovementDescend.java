@@ -33,10 +33,7 @@ import baritone.utils.pathing.MutableMoveResult;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.AirBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.FallingBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -162,7 +159,7 @@ public class MovementDescend extends Movement {
             tentativeCost += fallCostAndVelocity.first();
             velocity = fallCostAndVelocity.second();
             Clutch nonSolidClutchBlock = null;
-            if (MovementHelper.canWalkThrough(context, destX, newY, destZ, ontoBlock)) {
+            if (ontoBlock.getBlock() instanceof AirBlock) { // Having some issues with: MovementHelper.canWalkThrough(context, destX, newY, destZ, ontoBlock)
                 if (aboveCost != -1) {
                     tentativeCost += aboveCost;
                     aboveCost = -1;
@@ -212,7 +209,8 @@ public class MovementDescend extends Movement {
                     context.allowPlace &&
                     !context.isPossiblyProtected(destX, newY + 1, destZ) &&
                     context.worldBorder.canPlaceAt(destX, destZ) &&
-                    MovementHelper.isReplaceable(destX, newY + 1, destZ, aboveBlock, context.bsi)) {
+                    MovementHelper.isReplaceable(destX, newY + 1, destZ, aboveBlock, context.bsi) &&
+                    !(aboveBlock.getBlock() instanceof DoublePlantBlock)) {
                 for (Clutch clutch : ClutchHelper.CLUTCHES) {
                     ItemStack item = clutch.getClutchingItem(context);
                     if (clutch.clutchable(context) &&
