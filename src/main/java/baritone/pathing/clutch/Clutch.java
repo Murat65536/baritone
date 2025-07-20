@@ -85,4 +85,7 @@ public abstract class Clutch {
     public boolean slowsOnTopBlock() {
         return true;
     }
+    public boolean topBlockPriority() {
+        return true;
+    }
 }

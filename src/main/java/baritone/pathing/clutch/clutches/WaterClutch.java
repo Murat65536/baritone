@@ -53,4 +53,8 @@ public final class WaterClutch extends Clutch {
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
         return ClutchHelper.bucketPickup(state, ctx.player().getInventory());
     }
+    @Override
+    public boolean topBlockPriority() {
+        return false;
+    }
 }

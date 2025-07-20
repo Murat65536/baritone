@@ -148,6 +148,7 @@ public class MovementDescend extends Movement {
         }
         double tentativeCost = WALK_OFF_BLOCK_COST + frontBreak;
         double aboveCost = -1;
+        boolean abovePriority = true;
         double velocity = 0;
         int effectiveStartHeight = y;
         int newY;
@@ -165,6 +166,7 @@ public class MovementDescend extends Movement {
                 if (aboveCost != -1) {
                     tentativeCost += aboveCost;
                     aboveCost = -1;
+                    abovePriority = true;
                 }
                 continue;
             }
@@ -243,16 +245,15 @@ public class MovementDescend extends Movement {
             }
             if (nonSolidClutchBlock != null) {
                 Pair<Double, Double> ticksAndVelocity = ActionCosts.distanceToTicks(1, 1, nonSolidClutchBlock.getCostMultiplier(), velocity);
-                if (aboveCost != -1) {
+                if (aboveCost != -1 && abovePriority) {
                     tentativeCost += aboveCost;
                     aboveCost = ticksAndVelocity.first();
                 }
                 else {
                     tentativeCost += ticksAndVelocity.first();
-                    if (nonSolidClutchBlock.slowsOnTopBlock()) {
-                        aboveCost = ticksAndVelocity.first();
-                    }
+                    aboveCost = nonSolidClutchBlock.slowsOnTopBlock() ? ticksAndVelocity.first() : -1;
                 }
+                abovePriority = nonSolidClutchBlock.topBlockPriority();
                 if (res.cost > tentativeCost) {
                     velocity = ticksAndVelocity.second();
                     effectiveStartHeight = newY;
