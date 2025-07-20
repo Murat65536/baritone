@@ -159,7 +159,7 @@ public class MovementDescend extends Movement {
             tentativeCost += fallCostAndVelocity.first();
             velocity = fallCostAndVelocity.second();
             Clutch nonSolidClutchBlock = null;
-            if (ontoBlock.getBlock() instanceof AirBlock) { // Having some issues with: MovementHelper.canWalkThrough(context, destX, newY, destZ, ontoBlock)
+            if (MovementHelper.canWalkThrough(context, destX, newY, destZ, ontoBlock)) {
                 if (aboveCost != -1) {
                     tentativeCost += aboveCost;
                     aboveCost = -1;
