@@ -18,19 +18,17 @@
 package baritone.pathing.movement;
 
 import baritone.Baritone;
+import baritone.api.utils.IPlayerContext;
 import baritone.api.utils.RotationUtils;
 import baritone.api.utils.input.Input;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.init.MobEffects;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +44,8 @@ public class MovementPrediction {
      * Mutable
      */
     public static class PredictionResult {
-        EntityPlayerSP player;
-        private final Map<Potion, PotionEffect> activePotionsMap;
+        IPlayerContext player;
+        private final Map<MobEffect, MobEffectInstance> activePotionsMap;
         public int tick = 0; // ticks from the present
 
         /**
@@ -65,7 +63,6 @@ public class MovementPrediction {
         public double rotationYaw;
 
         boolean isJumping = false;
-        public boolean isAirBorne;
         boolean isSneaking = false; // changed in update()
         public boolean onGround;
 
@@ -73,9 +70,9 @@ public class MovementPrediction {
         double motionY;
         double motionZ;
 
-        AxisAlignedBB boundingBox;
+        AABB boundingBox;
 
-        private final ArrayList<Vec3d> positionCache = new ArrayList<>();
+        private final ArrayList<Vec3> positionCache = new ArrayList<>();
 
         public double posX;
         public double posY;
@@ -83,28 +80,27 @@ public class MovementPrediction {
 
         float fallDistance;
 
-        public PredictionResult(EntityPlayerSP p) {
+        public PredictionResult(IPlayerContext p) {
             player = p;
-            activePotionsMap = p.getActivePotionMap();
+            activePotionsMap = p.player().getActiveEffectsMap();
 
-            posX = p.posX;
-            posY = p.posY;
-            posZ = p.posZ;
+            posX = p.player().getX();
+            posY = p.player().getY();
+            posZ = p.player().getZ();
 
-            rotationYaw = p.rotationYaw;
+            rotationYaw = p.playerRotations().getYaw();
 
-            motionX = p.motionX;
-            motionY = p.motionY;
-            motionZ = p.motionZ;
+            motionX = p.playerMotion().x;
+            motionY = p.playerMotion().y;
+            motionZ = p.playerMotion().z;
 
-            isAirBorne = p.isAirBorne;
-            onGround = p.onGround;
+            onGround = p.player().isOnGround();
 
             double playerWidth = 0.3; // 0.3 in each direction
             double playerHeight = 1.8; // modified while sneaking?
-            boundingBox = new AxisAlignedBB(posX - playerWidth, posY, posZ - playerWidth, posX + playerWidth, posY + playerHeight, posZ + playerWidth);
+            boundingBox = new AABB(posX - playerWidth, posY, posZ - playerWidth, posX + playerWidth, posY + playerHeight, posZ + playerWidth);
 
-            positionCache.add(new Vec3d(posX, posY, posZ)); // prevent null pointers
+            positionCache.add(new Vec3(posX, posY, posZ)); // prevent null pointers
         }
 
         public void resetPositionToBB() {
@@ -113,15 +109,15 @@ public class MovementPrediction {
             this.posZ = (boundingBox.minZ + boundingBox.maxZ) / 2.0D;
         }
 
-        public void updateFallState(double y, boolean onGroundIn, IBlockState iblockstate) {
+        public void updateFallState(double y, boolean onGroundIn, BlockState iblockstate) {
             if (onGroundIn) {
 
                 // Change fall damage if block negates it? HayBale?
                 // if iblockstate.getBlock() instanceof Block... fallDistance = 0 etc..
 
                 // Fall damage
-                float f = getPotionAmplifier(MobEffects.JUMP_BOOST);
-                int i = MathHelper.ceil((fallDistance - 3.0F - f));
+                float f = getPotionAmplifier(MobEffects.JUMP);
+                int i = Mth.ceil((fallDistance - 3.0F - f));
                 damageTaken += i;
 
                 this.fallDistance = 0.0F;
@@ -130,11 +126,11 @@ public class MovementPrediction {
             }
         }
 
-        public Vec3d getPosition() {
+        public Vec3 getPosition() {
             return positionCache.get(tick);
         }
 
-        public Vec3d getPosition(int tick) {
+        public Vec3 getPosition(int tick) {
             return positionCache.get(tick);
         }
 
@@ -147,20 +143,20 @@ public class MovementPrediction {
          * returns 0 if considerPotionEffects setting is false.
          * Amplifier starts at 1
          */
-        public int getPotionAmplifier(Potion potionIn) {
-            if (Baritone.settings().considerPotionEffects.value && isPotionActive(potionIn)) {
-                return activePotionsMap.get(potionIn).getAmplifier() + 1;
+        public int getPotionAmplifier(MobEffect effect) {
+            if (Baritone.settings().considerPotionEffects.value && isPotionActive(effect)) {
+                return activePotionsMap.get(effect).getAmplifier() + 1;
             }
             return 0;
         }
 
-        public boolean isPotionActive(Potion potionIn) {
-            PotionEffect effect = activePotionsMap.get(potionIn);
-            if (effect == null) {
+        public boolean isPotionActive(MobEffect effect) {
+            MobEffectInstance effectMapValue = activePotionsMap.get(effect);
+            if (effectMapValue == null) {
                 return false;
             }
-            if (effect.getDuration() < tick) {
-                activePotionsMap.remove(potionIn);
+            if (effectMapValue.getDuration() < tick) {
+                activePotionsMap.remove(effect);
                 return false;
             }
             return true;
@@ -176,7 +172,7 @@ public class MovementPrediction {
             if (isJumping) lastJump = tick;
             rotationYaw = state.getTarget().rotation.getYaw();
             onLivingUpdate(this, state);
-            positionCache.add(new Vec3d(posX, posY, posZ));
+            positionCache.add(new Vec3(posX, posY, posZ));
             tick++;
         }
 
@@ -199,7 +195,7 @@ public class MovementPrediction {
         }
     }
 
-    public static PredictionResult getFutureLocation(EntityPlayerSP p, MovementState state, int ticksInTheFuture) {
+    public static PredictionResult getFutureLocation(IPlayerContext p, MovementState state, int ticksInTheFuture) {
         PredictionResult r = new PredictionResult(p);
         for (int tick = 0; tick < ticksInTheFuture; tick++) {
             r.update(state);
@@ -223,7 +219,7 @@ public class MovementPrediction {
         double initZ = z;
 
         // Calculate block collisions
-        List<AxisAlignedBB> nearbyBBs = r.player.world.getCollisionBoxes(r.player, r.boundingBox.expand(x, y, z));
+        List<VoxelShape> nearbyBBs = r.player.world().getEntityCollisions(r.player.player(), r.boundingBox.expandTowards(x, y, z));
 
         if (y != 0) {
             int i = 0;
@@ -362,20 +358,19 @@ public class MovementPrediction {
             distance = moveMod / distance;
             strafe = strafe * distance;
             forward = forward * distance;
-            float sinYaw = MathHelper.sin((float) (r.rotationYaw * RotationUtils.DEG_TO_RAD));
-            float cosYaw = MathHelper.cos((float) (r.rotationYaw * RotationUtils.DEG_TO_RAD));
+            float sinYaw = Mth.sin((float) (r.rotationYaw * RotationUtils.DEG_TO_RAD));
+            float cosYaw = Mth.cos((float) (r.rotationYaw * RotationUtils.DEG_TO_RAD));
             r.motionX += strafe * cosYaw - forward * sinYaw;
             r.motionZ += forward * cosYaw + strafe * sinYaw;
         }
 
         if (r.isJumping) {
-            r.motionY = 0.42 + r.getPotionAmplifier(MobEffects.JUMP_BOOST) * 0.1;
+            r.motionY = 0.42 + r.getPotionAmplifier(MobEffects.JUMP) * 0.1;
             if (state.getInputStates().getOrDefault(Input.SPRINT, false)) {
                 double f = r.rotationYaw * RotationUtils.DEG_TO_RAD;
                 r.motionX -= Math.sin(f) * 0.2;
                 r.motionZ += Math.cos(f) * 0.2;
             }
-            r.isAirBorne = true;
         }
 
         // new location
