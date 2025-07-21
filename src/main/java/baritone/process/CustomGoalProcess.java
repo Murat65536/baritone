@@ -23,7 +23,6 @@ import baritone.api.process.ICustomGoalProcess;
 import baritone.api.process.PathingCommand;
 import baritone.api.process.PathingCommandType;
 import baritone.utils.BaritoneProcessHelper;
-import baritone.utils.NotificationHelper;
 
 /**
  * As set by ExampleBaritoneControl or something idk
@@ -36,6 +35,11 @@ public final class CustomGoalProcess extends BaritoneProcessHelper implements IC
      * The current goal
      */
     private Goal goal;
+
+    /**
+     * The most recent goal. Not invalidated upon {@link #onLostControl()}
+     */
+    private Goal mostRecentGoal;
 
     /**
      * The current process state.
@@ -51,6 +55,10 @@ public final class CustomGoalProcess extends BaritoneProcessHelper implements IC
     @Override
     public void setGoal(Goal goal) {
         this.goal = goal;
+        this.mostRecentGoal = goal;
+        if (baritone.getElytraProcess().isActive()) {
+            baritone.getElytraProcess().pathTo(goal);
+        }
         if (this.state == State.NONE) {
             this.state = State.GOAL_SET;
         }
@@ -67,6 +75,11 @@ public final class CustomGoalProcess extends BaritoneProcessHelper implements IC
     @Override
     public Goal getGoal() {
         return this.goal;
+    }
+
+    @Override
+    public Goal mostRecentGoal() {
+        return this.mostRecentGoal;
     }
 
     @Override
@@ -92,16 +105,16 @@ public final class CustomGoalProcess extends BaritoneProcessHelper implements IC
                 if (this.goal == null || (this.goal.isInGoal(ctx.playerFeet()) && this.goal.isInGoal(baritone.getPathingBehavior().pathStart()))) {
                     onLostControl(); // we're there xd
                     if (Baritone.settings().disconnectOnArrival.value) {
-                        ctx.world().sendQuittingDisconnectingPacket();
+                        ctx.world().disconnect();
                     }
-                    if (Baritone.settings().desktopNotifications.value && Baritone.settings().notificationOnPathComplete.value) {
-                        NotificationHelper.notify("Pathing complete", false);
+                    if (Baritone.settings().notificationOnPathComplete.value) {
+                        logNotification("Pathing complete", false);
                     }
                     return new PathingCommand(this.goal, PathingCommandType.CANCEL_AND_SET_GOAL);
                 }
                 return new PathingCommand(this.goal, PathingCommandType.SET_GOAL_AND_PATH);
             default:
-                throw new IllegalStateException();
+                throw new IllegalStateException("Unexpected state " + this.state);
         }
     }
 

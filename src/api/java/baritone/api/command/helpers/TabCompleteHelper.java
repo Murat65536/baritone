@@ -19,18 +19,17 @@ package baritone.api.command.helpers;
 
 import baritone.api.BaritoneAPI;
 import baritone.api.Settings;
-import baritone.api.event.events.TabCompleteEvent;
-import baritone.api.utils.SettingsUtil;
 import baritone.api.command.argument.IArgConsumer;
 import baritone.api.command.manager.ICommandManager;
-import net.minecraft.util.ResourceLocation;
-
+import baritone.api.event.events.TabCompleteEvent;
+import baritone.api.utils.SettingsUtil;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * The {@link TabCompleteHelper} is a <b>single-use</b> object that helps you handle tab completion. It includes helper
@@ -213,7 +212,12 @@ public class TabCompleteHelper {
      * @return This {@link TabCompleteHelper}
      */
     public TabCompleteHelper filterPrefixNamespaced(String prefix) {
-        return filterPrefix(new ResourceLocation(prefix).toString());
+        ResourceLocation loc = ResourceLocation.tryParse(prefix);
+        if (loc == null) {
+            stream = Stream.empty();
+            return this;
+        }
+        return filterPrefix(loc.toString());
     }
 
     /**
@@ -236,7 +240,6 @@ public class TabCompleteHelper {
      * Appends every command in the specified {@link ICommandManager} to this {@link TabCompleteHelper}
      *
      * @param manager A command manager
-     *
      * @return This {@link TabCompleteHelper}
      */
     public TabCompleteHelper addCommands(ICommandManager manager) {
@@ -254,8 +257,8 @@ public class TabCompleteHelper {
     public TabCompleteHelper addSettings() {
         return append(
                 BaritoneAPI.getSettings().allSettings.stream()
+                        .filter(s -> !s.isJavaOnly())
                         .map(Settings.Setting::getName)
-                        .filter(s -> !s.equalsIgnoreCase("logger"))
                         .sorted(String.CASE_INSENSITIVE_ORDER)
         );
     }

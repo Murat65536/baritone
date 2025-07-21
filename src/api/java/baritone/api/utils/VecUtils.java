@@ -17,14 +17,14 @@
 
 package baritone.api.utils;
 
-import net.minecraft.block.BlockFire;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseFireBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * @author Brady
@@ -42,16 +42,22 @@ public final class VecUtils {
      * @return The center of the block's bounding box
      * @see #getBlockPosCenter(BlockPos)
      */
-    public static Vec3d calculateBlockCenter(World world, BlockPos pos) {
-        IBlockState b = world.getBlockState(pos);
-        AxisAlignedBB bbox = b.getBoundingBox(world, pos);
-        double xDiff = (bbox.minX + bbox.maxX) / 2;
-        double yDiff = (bbox.minY + bbox.maxY) / 2;
-        double zDiff = (bbox.minZ + bbox.maxZ) / 2;
-        if (b.getBlock() instanceof BlockFire) {//look at bottom of fire when putting it out
+    public static Vec3 calculateBlockCenter(Level world, BlockPos pos) {
+        BlockState b = world.getBlockState(pos);
+        VoxelShape shape = b.getCollisionShape(world, pos);
+        if (shape.isEmpty()) {
+            return getBlockPosCenter(pos);
+        }
+        double xDiff = (shape.min(Direction.Axis.X) + shape.max(Direction.Axis.X)) / 2;
+        double yDiff = (shape.min(Direction.Axis.Y) + shape.max(Direction.Axis.Y)) / 2;
+        double zDiff = (shape.min(Direction.Axis.Z) + shape.max(Direction.Axis.Z)) / 2;
+        if (Double.isNaN(xDiff) || Double.isNaN(yDiff) || Double.isNaN(zDiff)) {
+            throw new IllegalStateException(b + " " + pos + " " + shape);
+        }
+        if (b.getBlock() instanceof BaseFireBlock) {//look at bottom of fire when putting it out
             yDiff = 0;
         }
-        return new Vec3d(
+        return new Vec3(
                 pos.getX() + xDiff,
                 pos.getY() + yDiff,
                 pos.getZ() + zDiff
@@ -66,10 +72,10 @@ public final class VecUtils {
      *
      * @param pos The block position
      * @return The assumed center of the position
-     * @see #calculateBlockCenter(World, BlockPos)
+     * @see #calculateBlockCenter(Level, BlockPos)
      */
-    public static Vec3d getBlockPosCenter(BlockPos pos) {
-        return new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+    public static Vec3 getBlockPosCenter(BlockPos pos) {
+        return new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
     }
 
     /**
@@ -99,7 +105,7 @@ public final class VecUtils {
      * @see #getBlockPosCenter(BlockPos)
      */
     public static double entityDistanceToCenter(Entity entity, BlockPos pos) {
-        return distanceToCenter(pos, entity.posX, entity.posY, entity.posZ);
+        return distanceToCenter(pos, entity.position().x, entity.position().y, entity.position().z);
     }
 
     /**
@@ -112,41 +118,6 @@ public final class VecUtils {
      * @see #getBlockPosCenter(BlockPos)
      */
     public static double entityFlatDistanceToCenter(Entity entity, BlockPos pos) {
-        return distanceToCenter(pos, entity.posX, pos.getY() + 0.5, entity.posZ);
-    }
-
-    /**
-     * Adds vec1 and vec2
-     *
-     * @param vec1  The initial vector
-     * @param vec2  The vector to add
-     * @return      A new resultant vector
-     */
-    public static Vec3i add(Vec3i vec1, Vec3i vec2) {
-        return new Vec3i(vec1.getX() + vec2.getX(), vec1.getY() + vec2.getY(), vec1.getZ() + vec2.getZ());
-    }
-
-    /**
-     * Adds vec1 and vec2
-     *
-     * @param vec1  The initial vector
-     * @param vec2X The x value to add to the vector
-     * @param vec2Y The y value to add to the vector
-     * @param vec2Z The z value to add to the vector
-     * @return      A new resultant vector
-     */
-    public static Vec3i add(Vec3i vec1, int vec2X, int vec2Y, int vec2Z) {
-        return new Vec3i(vec1.getX() + vec2X, vec1.getY() + vec2Y, vec1.getZ() + vec2Z);
-    }
-
-    /**
-     * Subtracts vec2 from vec1; vec1 - vec2
-     *
-     * @param vec1  The initial vector
-     * @param vec2  The vector to subtract
-     * @return      A new resultant vector
-     */
-    public static Vec3i subtract(Vec3i vec1, Vec3i vec2) {
-        return new Vec3i(vec1.getX() - vec2.getX(), vec1.getY() - vec2.getY(), vec1.getZ() - vec2.getZ());
+        return distanceToCenter(pos, entity.position().x, pos.getY() + 0.5, entity.position().z);
     }
 }

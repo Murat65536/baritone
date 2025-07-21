@@ -17,9 +17,10 @@
 
 package baritone.api.pathing.goals;
 
+import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.SettingsUtil;
 import baritone.api.utils.interfaces.IGoalRenderPos;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 /**
  * A specific BlockPos goal
@@ -67,6 +68,26 @@ public class GoalBlock implements Goal, IGoalRenderPos {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        GoalBlock goal = (GoalBlock) o;
+        return x == goal.x
+                && y == goal.y
+                && z == goal.z;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) BetterBlockPos.longHash(x, y, z) * 905165533;
+    }
+
+    @Override
     public String toString() {
         return String.format(
                 "GoalBlock{x=%s,y=%s,z=%s}",
@@ -87,9 +108,9 @@ public class GoalBlock implements Goal, IGoalRenderPos {
     public static double calculate(double xDiff, int yDiff, double zDiff) {
         double heuristic = 0;
 
-        // if yDiff is 1 that means that pos.getY()-this.y==1 which means that we're 1 block below where we should be
-        // therefore going from 0,0,0 to a GoalYLevel of pos.getY()-this.y is accurate
-        heuristic += GoalYLevel.calculate(yDiff, 0);
+        // if yDiff is 1 that means that currentY-goalY==1 which means that we're 1 block above where we should be
+        // therefore going from 0,yDiff,0 to a GoalYLevel of 0 is accurate
+        heuristic += GoalYLevel.calculate(0, yDiff);
 
         //use the pythagorean and manhattan mixture from GoalXZ
         heuristic += GoalXZ.calculate(xDiff, zDiff);

@@ -27,7 +27,7 @@ import baritone.api.process.PathingCommand;
 import baritone.api.process.PathingCommandType;
 import baritone.behavior.PathingBehavior;
 import baritone.pathing.path.PathExecutor;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 import java.util.*;
 
@@ -68,7 +68,7 @@ public class PathingControlManager implements IPathingControlManager {
         for (IBaritoneProcess proc : processes) {
             proc.onLostControl();
             if (proc.isActive() && !proc.isTemporary()) { // it's okay only for a temporary thing (like combat pause) to maintain control even if you say to cancel
-                throw new IllegalStateException(proc.displayName());
+                throw new IllegalStateException(proc.displayName() + " stayed active after being cancelled");
             }
         }
     }
@@ -99,6 +99,8 @@ public class PathingControlManager implements IPathingControlManager {
             // get rid of the in progress stuff from the last process
         }
         switch (command.commandType) {
+            case SET_GOAL_AND_PAUSE:
+                p.secretInternalSetGoalAndPath(command);
             case REQUEST_PAUSE:
                 p.requestPause();
                 break;
@@ -107,10 +109,6 @@ public class PathingControlManager implements IPathingControlManager {
                 p.cancelSegmentIfSafe();
                 break;
             case FORCE_REVALIDATE_GOAL_AND_PATH:
-                if (!p.isPathing() && !p.getInProgress().isPresent()) {
-                    p.secretInternalSetGoalAndPath(command);
-                }
-                break;
             case REVALIDATE_GOAL_AND_PATH:
                 if (!p.isPathing() && !p.getInProgress().isPresent()) {
                     p.secretInternalSetGoalAndPath(command);
@@ -119,11 +117,11 @@ public class PathingControlManager implements IPathingControlManager {
             case SET_GOAL_AND_PATH:
                 // now this i can do
                 if (command.goal != null) {
-                    baritone.getPathingBehavior().secretInternalSetGoalAndPath(command);
+                    p.secretInternalSetGoalAndPath(command);
                 }
                 break;
             default:
-                throw new IllegalStateException();
+                throw new IllegalStateException("Unexpected command type " + command.commandType);
         }
     }
 
@@ -160,7 +158,7 @@ public class PathingControlManager implements IPathingControlManager {
             if (newGoal.isInGoal(current.getPath().getDest())) {
                 return false;
             }
-            return !newGoal.toString().equals(current.getPath().getGoal().toString());
+            return !newGoal.equals(current.getPath().getGoal());
         }
         return false;
     }

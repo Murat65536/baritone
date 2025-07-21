@@ -58,6 +58,34 @@ public class GoalComposite implements Goal {
     }
 
     @Override
+    public double heuristic() {
+        double min = Double.MAX_VALUE;
+        for (Goal g : goals) {
+            // just take the highest value that is guaranteed to be inside the goal
+            min = Math.min(min, g.heuristic());
+        }
+        return min;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        GoalComposite goal = (GoalComposite) o;
+        return Arrays.equals(goals, goal.goals);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(goals);
+    }
+
+    @Override
     public String toString() {
         return "GoalComposite" + Arrays.toString(goals);
     }

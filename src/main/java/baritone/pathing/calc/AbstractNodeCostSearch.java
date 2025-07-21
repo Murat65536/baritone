@@ -26,7 +26,6 @@ import baritone.api.utils.Helper;
 import baritone.api.utils.PathCalculationResult;
 import baritone.pathing.movement.CalculationContext;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import baritone.utils.NotificationHelper;
 
 import java.util.Optional;
 
@@ -37,6 +36,7 @@ import java.util.Optional;
  */
 public abstract class AbstractNodeCostSearch implements IPathFinder, Helper {
 
+    protected final BetterBlockPos realStart;
     protected final int startX;
     protected final int startY;
     protected final int startZ;
@@ -82,7 +82,8 @@ public abstract class AbstractNodeCostSearch implements IPathFinder, Helper {
      */
     protected static final double MIN_IMPROVEMENT = 0.01;
 
-    AbstractNodeCostSearch(int startX, int startY, int startZ, Goal goal, CalculationContext context) {
+    AbstractNodeCostSearch(BetterBlockPos realStart, int startX, int startY, int startZ, Goal goal, CalculationContext context) {
+        this.realStart = realStart;
         this.startX = startX;
         this.startY = startY;
         this.startZ = startZ;
@@ -178,7 +179,7 @@ public abstract class AbstractNodeCostSearch implements IPathFinder, Helper {
 
     @Override
     public Optional<IPath> pathToMostRecentNodeConsidered() {
-        return Optional.ofNullable(mostRecentConsidered).map(node -> new Path(startNode, node, 0, goal, context));
+        return Optional.ofNullable(mostRecentConsidered).map(node -> new Path(realStart, startNode, node, 0, goal, context));
     }
 
     @Override
@@ -209,7 +210,7 @@ public abstract class AbstractNodeCostSearch implements IPathFinder, Helper {
                     System.out.println("Path goes for " + Math.sqrt(dist) + " blocks");
                     logDebug("A* cost coefficient " + COEFFICIENTS[i]);
                 }
-                return Optional.of(new Path(startNode, bestSoFar[i], numNodes, goal, context));
+                return Optional.of(new Path(realStart, startNode, bestSoFar[i], numNodes, goal, context));
             }
         }
         // instead of returning bestSoFar[0], be less misleading
@@ -217,9 +218,7 @@ public abstract class AbstractNodeCostSearch implements IPathFinder, Helper {
         if (logInfo) {
             logDebug("Even with a cost coefficient of " + COEFFICIENTS[COEFFICIENTS.length - 1] + ", I couldn't get more than " + Math.sqrt(bestDist) + " blocks");
             logDebug("No path found =(");
-            if (Baritone.settings().desktopNotifications.value) {
-                NotificationHelper.notify("No path found =(", true);
-            }
+            logNotification("No path found =(", true);
         }
         return Optional.empty();
     }

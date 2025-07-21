@@ -18,10 +18,10 @@
 package baritone.command.defaults;
 
 import baritone.api.IBaritone;
-import baritone.api.utils.BetterBlockPos;
 import baritone.api.command.Command;
-import baritone.api.command.exception.CommandException;
 import baritone.api.command.argument.IArgConsumer;
+import baritone.api.command.exception.CommandException;
+import baritone.api.utils.BetterBlockPos;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,13 +37,13 @@ public class RenderCommand extends Command {
     public void execute(String label, IArgConsumer args) throws CommandException {
         args.requireMax(0);
         BetterBlockPos origin = ctx.playerFeet();
-        int renderDistance = (mc.gameSettings.renderDistanceChunks + 1) * 16;
-        mc.renderGlobal.markBlockRangeForRenderUpdate(
+        int renderDistance = (ctx.minecraft().options.renderDistance().get() + 1) * 16;
+        ctx.minecraft().levelRenderer.setBlocksDirty(
                 origin.x - renderDistance,
-                0,
+                ctx.world().getMinBuildHeight(),
                 origin.z - renderDistance,
                 origin.x + renderDistance,
-                255,
+                ctx.world().getMaxBuildHeight(),
                 origin.z + renderDistance
         );
         logDirect("Done");

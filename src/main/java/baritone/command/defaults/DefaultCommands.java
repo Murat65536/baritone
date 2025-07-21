@@ -38,10 +38,12 @@ public final class DefaultCommands {
                 new GotoCommand(baritone),
                 new PathCommand(baritone),
                 new ProcCommand(baritone),
+                new ETACommand(baritone),
                 new VersionCommand(baritone),
                 new RepackCommand(baritone),
                 new BuildCommand(baritone),
-                new SchematicaCommand(baritone),
+                //new SchematicaCommand(baritone),
+                new LitematicaCommand(baritone),
                 new ComeCommand(baritone),
                 new AxisCommand(baritone),
                 new ForceCancelCommand(baritone),
@@ -50,8 +52,8 @@ public final class DefaultCommands {
                 new TunnelCommand(baritone),
                 new RenderCommand(baritone),
                 new FarmCommand(baritone),
-                new ChestsCommand(baritone),
                 new FollowCommand(baritone),
+                new PickupCommand(baritone),
                 new ExploreFilterCommand(baritone),
                 new ReloadAllCommand(baritone),
                 new SaveAllCommand(baritone),
@@ -65,7 +67,8 @@ public final class DefaultCommands {
                 new WaypointsCommand(baritone),
                 new CommandAlias(baritone, "sethome", "Sets your home waypoint", "waypoints save home"),
                 new CommandAlias(baritone, "home", "Path to your home waypoint", "waypoints goto home"),
-                new SelCommand(baritone)
+                new SelCommand(baritone),
+                new ElytraCommand(baritone)
         ));
         ExecutionControlCommands prc = new ExecutionControlCommands(baritone);
         commands.add(prc.pauseCommand);

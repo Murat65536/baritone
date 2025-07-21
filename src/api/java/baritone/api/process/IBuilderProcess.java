@@ -18,13 +18,13 @@
 package baritone.api.process;
 
 import baritone.api.schematic.ISchematic;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.level.block.state.BlockState;
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Brady
@@ -51,12 +51,15 @@ public interface IBuilderProcess extends IBaritoneProcess {
      */
     boolean build(String name, File schematic, Vec3i origin);
 
+    @Deprecated
     default boolean build(String schematicFile, BlockPos origin) {
-        File file = new File(new File(Minecraft.getMinecraft().gameDir, "schematics"), schematicFile);
+        File file = new File(new File(Minecraft.getInstance().gameDirectory, "schematics"), schematicFile);
         return build(schematicFile, file, origin);
     }
 
     void buildOpenSchematic();
+
+    void buildOpenLitematic(int i);
 
     void pause();
 
@@ -71,5 +74,18 @@ public interface IBuilderProcess extends IBaritoneProcess {
      * schematics, for example, to pick a state that the builder process will be happy with, because any variation will
      * cause it to give up. This is updated every tick, but only while the builder process is active.
      */
-    List<IBlockState> getApproxPlaceable();
+    List<BlockState> getApproxPlaceable();
+    /**
+     * Returns the lower bound of the current mining layer if mineInLayers is true.
+     * If mineInLayers is false, this will return an empty optional.
+     * @return The lower bound of the current mining layer
+     */
+    Optional<Integer> getMinLayer();
+
+    /**
+     * Returns the upper bound of the current mining layer if mineInLayers is true.
+     * If mineInLayers is false, this will return an empty optional.
+     * @return The upper bound of the current mining layer
+     */
+    Optional<Integer> getMaxLayer();
 }
