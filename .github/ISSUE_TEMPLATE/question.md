@@ -8,7 +8,7 @@ assignees: ''
 
 ## What do you need help with?
 With as much detail as possible, describe your question and what you may need help with.
-Do NOT ask about a Minecraft version. If Baritone supports the Minecraft version you want, you can either find it from the quick download links in the README or in an open pull request which you can build yourself.
+Do NOT ask about a Minecraft version. If Baritone supports the Minecraft version you want, you can either find it from the quick download links in the README or in an open pull request which you can [build yourself](https://github.com/cabaletta/baritone/blob/1.19.4/SETUP.md#build-it-yourself).
 
 ## Final checklist
 - [x] I know how to properly use check boxes
