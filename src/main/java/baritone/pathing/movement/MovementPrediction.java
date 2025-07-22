@@ -18,14 +18,18 @@
 package baritone.pathing.movement;
 
 import baritone.Baritone;
+import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.IPlayerContext;
 import baritone.api.utils.RotationUtils;
 import baritone.api.utils.input.Input;
+import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -109,11 +113,11 @@ public class MovementPrediction {
             this.posZ = (boundingBox.minZ + boundingBox.maxZ) / 2.0D;
         }
 
-        public void updateFallState(double y, boolean onGroundIn, BlockState iblockstate) {
+        public void updateFallState(double y, boolean onGroundIn, BlockState BlockState) {
             if (onGroundIn) {
 
                 // Change fall damage if block negates it? HayBale?
-                // if iblockstate.getBlock() instanceof Block... fallDistance = 0 etc..
+                // if BlockState.getBlock() instanceof Block... fallDistance = 0 etc..
 
                 // Fall damage
                 float f = getPotionAmplifier(MobEffects.JUMP);
@@ -224,28 +228,28 @@ public class MovementPrediction {
         if (y != 0) {
             int i = 0;
             for (int listSize = nearbyBBs.size(); i < listSize; ++i) {
-                y = nearbyBBs.get(i).calculateYOffset(r.boundingBox, y);
+                y = nearbyBBs.get(i).collide(Direction.Axis.Y, r.boundingBox, y);
             }
-            r.boundingBox = r.boundingBox.offset(0, y, 0);
+            r.boundingBox = r.boundingBox.expandTowards(0, y, 0);
         }
 
         if (x != 0) {
             int i = 0;
             for (int listSize = nearbyBBs.size(); i < listSize; ++i) {
-                x = nearbyBBs.get(i).calculateXOffset(r.boundingBox, x);
+                x = nearbyBBs.get(i).collide(Direction.Axis.X, r.boundingBox, x);
             }
             if (x != 0) {
-                r.boundingBox = r.boundingBox.offset(x, 0, 0);
+                r.boundingBox = r.boundingBox.expandTowards(x, 0, 0);
             }
         }
 
         if (z != 0) {
             int i = 0;
             for (int listSize = nearbyBBs.size(); i < listSize; ++i) {
-                z = nearbyBBs.get(i).calculateZOffset(r.boundingBox, z);
+                z = nearbyBBs.get(i).collide(Direction.Axis.Z, r.boundingBox, z);
             }
             if (z != 0) {
-                r.boundingBox = r.boundingBox.offset(0, 0, z);
+                r.boundingBox = r.boundingBox.expandTowards(0, 0, z);
             }
         }
 
@@ -260,16 +264,16 @@ public class MovementPrediction {
         r.onGround = r.collidedVertically && initY < 0.0D; // collided vertically in the downwards direction
 
         // Check block underneath for fences/etc. that could cause fall damage early
-        int blockX = MathHelper.floor(r.posX);
-        int blockYdown = MathHelper.floor(r.posY - 0.20000000298023224D);
-        int blockZ = MathHelper.floor(r.posZ);
-        BlockPos blockpos = new BlockPos(blockX, blockYdown, blockZ);
-        IBlockState landingBlockState = r.player.world.getBlockState(blockpos);
+        int blockX = Mth.floor(r.posX);
+        int blockYdown = Mth.floor(r.posY - 0.20000000298023224D);
+        int blockZ = Mth.floor(r.posZ);
+        BetterBlockPos blockpos = new BetterBlockPos(blockX, blockYdown, blockZ);
+        BlockState landingBlockState = r.player.world().getBlockState(blockpos);
         if (landingBlockState.getMaterial() == Material.AIR) {
-            IBlockState posbFenceState = r.player.world.getBlockState(blockpos.down());
+            BlockState posbFenceState = r.player.world().getBlockState(blockpos.below());
             Block blockBelow = posbFenceState.getBlock();
 
-            if (blockBelow instanceof BlockFence || blockBelow instanceof BlockWall || blockBelow instanceof BlockFenceGate) {
+            if (blockBelow instanceof FenceBlock || blockBelow instanceof FenceGateBlock || blockBelow instanceof WallBlock) {
                 landingBlockState = posbFenceState;
             }
         }
@@ -289,11 +293,11 @@ public class MovementPrediction {
         Block landingBlock = landingBlockState.getBlock();
         // replaced landingBlock.onLanded()
         if (r.collidedVertically) {
-            if (landingBlock instanceof BlockSlime && !r.isSneaking) {
+            if (landingBlock instanceof SlimeBlock && !r.isSneaking) {
                 if (r.motionY < 0.0D) {
                     r.motionY = -r.motionY;
                 }
-            } else if (landingBlock instanceof BlockBed && !r.isSneaking) {
+            } else if (landingBlock instanceof BedBlock && !r.isSneaking) {
                 if (r.motionY < 0.0D) {
                     r.motionY = -r.motionY * 0.6600000262260437D;
                 }
@@ -331,7 +335,7 @@ public class MovementPrediction {
         // inertia determines how much speed is conserved on the next tick
         double inertia = 0.91;
         if (r.onGround) {
-            inertia = r.player.world.getBlockState(new BlockPos(MathHelper.floor(r.posX), MathHelper.floor(r.posY) - 1, MathHelper.floor(r.posZ))).getBlock().slipperiness * 0.91F; // -1 is 0.5 in 1.15+
+            inertia = r.player.world().getBlockState(BetterBlockPos.containing(r.posX, r.posY, r.posZ)).getBlock().getFriction() * 0.91F; // -1 is 0.5 in 1.15+
         }
 
         // acceleration = (0.6*0.91)^3 / (slipperiness*0.91)^3) -> redundant calculations...
@@ -339,7 +343,7 @@ public class MovementPrediction {
 
         double moveMod;
         if (r.onGround) {
-            moveMod = 0.1 * acceleration * (r.getPotionAmplifier(MobEffects.SPEED) * 0.2 - r.getPotionAmplifier(MobEffects.SLOWNESS) * 0.15 + 1);
+            moveMod = 0.1 * acceleration * (r.getPotionAmplifier(MobEffects.MOVEMENT_SPEED) * 0.2 - r.getPotionAmplifier(MobEffects.MOVEMENT_SLOWDOWN) * 0.15 + 1);
         } else {
             moveMod = 0.02F;
         }
