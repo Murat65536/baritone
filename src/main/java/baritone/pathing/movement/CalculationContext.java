@@ -148,7 +148,7 @@ public class CalculationContext {
     }
 
     public double costOfPlacingAt(int x, int y, int z, BlockState current) {
-        if (!(allowPlace && hasThrowaway)) {
+        if (!allowPlace || !hasThrowaway) {
             return COST_INF;
         }
         if (isPossiblyProtected(x, y, z)) {

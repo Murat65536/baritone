@@ -53,7 +53,7 @@ public class MovementFall extends Movement {
         MutableMoveResult result = new MutableMoveResult();
         MovementDescend.cost(context, src.x, src.y, src.z, dest.x, dest.z, result);
         if (result.y != dest.y) {
-            return COST_INF; // doesn't apply to us, this position is a descent not a fall
+            return COST_INF; // doesn't apply to us, this position is a descend not a fall
         }
         return result.cost;
     }
@@ -92,17 +92,13 @@ public class MovementFall extends Movement {
                 if (clutchResult.clutch.finished(ctx, state, clutchResult)) {
                     clutchResult.reset();
                     return state.setStatus(MovementStatus.SUCCESS);
-                }
-                else {
-                    System.out.println(System.nanoTime());
+                } else {
                     return state;
                 }
-            }
-            else if (!clutchResult.clutch.compare(destState) && clutchResult.item != null) {
+            } else if (!clutchResult.clutch.compare(destState) && clutchResult.item != null) {
                 clutchResult.clutch.clutch(baritone, state, dest, clutchResult);
             }
-        }
-        else if (playerFeet.equals(dest)) {
+        } else if (playerFeet.equals(dest)) {
             return state.setStatus(MovementStatus.SUCCESS);
         }
         state.setTarget(new MovementTarget(toDest, false));

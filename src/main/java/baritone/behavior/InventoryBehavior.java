@@ -177,8 +177,7 @@ public final class InventoryBehavior extends Behavior implements Helper {
         }
         if (customItem != null) {
             return throwaway(select, stack -> stack.is(customItem));
-        }
-        else {
+        } else {
             for (Item item : Baritone.settings().acceptableThrowawayItems.value) {
                 if (throwaway(select, stack -> item.equals(stack.getItem()))) {
                     return true;

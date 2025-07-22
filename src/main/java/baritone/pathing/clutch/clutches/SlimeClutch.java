@@ -52,8 +52,7 @@ public final class SlimeClutch extends Clutch {
                 result.phase = 1;
             }
             return false;
-        }
-        else {
+        } else {
             state.setInput(Input.SNEAK, true);
             return ctx.player().isOnGround();
         }
