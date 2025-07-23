@@ -108,12 +108,17 @@ public interface ActionCosts {
         }
         double tmpDistance = distance;
         int tickCount = 0;
+        boolean firstTick = true;
         while (true) {
             double fallDistance;
             if (tmpDistance < endBlockHeight) {
-                fallDistance = 0.08 * endBlockSpeedMultiplier;
-            }
-            else {
+                if  (firstTick) {
+                    firstTick = false;
+                    fallDistance = velocity(tickCount, endBlockSpeedMultiplier, startingVelocity);
+                } else {
+                    fallDistance = 0.0784 * endBlockSpeedMultiplier;
+                }
+            } else {
                 fallDistance = velocity(tickCount, 1d, startingVelocity);
             }
             if (tmpDistance <= fallDistance) {
