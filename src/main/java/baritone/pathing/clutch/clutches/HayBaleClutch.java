@@ -20,8 +20,7 @@ package baritone.pathing.clutch.clutches;
 import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.IPlayerContext;
 import baritone.pathing.clutch.Clutch;
-import com.google.common.collect.ImmutableSet;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,15 +28,19 @@ import net.minecraft.world.level.block.state.BlockState;
 public final class HayBaleClutch extends Clutch {
     public static final HayBaleClutch INSTANCE = new HayBaleClutch();
 
-    private HayBaleClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.HAY_BLOCK)), Blocks.HAY_BLOCK);
+    private HayBaleClutch() {}
+    public boolean acceptedItem(Item item) {
+        return item.equals(Items.HAY_BLOCK);
+    }
+    public boolean compare(BlockState state) {
+        return state.is(Blocks.HAY_BLOCK);
     }
     @Override
     public boolean clutched(IPlayerContext ctx, BetterBlockPos dest) {
         return super.clutched(ctx, dest.above());
     }
     @Override
-    public float getFallDamageModifier() {
-        return 0.2f;
+    public float getFallDamage(int fallHeight) {
+        return fallHeight * 0.2f;
     }
 }

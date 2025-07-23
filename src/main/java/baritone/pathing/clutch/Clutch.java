@@ -25,38 +25,26 @@ import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
-import com.google.common.collect.ImmutableSet;
-import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 public abstract class Clutch {
-    private final ImmutableSet<ItemStack> stack;
-    private final Block block;
-
-    protected Clutch(ImmutableSet<ItemStack> stack, Block block) {
-        this.stack = stack;
-        this.block = block;
-    }
-    public final ItemStack getClutchingItem(CalculationContext context) {
-        for (ItemStack item : stack) {
-            int slot = context.getBaritone().getPlayerContext().player().getInventory().findSlotMatchingItem(item);
-            if (Inventory.isHotbarSlot(slot) || (Baritone.settings().allowInventory.value && slot != -1)) {
+    protected Clutch() {}
+    public final ItemStack getClutchingItem(CalculationContext context) { // We could return the slot instead of the item
+        for (int slot = 0; slot < (Baritone.settings().allowInventory.value ? 36 : 9); slot++) {
+            ItemStack item = context.getBaritone().getPlayerContext().player().getInventory().items.get(slot);
+            if (acceptedItem(item.getItem())) {
                 return item;
             }
         }
         return null;
     }
-    public final Block getBlock() {
-        return block;
-    }
+    public abstract boolean acceptedItem(Item stack);
+    public abstract boolean compare(BlockState state);
     public boolean isSolid(CalculationContext context) {
         return false;
-    }
-    public boolean compare(BlockState state) {
-        return state.is(getBlock());
     }
     public boolean placeable(CalculationContext context, int x, int y, int z, BlockState block) {
         return MovementHelper.canPlaceAgainst(context.bsi, x, y, z, block);
@@ -73,7 +61,7 @@ public abstract class Clutch {
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
         return true;
     }
-    public float getFallDamageModifier() {
+    public float getFallDamage(int fallHeight) {
         return 0f;
     }
     public double getAdditionalCost() {

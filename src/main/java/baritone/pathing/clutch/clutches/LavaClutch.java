@@ -21,12 +21,10 @@ import baritone.api.utils.IPlayerContext;
 import baritone.pathing.clutch.Clutch;
 import baritone.pathing.clutch.ClutchHelper;
 import baritone.pathing.movement.CalculationContext;
-import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
-import com.google.common.collect.ImmutableSet;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,10 +33,10 @@ import net.minecraft.world.level.material.LavaFluid;
 public final class LavaClutch extends Clutch {
     public static final LavaClutch INSTANCE = new LavaClutch();
 
-    private LavaClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.LAVA_BUCKET)), Blocks.LAVA);
+    private LavaClutch() {}
+    public boolean acceptedItem(Item item) {
+        return item.equals(Items.LAVA_BUCKET);
     }
-    @Override
     public boolean compare(BlockState state) {
         return state.getFluidState().getType() instanceof LavaFluid;
     }

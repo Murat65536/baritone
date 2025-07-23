@@ -25,9 +25,8 @@ import baritone.pathing.clutch.Clutch;
 import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
-import com.google.common.collect.ImmutableSet;
 import net.minecraft.core.Direction;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,8 +34,12 @@ import net.minecraft.world.level.block.state.BlockState;
 public final class LadderClutch extends Clutch {
     public static final LadderClutch INSTANCE = new LadderClutch();
 
-    private LadderClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.LADDER)), Blocks.LADDER);
+    private LadderClutch() {}
+    public boolean acceptedItem(Item item) {
+        return item.equals(Items.LADDER);
+    }
+    public boolean compare(BlockState state) {
+        return state.is(Blocks.LADDER);
     }
     @Override
     public boolean placeable(CalculationContext context, int x, int y, int z, BlockState block) {

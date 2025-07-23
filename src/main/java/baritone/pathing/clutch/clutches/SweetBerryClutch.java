@@ -17,12 +17,10 @@
 
 package baritone.pathing.clutch.clutches;
 
-import baritone.api.utils.BetterBlockPos;
 import baritone.pathing.clutch.Clutch;
 import baritone.pathing.movement.CalculationContext;
-import com.google.common.collect.ImmutableSet;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -30,8 +28,12 @@ import net.minecraft.world.level.block.state.BlockState;
 public final class SweetBerryClutch extends Clutch {
     public static final SweetBerryClutch INSTANCE = new SweetBerryClutch();
 
-    private SweetBerryClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.SWEET_BERRIES)), Blocks.SWEET_BERRY_BUSH);
+    private SweetBerryClutch() {}
+    public boolean acceptedItem(Item item) {
+        return item.equals(Items.SWEET_BERRIES);
+    }
+    public boolean compare(BlockState state) {
+        return state.is(Blocks.SWEET_BERRY_BUSH);
     }
     @Override
     public boolean placeable(CalculationContext context, int x, int y, int z, BlockState block) {

@@ -24,8 +24,7 @@ import baritone.pathing.clutch.Clutch;
 import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
 import baritone.utils.pathing.MutableClutchResult;
-import com.google.common.collect.ImmutableSet;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -36,17 +35,15 @@ import net.minecraft.world.level.material.WaterFluid;
 public final class WaterClutch extends Clutch {
     public static final WaterClutch INSTANCE = new WaterClutch();
 
-    private WaterClutch() {
-        super(ImmutableSet.of(
-                new ItemStack(Items.WATER_BUCKET),
-                new ItemStack(Items.AXOLOTL_BUCKET),
-                new ItemStack(Items.COD_BUCKET),
-                new ItemStack(Items.TROPICAL_FISH_BUCKET),
-                new ItemStack(Items.SALMON_BUCKET),
-                new ItemStack(Items.TADPOLE_BUCKET)
-        ), Blocks.WATER);
+    private WaterClutch() {}
+    public boolean acceptedItem(Item item) {
+        return item.equals(Items.WATER_BUCKET) ||
+                item.equals(Items.AXOLOTL_BUCKET) ||
+                item.equals(Items.COD_BUCKET) ||
+                item.equals(Items.TROPICAL_FISH_BUCKET) ||
+                item.equals(Items.SALMON_BUCKET) ||
+                item.equals(Items.TADPOLE_BUCKET);
     }
-    @Override
     public boolean compare(BlockState state) {
         return state.getFluidState().getType() instanceof WaterFluid;
     }

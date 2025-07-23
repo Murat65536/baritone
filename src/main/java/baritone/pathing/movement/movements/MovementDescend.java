@@ -184,7 +184,7 @@ public class MovementDescend extends Movement {
                 for (Clutch clutch : ClutchHelper.CLUTCHES) {
                     if (clutch.compare(ontoBlock) &&
                             clutch.clutchable(context) &&
-                            unprotectedFallHeight * clutch.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1) {
+                            clutch.getFallDamage(unprotectedFallHeight) <= context.maxFallHeightNoClutch + 1) {
                         if (clutch.isSolid(context)) {
                             double newCost = tentativeCost + clutch.getAdditionalCost();
                             if (newCost < res.cost) {
@@ -213,14 +213,14 @@ public class MovementDescend extends Movement {
                 for (Clutch clutch : ClutchHelper.CLUTCHES) {
                     ItemStack item = clutch.getClutchingItem(context);
                     if (clutch.clutchable(context) &&
-                            unprotectedFallHeight * clutch.getFallDamageModifier() <= context.maxFallHeightNoClutch + 1 &&
+                            clutch.getFallDamage(unprotectedFallHeight) <= context.maxFallHeightNoClutch + 1 &&
                             clutch.placeable(context, destX, newY, destZ, ontoBlock) &&
                             item != null) {
                         double newCost = tentativeCost + context.placeBlockCost;
                         if (clutch.isSolid(context)) {
                             newCost += clutch.getAdditionalCost();
                         } else if (MovementHelper.canWalkOn(context, destX, newY, destZ, ontoBlock)) {
-                            newCost += ActionCosts.distanceToTicks(1, 1, clutch.getCostMultiplier(), velocity).first();
+                            newCost += ActionCosts.distanceToTicks(1d, 1d, clutch.getCostMultiplier(), velocity).first();
                         } else {
                             continue;
                         }
@@ -239,7 +239,7 @@ public class MovementDescend extends Movement {
                 }
             }
             if (nonSolidClutchBlock != null) {
-                Pair<Double, Double> ticksAndVelocity = ActionCosts.distanceToTicks(1, 1, nonSolidClutchBlock.getCostMultiplier(), velocity);
+                Pair<Double, Double> ticksAndVelocity = ActionCosts.distanceToTicks(1d, 1d, nonSolidClutchBlock.getCostMultiplier(), velocity);
                 if (aboveCost != -1 && abovePriority) {
                     tentativeCost += aboveCost;
                     aboveCost = ticksAndVelocity.first();

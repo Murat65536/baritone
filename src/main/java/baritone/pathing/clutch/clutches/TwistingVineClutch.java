@@ -18,8 +18,7 @@
 package baritone.pathing.clutch.clutches;
 
 import baritone.pathing.clutch.Clutch;
-import com.google.common.collect.ImmutableSet;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -27,8 +26,12 @@ import net.minecraft.world.level.block.state.BlockState;
 public final class TwistingVineClutch extends Clutch {
     public static final TwistingVineClutch INSTANCE = new TwistingVineClutch();
 
-    private TwistingVineClutch() {
-        super(ImmutableSet.of(new ItemStack(Items.TWISTING_VINES)), Blocks.TWISTING_VINES);
+    private TwistingVineClutch() {}
+    public boolean acceptedItem(Item item) {
+        return item.equals(Items.TWISTING_VINES);
+    }
+    public boolean compare(BlockState state) {
+        return state.is(Blocks.TWISTING_VINES);
     }
     @Override
     public double getCostMultiplier() {
