@@ -98,9 +98,9 @@ public final class Settings {
     public final Setting<Integer> ticksBetweenInventoryMoves = new Setting<>(1);
 
     /**
-     * Come to a halt before doing any inventory moves. Intended for anticheat such as 2b2t
+     * Come to a halt if inventory opens. Intended for anticheat such as 2b2t
      */
-    public final Setting<Boolean> inventoryMoveOnlyIfStationary = new Setting<>(false);
+    public final Setting<Boolean> stopWhenInventoryOpen = new Setting<>(false);
 
     /**
      * Disable baritone's auto-tool at runtime, but still assume that another mod will provide auto tool functionality

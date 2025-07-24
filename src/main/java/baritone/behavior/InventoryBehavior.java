@@ -115,7 +115,7 @@ public final class InventoryBehavior extends Behavior implements Helper {
             logDebug("Inventory move requested but delaying " + ticksSinceLastInventoryMove + " " + Baritone.settings().ticksBetweenInventoryMoves.value);
             return false;
         }
-        if (Baritone.settings().inventoryMoveOnlyIfStationary.value && !baritone.getInventoryPauserProcess().stationaryForInventoryMove()) {
+        if (Baritone.settings().stopWhenInventoryOpen.value && !baritone.getInventoryPauserProcess().stationaryForInventoryMove()) {
             logDebug("Inventory move requested but delaying until stationary");
             return false;
         }
