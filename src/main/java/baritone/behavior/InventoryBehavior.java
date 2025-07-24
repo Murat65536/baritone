@@ -46,7 +46,7 @@ import java.util.function.Predicate;
 
 public final class InventoryBehavior extends Behavior implements Helper {
 
-    private int ticksSinceLastInventoryMove;
+    private int ticksSinceLastInventoryMove = 0;
     private int[] lastTickRequestedMove; // not everything asks every tick, so remember the request while coming to a halt
 
     public InventoryBehavior(Baritone baritone) {
@@ -64,9 +64,6 @@ public final class InventoryBehavior extends Behavior implements Helper {
         if (ctx.player().containerMenu != ctx.player().inventoryMenu) {
             // we have a crafting table or a chest or something open
             return;
-        }
-        if (ticksSinceLastInventoryMove < Baritone.settings().ticksBetweenInventoryMoves.value) {
-            ticksSinceLastInventoryMove++;
         }
         PathExecutor currentPath = baritone.getPathingBehavior().getCurrent();
         if (currentPath != null) {
@@ -87,12 +84,7 @@ public final class InventoryBehavior extends Behavior implements Helper {
 
     public boolean attemptToPutOnHotbar(int inMainInvy, Predicate<Integer> disallowedHotbar) {
         OptionalInt destination = getTempHotbarSlot(disallowedHotbar);
-        if (destination.isPresent()) {
-            if (!requestSwapWithHotBar(inMainInvy, destination.getAsInt())) {
-                return false;
-            }
-        }
-        return true;
+        return destination.isEmpty() || requestSwapWithHotBar(inMainInvy, destination.getAsInt());
     }
 
     public OptionalInt getTempHotbarSlot(Predicate<Integer> disallowedHotbar) {
@@ -120,6 +112,7 @@ public final class InventoryBehavior extends Behavior implements Helper {
         lastTickRequestedMove = new int[]{inInventory, inHotbar};
         if (ticksSinceLastInventoryMove < Baritone.settings().ticksBetweenInventoryMoves.value) {
             logDebug("Inventory move requested but delaying " + ticksSinceLastInventoryMove + " " + Baritone.settings().ticksBetweenInventoryMoves.value);
+            ticksSinceLastInventoryMove++;
             return false;
         }
         if (Baritone.settings().stopWhenInventoryOpen.value && !baritone.getInventoryPauserProcess().stationaryForInventoryMove()) {
