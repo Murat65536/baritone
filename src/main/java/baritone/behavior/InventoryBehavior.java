@@ -46,8 +46,8 @@ import java.util.function.Predicate;
 
 public final class InventoryBehavior extends Behavior implements Helper {
 
-    int ticksSinceLastInventoryMove;
-    int[] lastTickRequestedMove; // not everything asks every tick, so remember the request while coming to a halt
+    private int ticksSinceLastInventoryMove;
+    private int[] lastTickRequestedMove; // not everything asks every tick, so remember the request while coming to a halt
 
     public InventoryBehavior(Baritone baritone) {
         super(baritone);
@@ -65,7 +65,9 @@ public final class InventoryBehavior extends Behavior implements Helper {
             // we have a crafting table or a chest or something open
             return;
         }
-        ticksSinceLastInventoryMove++;
+        if (ticksSinceLastInventoryMove < Baritone.settings().ticksBetweenInventoryMoves.value) {
+            ticksSinceLastInventoryMove++;
+        }
         PathExecutor currentPath = baritone.getPathingBehavior().getCurrent();
         if (currentPath != null) {
             int throwaway = firstValidThrowaway();
