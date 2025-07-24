@@ -87,7 +87,7 @@ public final class InputOverrideHandler extends Behavior implements IInputOverri
         if (event.getType() == TickEvent.Type.OUT) {
             return;
         }
-        if (ctx.minecraft().screen != null) {
+        if (Baritone.settings().inventoryMoveOnlyIfStationary.value && ctx.minecraft().screen != null) {
             ctx.player().input = new KeyboardInput(ctx.minecraft().options);
             return;
         }
