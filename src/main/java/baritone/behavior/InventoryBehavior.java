@@ -20,6 +20,7 @@ package baritone.behavior;
 import baritone.Baritone;
 import baritone.api.event.events.TickEvent;
 import baritone.api.utils.Helper;
+import baritone.pathing.path.PathExecutor;
 import baritone.utils.ToolSet;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
@@ -65,16 +66,20 @@ public final class InventoryBehavior extends Behavior implements Helper {
             return;
         }
         ticksSinceLastInventoryMove++;
-        if (firstValidThrowaway() >= 9) { // aka there are none on the hotbar, but there are some in main inventory
-            requestSwapWithHotBar(firstValidThrowaway(), 8);
-        }
-        int pick = bestToolAgainst(Blocks.STONE, PickaxeItem.class);
-        if (pick >= 9) {
-            requestSwapWithHotBar(pick, 0);
-        }
-        if (lastTickRequestedMove != null) {
-            logDebug("Remembering to move " + lastTickRequestedMove[0] + " " + lastTickRequestedMove[1] + " from a previous tick");
-            requestSwapWithHotBar(lastTickRequestedMove[0], lastTickRequestedMove[1]);
+        PathExecutor currentPath = baritone.getPathingBehavior().getCurrent();
+        if (currentPath != null) {
+            int throwaway = firstValidThrowaway();
+            if (throwaway >= 9 && !currentPath.toPlace().isEmpty()) { // aka there are none on the hotbar, but there are some in main inventory
+                requestSwapWithHotBar(throwaway, 8);
+            }
+            int pick = bestToolAgainst(Blocks.STONE, PickaxeItem.class);
+            if (pick >= 9 && !currentPath.toBreak().isEmpty()) {
+                requestSwapWithHotBar(pick, 0);
+            }
+            if (lastTickRequestedMove != null) {
+                logDebug("Remembering to move " + lastTickRequestedMove[0] + " " + lastTickRequestedMove[1] + " from a previous tick");
+                requestSwapWithHotBar(lastTickRequestedMove[0], lastTickRequestedMove[1]);
+            }
         }
     }
 
