@@ -29,18 +29,22 @@ public final class SweetBerryClutch extends Clutch {
     public static final SweetBerryClutch INSTANCE = new SweetBerryClutch();
 
     private SweetBerryClutch() {}
+
     @Override
     public boolean acceptedItem(Item item) {
         return item.equals(Items.SWEET_BERRIES);
     }
+
     @Override
     public boolean compare(BlockState state) {
         return state.is(Blocks.SWEET_BERRY_BUSH);
     }
+
     @Override
     public boolean placeable(CalculationContext context, int x, int y, int z, BlockState block) {
         return block.is(BlockTags.DIRT) || block.is(Blocks.FARMLAND);
     }
+
     @Override
     public double getCostMultiplier() {
         return 0.75d;

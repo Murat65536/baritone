@@ -27,14 +27,17 @@ public final class TwistingVineClutch extends Clutch {
     public static final TwistingVineClutch INSTANCE = new TwistingVineClutch();
 
     private TwistingVineClutch() {}
+
     @Override
     public boolean acceptedItem(Item item) {
         return item.equals(Items.TWISTING_VINES);
     }
+
     @Override
     public boolean compare(BlockState state) {
         return state.is(Blocks.TWISTING_VINES);
     }
+
     @Override
     public double getCostMultiplier() {
         return 1.5d;

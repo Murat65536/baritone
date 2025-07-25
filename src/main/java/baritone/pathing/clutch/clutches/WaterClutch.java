@@ -35,6 +35,7 @@ public final class WaterClutch extends Clutch {
     public static final WaterClutch INSTANCE = new WaterClutch();
 
     private WaterClutch() {}
+
     @Override
     public boolean acceptedItem(Item item) {
         return item.equals(Items.WATER_BUCKET) ||
@@ -44,6 +45,7 @@ public final class WaterClutch extends Clutch {
                 item.equals(Items.SALMON_BUCKET) ||
                 item.equals(Items.TADPOLE_BUCKET);
     }
+
     @Override
     public boolean compare(BlockState state) {
         return state.getFluidState().getType() instanceof WaterFluid;
@@ -54,10 +56,12 @@ public final class WaterClutch extends Clutch {
                 (!(block.getBlock() instanceof SimpleWaterloggedBlock) || MovementHelper.isBottomSlab(block)) &&
                 context.world.dimension() != Level.NETHER;
     }
+
     @Override
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
         return ClutchHelper.bucketPickup(state, ctx.player().getInventory());
     }
+
     @Override
     public boolean topBlockPriority() {
         return false;

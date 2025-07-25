@@ -32,23 +32,28 @@ public final class ScaffoldingClutch extends Clutch {
     public static final ScaffoldingClutch INSTANCE = new ScaffoldingClutch();
 
     private ScaffoldingClutch() {}
+
     @Override
     public boolean acceptedItem(Item item) {
         return  item.equals(Items.SCAFFOLDING);
     }
+
     @Override
     public boolean compare(BlockState state) {
         return state.is(Blocks.SCAFFOLDING);
     }
+
     @Override
     public boolean clutched(IPlayerContext ctx, BetterBlockPos dest) {
         return super.clutched(ctx, dest.above());
     }
+
     @Override
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
         state.setInput(Input.SNEAK, true);
         return ctx.world().getBlockState(ctx.playerFeet()).is(Blocks.SCAFFOLDING);
     }
+
     @Override
     public double getCostMultiplier() {
         return 1.5d;

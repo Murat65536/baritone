@@ -33,22 +33,27 @@ public final class SlimeClutch extends Clutch {
     public static final SlimeClutch INSTANCE = new SlimeClutch();
 
     private SlimeClutch() {}
+
     @Override
     public boolean acceptedItem(Item item) {
         return item.equals(Items.SLIME_BLOCK);
     }
+
     @Override
     public boolean compare(BlockState state) {
         return state.is(Blocks.SLIME_BLOCK);
     }
+
     @Override
     public boolean isSolid(CalculationContext context) {
         return true;
     }
+
     @Override
     public boolean clutched(IPlayerContext ctx, BetterBlockPos dest) {
         return super.clutched(ctx, dest.above());
     }
+
     @Override
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
         if (result.phase == 0) {
@@ -62,6 +67,7 @@ public final class SlimeClutch extends Clutch {
             return ctx.player().isOnGround();
         }
     }
+
     @Override
     public double getAdditionalCost() {
         return 13.0182684d;

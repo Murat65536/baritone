@@ -37,14 +37,17 @@ public final class VineClutch extends Clutch {
     public static final VineClutch INSTANCE = new VineClutch();
 
     private VineClutch() {}
+
     @Override
     public boolean acceptedItem(Item item) {
         return item.equals(Items.VINE);
     }
+
     @Override
     public boolean compare(BlockState state) {
         return state.is(Blocks.VINE);
     }
+
     // Had to yoink this out of VineBlock since it was private
     private boolean canSupportAtFace(BlockGetter level, BlockPos pos, Direction direction) {
         if (direction == Direction.DOWN) {
@@ -61,6 +64,7 @@ public final class VineClutch extends Clutch {
             }
         }
     }
+
     @Override
     public boolean placeable(CalculationContext context, int x, int y, int z, BlockState block) {
         return super.placeable(context, x, y, z, block) &&
@@ -69,10 +73,12 @@ public final class VineClutch extends Clutch {
                         canSupportAtFace(context.bsi.access, new BetterBlockPos(x, y + 1, z - 1), Direction.NORTH) ||
                         canSupportAtFace(context.bsi.access, new BetterBlockPos(x, y + 1, z + 1), Direction.SOUTH));
     }
+
     @Override
     public void clutch(IBaritone baritone, MovementState state, BetterBlockPos dest, MutableClutchResult result) {
         ClutchHelper.blockClutch(baritone, state, dest, result, false);
     }
+
     @Override
     public double getCostMultiplier() {
         return 1.5d;

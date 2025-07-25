@@ -35,14 +35,17 @@ public final class LadderClutch extends Clutch {
     public static final LadderClutch INSTANCE = new LadderClutch();
 
     private LadderClutch() {}
+
     @Override
     public boolean acceptedItem(Item item) {
         return item.equals(Items.LADDER);
     }
+
     @Override
     public boolean compare(BlockState state) {
         return state.is(Blocks.LADDER);
     }
+
     @Override
     public boolean placeable(CalculationContext context, int x, int y, int z, BlockState block) {
         return MovementHelper.canPlaceAgainst(context.bsi, x, y, z, block) &&
@@ -51,10 +54,12 @@ public final class LadderClutch extends Clutch {
                         context.get(x, y + 1, z - 1).isFaceSturdy(context.bsi.access, new BetterBlockPos(x, y + 1, z - 1), Direction.SOUTH) ||
                         context.get(x, y + 1, z + 1).isFaceSturdy(context.bsi.access, new BetterBlockPos(x, y + 1, z + 1), Direction.NORTH));
     }
+
     @Override
     public void clutch(IBaritone baritone, MovementState state, BetterBlockPos dest, MutableClutchResult result) {
         ClutchHelper.blockClutch(baritone, state, dest, result, false);
     }
+
     @Override
     public double getCostMultiplier() {
         return 1.5d;

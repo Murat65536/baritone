@@ -32,18 +32,22 @@ public final class PowderedSnowClutch extends Clutch {
     public static final PowderedSnowClutch INSTANCE = new PowderedSnowClutch();
 
     private PowderedSnowClutch() {}
+
     @Override
     public boolean acceptedItem(Item item) {
         return item.equals(Items.POWDER_SNOW_BUCKET);
     }
+
     @Override
     public boolean compare(BlockState state) {
         return state.is(Blocks.POWDER_SNOW);
     }
+
     @Override
     public boolean isSolid(CalculationContext context) {
         return context.getBaritone().getPlayerContext().player().getInventory().getArmor(3).is(Items.LEATHER_BOOTS);
     }
+
     @Override
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
         return ClutchHelper.bucketPickup(state, ctx.player().getInventory());

@@ -29,7 +29,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 public interface ClutchHelper {
-    // This list is the order to try the clutches in. More convenient clutches should go further up.
+    // This list holds the order to try the clutches in. More convenient clutches should go further up.
     Clutch[] CLUTCHES = new Clutch[]{
             WaterClutch.INSTANCE,
             LavaClutch.INSTANCE,
@@ -43,7 +43,6 @@ public interface ClutchHelper {
             HayBaleClutch.INSTANCE,
             CobwebClutch.INSTANCE,
     };
-
     ItemStack STACK_EMPTY_BUCKET = new ItemStack(Items.BUCKET);
 
     static void blockClutch(IBaritone baritone, MovementState state, BetterBlockPos dest, MutableClutchResult result, boolean allowDown) {

@@ -33,22 +33,27 @@ public final class LavaClutch extends Clutch {
     public static final LavaClutch INSTANCE = new LavaClutch();
 
     private LavaClutch() {}
+
     @Override
     public boolean acceptedItem(Item item) {
         return item.equals(Items.LAVA_BUCKET);
     }
+
     @Override
     public boolean compare(BlockState state) {
         return state.getFluidState().getType() instanceof LavaFluid;
     }
+
     @Override
     public boolean clutchable(CalculationContext context) {
         return !context.considerPotionEffects || context.getBaritone().getPlayerContext().player().hasEffect(MobEffects.FIRE_RESISTANCE);
     }
+
     @Override
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
         return ClutchHelper.bucketPickup(state, ctx.player().getInventory());
     }
+
     @Override
     public boolean topBlockPriority() {
         return false;
