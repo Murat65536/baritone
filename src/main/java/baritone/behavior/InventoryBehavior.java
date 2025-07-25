@@ -108,12 +108,13 @@ public final class InventoryBehavior extends Behavior implements Helper {
     }
 
     private boolean requestSwapWithHotBar(int inInventory, int inHotbar) {
-        if (!(ctx.minecraft().screen instanceof InventoryScreen)) {
-            ctx.player().closeContainer();
-        }
-        if (!inventoryOpen) {
-            ctx.player().sendOpenInventory();
-            inventoryOpen = true;
+        if (ctx.minecraft().screen == null) {
+            if (!inventoryOpen) {
+                ctx.player().sendOpenInventory();
+                inventoryOpen = true;
+            }
+        } else if (!(ctx.minecraft().screen instanceof InventoryScreen)) {
+            return false;
         }
         lastTickRequestedMove = new int[]{inInventory, inHotbar};
         if (ticksSinceLastInventoryMove < Baritone.settings().ticksBetweenInventoryMoves.value) {
@@ -128,8 +129,10 @@ public final class InventoryBehavior extends Behavior implements Helper {
         ctx.playerController().windowClick(ctx.player().inventoryMenu.containerId, inInventory < 9 ? inInventory + 36 : inInventory, inHotbar, ClickType.SWAP, ctx.player());
         ticksSinceLastInventoryMove = 0;
         lastTickRequestedMove = null;
-        ctx.player().connection.send(new ServerboundContainerClosePacket(ctx.player().containerMenu.containerId));
-        inventoryOpen = false;
+        if (inventoryOpen) {
+            ctx.player().connection.send(new ServerboundContainerClosePacket(ctx.player().containerMenu.containerId));
+            inventoryOpen = false;
+        }
         return true;
     }
 
@@ -232,11 +235,10 @@ public final class InventoryBehavior extends Behavior implements Helper {
         if (allowInventory) {
             for (int i = 9; i < 36; i++) {
                 if (desired.test(inv.get(i))) {
-                    boolean success = true;
                     if (select) {
-                        success = requestSwapWithHotBar(i, p.getInventory().selected);
+                        requestSwapWithHotBar(i, p.getInventory().selected);
                     }
-                    return success;
+                    return true;
                 }
             }
         }
