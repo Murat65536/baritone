@@ -103,6 +103,13 @@ public final class Settings {
     public final Setting<Boolean> stopWhenInventoryOpen = new Setting<>(false);
 
     /**
+     * Just here so mods that use the API don't break. Does nothing.
+     */
+    @Deprecated
+    @JavaOnly
+    public final Setting<Boolean> inventoryMoveOnlyIfStationary = new Setting<>(false);
+
+    /**
      * Disable baritone's auto-tool at runtime, but still assume that another mod will provide auto tool functionality
      * <p>
      * Specifically, path calculation will still assume that an auto tool will run at execution time, even though

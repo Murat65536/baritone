@@ -87,6 +87,10 @@ public class SettingsUtil {
                 if ("allowjumpat256".equals(settingName)) {
                     settingName = "allowjumpatbuildlimit";
                 }
+                // TODO also remove soonish
+                if ("inventoryMoveOnlyIfStationary".equals(settingName)) {
+                    settingName = "stopWhenInventoryOpen";
+                }
                 try {
                     parseAndApply(settings, settingName, settingValue);
                 } catch (Exception ex) {
