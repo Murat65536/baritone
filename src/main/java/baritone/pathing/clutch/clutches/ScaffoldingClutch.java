@@ -32,9 +32,11 @@ public final class ScaffoldingClutch extends Clutch {
     public static final ScaffoldingClutch INSTANCE = new ScaffoldingClutch();
 
     private ScaffoldingClutch() {}
+    @Override
     public boolean acceptedItem(Item item) {
         return  item.equals(Items.SCAFFOLDING);
     }
+    @Override
     public boolean compare(BlockState state) {
         return state.is(Blocks.SCAFFOLDING);
     }

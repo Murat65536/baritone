@@ -29,9 +29,11 @@ public final class CobwebClutch extends Clutch {
     public static final CobwebClutch INSTANCE = new CobwebClutch();
 
     private CobwebClutch() {}
+    @Override
     public boolean compare(BlockState state) {
         return state.is(Blocks.COBWEB);
     }
+    @Override
     public boolean acceptedItem(Item item) {
         return item.equals(Items.COBWEB);
     }

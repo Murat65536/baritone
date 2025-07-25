@@ -29,9 +29,11 @@ public final class HayBaleClutch extends Clutch {
     public static final HayBaleClutch INSTANCE = new HayBaleClutch();
 
     private HayBaleClutch() {}
+    @Override
     public boolean acceptedItem(Item item) {
         return item.equals(Items.HAY_BLOCK);
     }
+    @Override
     public boolean compare(BlockState state) {
         return state.is(Blocks.HAY_BLOCK);
     }

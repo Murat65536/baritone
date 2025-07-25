@@ -35,9 +35,11 @@ public final class LadderClutch extends Clutch {
     public static final LadderClutch INSTANCE = new LadderClutch();
 
     private LadderClutch() {}
+    @Override
     public boolean acceptedItem(Item item) {
         return item.equals(Items.LADDER);
     }
+    @Override
     public boolean compare(BlockState state) {
         return state.is(Blocks.LADDER);
     }

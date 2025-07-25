@@ -33,9 +33,11 @@ public final class LavaClutch extends Clutch {
     public static final LavaClutch INSTANCE = new LavaClutch();
 
     private LavaClutch() {}
+    @Override
     public boolean acceptedItem(Item item) {
         return item.equals(Items.LAVA_BUCKET);
     }
+    @Override
     public boolean compare(BlockState state) {
         return state.getFluidState().getType() instanceof LavaFluid;
     }

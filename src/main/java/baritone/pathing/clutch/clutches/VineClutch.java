@@ -37,9 +37,11 @@ public final class VineClutch extends Clutch {
     public static final VineClutch INSTANCE = new VineClutch();
 
     private VineClutch() {}
+    @Override
     public boolean acceptedItem(Item item) {
         return item.equals(Items.VINE);
     }
+    @Override
     public boolean compare(BlockState state) {
         return state.is(Blocks.VINE);
     }

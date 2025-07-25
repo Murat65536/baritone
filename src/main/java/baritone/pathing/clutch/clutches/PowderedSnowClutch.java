@@ -32,9 +32,11 @@ public final class PowderedSnowClutch extends Clutch {
     public static final PowderedSnowClutch INSTANCE = new PowderedSnowClutch();
 
     private PowderedSnowClutch() {}
+    @Override
     public boolean acceptedItem(Item item) {
         return item.equals(Items.POWDER_SNOW_BUCKET);
     }
+    @Override
     public boolean compare(BlockState state) {
         return state.is(Blocks.POWDER_SNOW);
     }

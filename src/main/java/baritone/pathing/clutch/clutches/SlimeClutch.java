@@ -33,9 +33,11 @@ public final class SlimeClutch extends Clutch {
     public static final SlimeClutch INSTANCE = new SlimeClutch();
 
     private SlimeClutch() {}
+    @Override
     public boolean acceptedItem(Item item) {
         return item.equals(Items.SLIME_BLOCK);
     }
+    @Override
     public boolean compare(BlockState state) {
         return state.is(Blocks.SLIME_BLOCK);
     }

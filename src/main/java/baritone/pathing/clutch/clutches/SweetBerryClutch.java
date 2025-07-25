@@ -29,9 +29,11 @@ public final class SweetBerryClutch extends Clutch {
     public static final SweetBerryClutch INSTANCE = new SweetBerryClutch();
 
     private SweetBerryClutch() {}
+    @Override
     public boolean acceptedItem(Item item) {
         return item.equals(Items.SWEET_BERRIES);
     }
+    @Override
     public boolean compare(BlockState state) {
         return state.is(Blocks.SWEET_BERRY_BUSH);
     }
