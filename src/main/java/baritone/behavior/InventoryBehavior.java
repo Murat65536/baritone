@@ -22,9 +22,11 @@ import baritone.api.event.events.TickEvent;
 import baritone.api.utils.Helper;
 import baritone.pathing.path.PathExecutor;
 import baritone.utils.ToolSet;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.BlockItem;
@@ -48,6 +50,7 @@ public final class InventoryBehavior extends Behavior implements Helper {
 
     private int ticksSinceLastInventoryMove = 0;
     private int[] lastTickRequestedMove; // not everything asks every tick, so remember the request while coming to a halt
+    private boolean inventoryOpen = false;
 
     public InventoryBehavior(Baritone baritone) {
         super(baritone);
@@ -59,10 +62,6 @@ public final class InventoryBehavior extends Behavior implements Helper {
             return;
         }
         if (event.getType() == TickEvent.Type.OUT) {
-            return;
-        }
-        if (ctx.player().containerMenu != ctx.player().inventoryMenu) {
-            // we have a crafting table or a chest or something open
             return;
         }
         PathExecutor currentPath = baritone.getPathingBehavior().getCurrent();
@@ -109,6 +108,13 @@ public final class InventoryBehavior extends Behavior implements Helper {
     }
 
     private boolean requestSwapWithHotBar(int inInventory, int inHotbar) {
+        if (!(ctx.minecraft().screen instanceof InventoryScreen)) {
+            ctx.player().closeContainer();
+        }
+        if (!inventoryOpen) {
+            ctx.player().sendOpenInventory();
+            inventoryOpen = true;
+        }
         lastTickRequestedMove = new int[]{inInventory, inHotbar};
         if (ticksSinceLastInventoryMove < Baritone.settings().ticksBetweenInventoryMoves.value) {
             logDebug("Inventory move requested but delaying " + ticksSinceLastInventoryMove + " " + Baritone.settings().ticksBetweenInventoryMoves.value);
@@ -122,6 +128,8 @@ public final class InventoryBehavior extends Behavior implements Helper {
         ctx.playerController().windowClick(ctx.player().inventoryMenu.containerId, inInventory < 9 ? inInventory + 36 : inInventory, inHotbar, ClickType.SWAP, ctx.player());
         ticksSinceLastInventoryMove = 0;
         lastTickRequestedMove = null;
+        ctx.player().connection.send(new ServerboundContainerClosePacket(ctx.player().containerMenu.containerId));
+        inventoryOpen = false;
         return true;
     }
 
@@ -224,11 +232,11 @@ public final class InventoryBehavior extends Behavior implements Helper {
         if (allowInventory) {
             for (int i = 9; i < 36; i++) {
                 if (desired.test(inv.get(i))) {
+                    boolean success = true;
                     if (select) {
-                        requestSwapWithHotBar(i, 7);
-                        p.getInventory().selected = 7;
+                        success = requestSwapWithHotBar(i, p.getInventory().selected);
                     }
-                    return true;
+                    return success;
                 }
             }
         }
