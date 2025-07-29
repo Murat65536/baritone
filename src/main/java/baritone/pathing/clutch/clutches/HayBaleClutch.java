@@ -20,6 +20,7 @@ package baritone.pathing.clutch.clutches;
 import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.IPlayerContext;
 import baritone.pathing.clutch.Clutch;
+import baritone.pathing.movement.CalculationContext;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -38,6 +39,11 @@ public final class HayBaleClutch extends Clutch {
     @Override
     public boolean compare(BlockState state) {
         return state.is(Blocks.HAY_BLOCK);
+    }
+
+    @Override
+    public boolean isSolid(CalculationContext context) {
+        return true;
     }
 
     @Override
