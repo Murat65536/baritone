@@ -19,8 +19,10 @@ package baritone.pathing.clutch;
 
 import baritone.Baritone;
 import baritone.api.IBaritone;
+import baritone.api.pathing.movement.ActionCosts;
 import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.IPlayerContext;
+import baritone.api.utils.Pair;
 import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
@@ -31,7 +33,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 public abstract class Clutch {
-    protected Clutch() {}
+    private final double costMultiplier;
+
+    protected Clutch(double costMultiplier) {
+        this.costMultiplier = costMultiplier;
+    }
+
+    protected Clutch() {
+        this(1d);
+    }
 
     public final ItemStack getClutchingItem(CalculationContext context) { // We could return the slot instead of the item
         for (int slot = 0; slot < (Baritone.settings().allowInventory.value ? 36 : 9); slot++) {
@@ -75,12 +85,12 @@ public abstract class Clutch {
         return 0f;
     }
 
-    public double getAdditionalCost() {
-        return 0d;
+    public Pair<Double, Double> getCost(double distance, double endBlockHeight, double velocity) {
+        return ActionCosts.distanceToTicks(distance, endBlockHeight, costMultiplier, velocity);
     }
 
-    public double getCostMultiplier() {
-        return 1d;
+    public double getAdditionalCost() {
+        return 0d;
     }
 
     public boolean slowsOnTopBlock() {

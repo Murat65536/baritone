@@ -34,7 +34,9 @@ import net.minecraft.world.level.block.state.BlockState;
 public final class LadderClutch extends Clutch {
     public static final LadderClutch INSTANCE = new LadderClutch();
 
-    private LadderClutch() {}
+    private LadderClutch() {
+        super(1.5d);
+    }
 
     @Override
     public boolean acceptedItem(Item item) {
@@ -58,10 +60,5 @@ public final class LadderClutch extends Clutch {
     @Override
     public void clutch(IBaritone baritone, MovementState state, BetterBlockPos dest, MutableClutchResult result) {
         ClutchHelper.blockClutch(baritone, state, dest, result, false);
-    }
-
-    @Override
-    public double getCostMultiplier() {
-        return 1.5d;
     }
 }

@@ -31,8 +31,10 @@ import net.minecraft.world.level.block.state.BlockState;
 public final class ScaffoldingClutch extends Clutch {
     public static final ScaffoldingClutch INSTANCE = new ScaffoldingClutch();
 
-    private ScaffoldingClutch() {}
+    private ScaffoldingClutch() {
+        super(1.5d);
 
+    }
     @Override
     public boolean acceptedItem(Item item) {
         return  item.equals(Items.SCAFFOLDING);
@@ -52,10 +54,5 @@ public final class ScaffoldingClutch extends Clutch {
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
         state.setInput(Input.SNEAK, true);
         return ctx.world().getBlockState(ctx.playerFeet()).is(Blocks.SCAFFOLDING);
-    }
-
-    @Override
-    public double getCostMultiplier() {
-        return 1.5d;
     }
 }

@@ -28,7 +28,9 @@ import net.minecraft.world.level.block.state.BlockState;
 public final class SweetBerryClutch extends Clutch {
     public static final SweetBerryClutch INSTANCE = new SweetBerryClutch();
 
-    private SweetBerryClutch() {}
+    private SweetBerryClutch() {
+        super(0.75d);
+    }
 
     @Override
     public boolean acceptedItem(Item item) {
@@ -43,10 +45,5 @@ public final class SweetBerryClutch extends Clutch {
     @Override
     public boolean placeable(CalculationContext context, int x, int y, int z, BlockState block) {
         return block.is(BlockTags.DIRT) || block.is(Blocks.FARMLAND);
-    }
-
-    @Override
-    public double getCostMultiplier() {
-        return 0.75d;
     }
 }

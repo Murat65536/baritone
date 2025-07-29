@@ -28,7 +28,9 @@ import net.minecraft.world.level.block.state.BlockState;
 public final class CobwebClutch extends Clutch {
     public static final CobwebClutch INSTANCE = new CobwebClutch();
 
-    private CobwebClutch() {}
+    private CobwebClutch() {
+        super(0.05d);
+    }
 
     @Override
     public boolean compare(BlockState state) {
@@ -43,10 +45,5 @@ public final class CobwebClutch extends Clutch {
     @Override
     public boolean clutched(IPlayerContext ctx, BetterBlockPos dest) {
         return super.clutched(ctx, dest.above());
-    }
-
-    @Override
-    public double getCostMultiplier() {
-        return 0.05d;
     }
 }

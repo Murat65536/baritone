@@ -221,7 +221,7 @@ public class MovementDescend extends Movement {
                         if (clutch.isSolid(context)) {
                             newCost += clutch.getAdditionalCost();
                         } else if (MovementHelper.canWalkOn(context, destX, newY, destZ, ontoBlock)) {
-                            newCost += ActionCosts.distanceToTicks(1d, 1d, clutch.getCostMultiplier(), velocity).first();
+                            newCost += clutch.getCost(1d, 1d, velocity).first();
                         } else {
                             continue;
                         }
@@ -240,7 +240,7 @@ public class MovementDescend extends Movement {
                 }
             }
             if (nonSolidClutchBlock != null) {
-                Pair<Double, Double> ticksAndVelocity = ActionCosts.distanceToTicks(1d, 1d, nonSolidClutchBlock.getCostMultiplier(), velocity);
+                Pair<Double, Double> ticksAndVelocity = nonSolidClutchBlock.getCost(1d, 1d, velocity);
                 if (aboveCost != -1 && abovePriority) {
                     tentativeCost += aboveCost;
                     aboveCost = ticksAndVelocity.first();

@@ -31,7 +31,9 @@ import net.minecraft.world.level.block.state.BlockState;
 public final class PowderedSnowClutch extends Clutch {
     public static final PowderedSnowClutch INSTANCE = new PowderedSnowClutch();
 
-    private PowderedSnowClutch() {}
+    private PowderedSnowClutch() {
+        super(1.5d);
+    }
 
     @Override
     public boolean acceptedItem(Item item) {
@@ -51,11 +53,6 @@ public final class PowderedSnowClutch extends Clutch {
     @Override
     public boolean finished(IPlayerContext ctx, MovementState state, MutableClutchResult result) {
         return ClutchHelper.bucketPickup(state, ctx.player().getInventory());
-    }
-
-    @Override
-    public double getCostMultiplier() {
-        return 1.5d;
     }
 
     @Override
