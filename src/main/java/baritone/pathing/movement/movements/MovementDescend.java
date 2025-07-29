@@ -31,6 +31,7 @@ import baritone.utils.BlockStateInterface;
 import baritone.utils.pathing.MutableMoveResult;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FallingBlock;
@@ -257,7 +258,9 @@ public class MovementDescend extends Movement {
         double z = ctx.player().position().z - (src.getZ() + 0.5);
         double fromStart = Math.sqrt(x * x + z * z);
 
-        state.setInput(Input.SNEAK, Baritone.settings().allowWalkOnMagmaBlocks.value && ctx.world().getBlockState(ctx.player().blockPosition().below()).is(Blocks.MAGMA_BLOCK));
+        if (MovementHelper.shouldSneakOnMagma(ctx)) {
+            state.setInput(Input.SNEAK, true);
+        }
 
         if (!playerFeet.equals(dest) || ab > 0.25) {
             if (numTicks++ < 20 && fromStart < 1.25) {

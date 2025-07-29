@@ -17,15 +17,19 @@
 
 package baritone.pathing.movement.movements;
 
+import baritone.Baritone;
 import baritone.api.IBaritone;
 import baritone.api.pathing.movement.MovementStatus;
 import baritone.api.utils.BetterBlockPos;
+import baritone.api.utils.input.Input;
 import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.Movement;
 import baritone.pathing.movement.MovementHelper;
 import baritone.pathing.movement.MovementState;
 import com.google.common.collect.ImmutableSet;
 import java.util.Set;
+
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -76,6 +80,10 @@ public class MovementDownward extends Movement {
         super.updateState(state);
         if (state.getStatus() != MovementStatus.RUNNING) {
             return state;
+        }
+
+        if (MovementHelper.shouldSneakOnMagma(ctx)) {
+            state.setInput(Input.SNEAK, true);
         }
 
         if (ctx.playerFeet().equals(dest)) {

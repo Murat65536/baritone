@@ -35,6 +35,7 @@ import java.util.Set;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -277,7 +278,9 @@ public class MovementDiagonal extends Movement {
         if (sprint()) {
             state.setInput(Input.SPRINT, true);
         }
-        state.setInput(Input.SNEAK, Baritone.settings().allowWalkOnMagmaBlocks.value && MovementHelper.steppingOnBlocks(ctx).stream().anyMatch(block -> ctx.world().getBlockState(block).is(Blocks.MAGMA_BLOCK)));
+        if (MovementHelper.shouldSneakOnMagma(ctx)) {
+            state.setInput(Input.SNEAK, true);
+        }
         MovementHelper.moveTowards(ctx, state, dest);
         return state;
     }

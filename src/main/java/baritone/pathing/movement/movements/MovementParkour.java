@@ -29,6 +29,7 @@ import baritone.pathing.movement.MovementState;
 import baritone.utils.BlockStateInterface;
 import baritone.utils.pathing.MutableMoveResult;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.StairBlock;
@@ -102,7 +103,7 @@ public class MovementParkour extends Movement {
             return; // can't jump out of water
         }
         int maxJump;
-        if (context.allowWalkOnMagmaBlocks && standingOn.is(Blocks.MAGMA_BLOCK)) {
+        if (context.allowWalkOnMagmaBlocks && standingOn.is(Blocks.MAGMA_BLOCK) && !EnchantmentHelper.hasFrostWalker(context.getBaritone().getPlayerContext().player())) {
             maxJump = 2;
         } else if (standingOn.getBlock() == Blocks.SOUL_SAND) {
             maxJump = 2; // 1 block gap
@@ -259,11 +260,10 @@ public class MovementParkour extends Movement {
             logDebug("sorry");
             return state.setStatus(MovementStatus.UNREACHABLE);
         }
-        if (dist >= 4 || ascend) {
-            state.setInput(Input.SPRINT, true);
-        }
-        if (Baritone.settings().allowWalkOnMagmaBlocks.value && ctx.world().getBlockState(ctx.playerFeet().below()).is(Blocks.MAGMA_BLOCK)) {
+        if (MovementHelper.shouldSneakOnMagma(ctx)) {
             state.setInput(Input.SNEAK, true);
+        } else if (dist >= 4 || ascend) {
+            state.setInput(Input.SPRINT, true);
         }
 
         MovementHelper.moveTowards(ctx, state, dest);

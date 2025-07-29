@@ -32,6 +32,7 @@ import baritone.pathing.movement.MovementState;
 import baritone.utils.BlockStateInterface;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.AirBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -221,7 +222,9 @@ public class MovementTraverse extends Movement {
         boolean ladder = fd == Blocks.LADDER || fd == Blocks.VINE;
 
         //sneak may have been set to true in the PREPPING state while mining an adjacent block, but we still want it to be true if the player is about to go on magma
-        state.setInput(Input.SNEAK, Baritone.settings().allowWalkOnMagmaBlocks.value && MovementHelper.steppingOnBlocks(ctx).stream().anyMatch(block -> ctx.world().getBlockState(block).is(Blocks.MAGMA_BLOCK)));
+        if (MovementHelper.shouldSneakOnMagma(ctx)) {
+            state.setInput(Input.SNEAK, true);
+        }
 
         if (pb0.getBlock() instanceof DoorBlock || pb1.getBlock() instanceof DoorBlock) {
             boolean notPassable = pb0.getBlock() instanceof DoorBlock && !MovementHelper.isDoorPassable(ctx, src, dest) || pb1.getBlock() instanceof DoorBlock && !MovementHelper.isDoorPassable(ctx, dest, src);

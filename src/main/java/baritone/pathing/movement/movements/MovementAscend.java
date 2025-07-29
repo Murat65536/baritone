@@ -30,6 +30,7 @@ import baritone.utils.BlockStateInterface;
 import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -191,7 +192,9 @@ public class MovementAscend extends Movement {
         }
         MovementHelper.moveTowards(ctx, state, dest);
 
-        state.setInput(Input.SNEAK, Baritone.settings().allowWalkOnMagmaBlocks.value && jumpingOnto.is(Blocks.MAGMA_BLOCK));
+        if (MovementHelper.shouldSneakOnMagma(ctx)) {
+            state.setInput(Input.SNEAK, true);
+        }
 
         if (MovementHelper.isBottomSlab(jumpingOnto) && !MovementHelper.isBottomSlab(BlockStateInterface.get(ctx, src.below()))) {
             return state; // don't jump while walking from a non double slab into a bottom slab

@@ -17,6 +17,7 @@
 
 package baritone.pathing.movement.movements;
 
+import baritone.Baritone;
 import baritone.api.IBaritone;
 import baritone.api.pathing.movement.MovementStatus;
 import baritone.api.utils.BetterBlockPos;
@@ -39,6 +40,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -95,7 +97,7 @@ public class MovementFall extends Movement {
         BlockState destState = ctx.world().getBlockState(dest);
         Block destBlock = destState.getBlock();
 
-        if (ctx.world().getBlockState(dest.below()).is(Blocks.MAGMA_BLOCK) && MovementHelper.steppingOnBlocks(ctx).stream().allMatch(block -> MovementHelper.canWalkThrough(ctx, block))) {
+        if (MovementHelper.shouldSneakOnMagma(ctx)) {
             state.setInput(Input.SNEAK, true);
         }
 

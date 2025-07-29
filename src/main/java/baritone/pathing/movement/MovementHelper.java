@@ -31,6 +31,7 @@ import baritone.utils.BlockStateInterface;
 import baritone.utils.ToolSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.piston.MovingPistonBlock;
@@ -808,15 +809,24 @@ public interface MovementHelper extends ActionCosts, Helper {
                 b == Blocks.WATER;
     }
 
-    static List<BetterBlockPos> steppingOnBlocks(IPlayerContext ctx) {
-        List<BetterBlockPos> blocks = new ArrayList<>();
-        for (byte x = -1; x <= 1; x++) {
-            for (byte z = -1; z <= 1; z++) {
-                if (ctx.player().getBoundingBox().intersects(Vec3.atLowerCornerOf(ctx.player().blockPosition()).add(x, 0, z), Vec3.atLowerCornerOf(ctx.player().blockPosition()).add(x + 1, 1, z + 1))) {
-                    blocks.add(new BetterBlockPos(ctx.player().getBlockX() + x, ctx.player().getBlockY() - 1, ctx.player().getBlockZ() + z));
-                }
-            }
-        }
-        return blocks;
+    static boolean shouldSneakOnMagma(IPlayerContext ctx) {
+        return Baritone.settings().allowWalkOnMagmaBlocks.value &&
+                ctx.player().isOnGround() &&
+                ctx.world().getBlockState(BetterBlockPos.containing(ctx.player().position().add(ctx.player().getDeltaMovement()).subtract(0d, 1d, 0d))).is(Blocks.MAGMA_BLOCK) &&
+                !EnchantmentHelper.hasFrostWalker(ctx.player());
     }
+
+//    static List<BetterBlockPos> steppingOnBlocks(IPlayerContext ctx) {
+//        if (!ctx.player().isOnGround()) {
+//            return List.of();
+//        }
+//        List<BetterBlockPos> blocks = new ArrayList<>();
+//        for (int x = (int)((float)ctx.player().getX() - (ctx.player().getBlockX() + 0.5f) - ctx.player().getBbWidth()); x <= (int)((float)ctx.player().getX() - (ctx.player().getBlockX() + 0.5f) + ctx.player().getBbWidth()); x++) {
+//            for (int z = (int)((float)ctx.player().getZ() - (ctx.player().getBlockZ() + 0.5f) - ctx.player().getBbWidth()); z <= (int)((float)ctx.player().getZ() - (ctx.player().getBlockZ() + 0.5f) + ctx.player().getBbWidth()); z++) {
+//                blocks.add(new BetterBlockPos(ctx.player().getBlockX() + x, ctx.player().getBlockY() - 1, ctx.player().getBlockZ() + z));
+//            }
+//        }
+//
+//        return blocks;
+//    }
 }
