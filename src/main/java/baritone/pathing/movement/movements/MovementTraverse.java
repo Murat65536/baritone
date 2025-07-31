@@ -286,7 +286,15 @@ public class MovementTraverse extends Movement {
                     return state.setStatus(MovementStatus.UNREACHABLE);
                 }
             }
-            MovementHelper.moveTowards(ctx, state, against);
+            Rotation faceEntityRotation = MovementHelper.getRotationForEntityInRange(ctx);
+            System.out.println(faceEntityRotation);
+            if (faceEntityRotation != null) {
+                state.setTarget(new MovementState.MovementTarget(faceEntityRotation, false));
+                MovementHelper.moveTowardsWithoutRotation(ctx, state, against);
+            }
+            else {
+                MovementHelper.moveTowards(ctx, state, against);
+            }
             return state;
         } else {
             wasTheBridgeBlockAlwaysThere = false;
@@ -294,7 +302,14 @@ public class MovementTraverse extends Movement {
             if (standingOn.equals(Blocks.SOUL_SAND) || standingOn instanceof SlabBlock) { // see issue #118
                 double dist = Math.max(Math.abs(dest.getX() + 0.5 - ctx.player().position().x), Math.abs(dest.getZ() + 0.5 - ctx.player().position().z));
                 if (dist < 0.85) { // 0.5 + 0.3 + epsilon
-                    MovementHelper.moveTowards(ctx, state, dest);
+                    Rotation faceEntityRotation = MovementHelper.getRotationForEntityInRange(ctx);
+                    if (faceEntityRotation != null) {
+                        state.setTarget(new MovementState.MovementTarget(faceEntityRotation, false));
+                        MovementHelper.moveTowardsWithoutRotation(ctx, state, dest);
+                    }
+                    else {
+                        MovementHelper.moveTowards(ctx, state, dest);
+                    }
                     return state.setInput(Input.MOVE_FORWARD, false)
                             .setInput(Input.MOVE_BACK, true);
                 }

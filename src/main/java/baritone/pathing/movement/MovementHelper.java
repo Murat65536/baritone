@@ -32,6 +32,8 @@ import baritone.utils.ToolSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.piston.MovingPistonBlock;
@@ -689,8 +691,8 @@ public interface MovementHelper extends ActionCosts, Helper {
         float closestZ = 100000;
         for (int i = 0; i < options.length; i++) {
             if (Mth.abs(targetAx - options[i][0]) + Mth.abs(targetAz - options[i][1]) < closestX + closestZ) {
-                closestX = Math.abs(targetAx - options[i][0]);
-                closestZ = Math.abs(targetAz - options[i][1]);
+                closestX = Mth.abs(targetAx - options[i][0]);
+                closestZ = Mth.abs(targetAz - options[i][1]);
                 selection = i;
             }
         }
@@ -702,7 +704,7 @@ public interface MovementHelper extends ActionCosts, Helper {
         return new float[][]{
                 {canSprint ? ax * 1.3f : ax, canSprint ? az * 1.3f : az}, // W
                 {-ax, -az}, // S
-                {-az, az}, // A
+                {-az, ax}, // A
                 {az, -ax}, // D
                 {(canSprint ? ax * 1.3f : ax) - az, (canSprint ? az * 1.3f : az) + ax}, // W+A
                 {(canSprint ? ax * 1.3f : ax) + az, (canSprint ? az * 1.3f : az) - ax}, // W+D
@@ -870,5 +872,33 @@ public interface MovementHelper extends ActionCosts, Helper {
             }
         }
         return blocks;
+    }
+
+    static Rotation getRotationForEntityInRange(IPlayerContext ctx) {
+        double closestDistance = Double.MAX_VALUE;
+        Entity closestEntity = null;
+        for (Entity entity : ctx.entities()) {
+            if (entity instanceof LivingEntity && entity.isAlive() && entity.isAttackable() && !entity.is(ctx.player())) {
+                double distance = ctx.player().getEyePosition().distanceToSqr(entity.getEyePosition()); // Not most accurate distance calculation, but it doesn't matter for now.
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestEntity = entity;
+                }
+            }
+        }
+        if (closestEntity != null) {
+            // Finds the closest point to attack the entity. Doesn't account for any blocks in the way.
+            Vec3 attackPoint = new Vec3(
+                    Mth.clamp(ctx.playerHead().x(), closestEntity.getBoundingBox().minX, closestEntity.getBoundingBox().maxX),
+                    Mth.clamp(ctx.playerHead().y(), closestEntity.getBoundingBox().minY, closestEntity.getBoundingBox().maxY),
+                    Mth.clamp(ctx.playerHead().z(), closestEntity.getBoundingBox().minZ, closestEntity.getBoundingBox().maxZ)
+            );
+            Rotation rotation = RotationUtils.calcRotationFromVec3d(ctx.playerHead(), attackPoint, ctx.playerRotations());
+            return rotation;
+//            if (RayTraceUtils.rayTraceTowards(ctx.player(), rotation, Baritone.settings().entityAttackRadius.value).getType().equals(HitResult.Type.ENTITY)) {
+//                return rotation;
+//            }
+        }
+        return null;
     }
 }

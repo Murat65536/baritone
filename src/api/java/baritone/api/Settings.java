@@ -1248,6 +1248,13 @@ public final class Settings {
     public final Setting<Integer> followTargetMaxDistance = new Setting<>(0);
 
     /**
+     * The distance until you start locking on and attacking entities.
+     * <p>
+     * This doesn't change the direction you go, just the direction you face.
+     */
+    public final Setting<Double> entityAttackRadius = new Setting<>(0D);
+
+    /**
      * Turn this on if your exploration filter is enormous, you don't want it to check if it's done,
      * and you are just fine with it just hanging on completion
      */
