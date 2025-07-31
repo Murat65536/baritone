@@ -29,9 +29,13 @@ import baritone.pathing.movement.MovementState.MovementTarget;
 import baritone.pathing.precompute.Ternary;
 import baritone.utils.BlockStateInterface;
 import baritone.utils.ToolSet;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.piston.MovingPistonBlock;
@@ -809,24 +813,92 @@ public interface MovementHelper extends ActionCosts, Helper {
                 b == Blocks.WATER;
     }
 
-    static boolean shouldSneakOnMagma(IPlayerContext ctx) {
-        return Baritone.settings().allowWalkOnMagmaBlocks.value &&
-                ctx.player().isOnGround() &&
-                ctx.world().getBlockState(BetterBlockPos.containing(ctx.player().position().add(ctx.player().getDeltaMovement()).subtract(0d, 1d, 0d))).is(Blocks.MAGMA_BLOCK) &&
-                !EnchantmentHelper.hasFrostWalker(ctx.player());
-    }
-
-//    static List<BetterBlockPos> steppingOnBlocks(IPlayerContext ctx) {
-//        if (!ctx.player().isOnGround()) {
-//            return List.of();
-//        }
-//        List<BetterBlockPos> blocks = new ArrayList<>();
-//        for (int x = (int)((float)ctx.player().getX() - (ctx.player().getBlockX() + 0.5f) - ctx.player().getBbWidth()); x <= (int)((float)ctx.player().getX() - (ctx.player().getBlockX() + 0.5f) + ctx.player().getBbWidth()); x++) {
-//            for (int z = (int)((float)ctx.player().getZ() - (ctx.player().getBlockZ() + 0.5f) - ctx.player().getBbWidth()); z <= (int)((float)ctx.player().getZ() - (ctx.player().getBlockZ() + 0.5f) + ctx.player().getBbWidth()); z++) {
-//                blocks.add(new BetterBlockPos(ctx.player().getBlockX() + x, ctx.player().getBlockY() - 1, ctx.player().getBlockZ() + z));
-//            }
+//    static Vec3 predictPosition(IPlayerContext ctx) {
+//        Vec3 deltaMovement = ctx.player().getDeltaMovement();
+//        Vec3 travelVector = new Vec3(ctx.player().input.leftImpulse * 0.98d, 0d, ctx.player().input.forwardImpulse * 0.98d);
+//        double fallDistance = 0.08;
+//        boolean falling = ctx.player().getDeltaMovement().y <= 0d;
+//        if (falling && ctx.player().hasEffect(MobEffects.SLOW_FALLING)) {
+//            fallDistance = 0.01d;
 //        }
 //
-//        return blocks;
+//        FluidState fluidState = ctx.world().getFluidState(ctx.player().blockPosition());
+//        if (ctx.player().isInWater() && ctx.player().isAffectedByFluids() && !ctx.player().canStandOnFluid(fluidState)) {
+//            double y = ctx.player().getY();
+//            float sprintHelper = ctx.player().isSprinting() ? 0.9f : 0.8f;
+//            float slowness = 0.02f;
+//            float depthStrider = (float) Math.min(EnchantmentHelper.getDepthStrider(ctx.player()), 3);
+//            if (!ctx.player().isOnGround()) {
+//                depthStrider *= 0.5f;
+//            }
+//
+//            if (depthStrider > 0f) {
+//                sprintHelper += (0.54600006f - sprintHelper) * depthStrider / 3f;
+//                slowness += (ctx.player().getSpeed() - slowness) * depthStrider / 3f;
+//            }
+//
+//            if (ctx.player().hasEffect(MobEffects.DOLPHINS_GRACE)) {
+//                sprintHelper = 0.96f;
+//            }
+//
+//            double distance = travelVector.lengthSqr();
+//            if (distance >= 1e-7) {
+//                Vec3 lv = (distance > 1d ? travelVector.normalize() : travelVector).scale(slowness);
+//                double sin = Mth.sin(ctx.player().getYRot() * Mth.DEG_TO_RAD);
+//                double cos = Mth.cos(ctx.player().getYRot() * Mth.DEG_TO_RAD);
+//                deltaMovement = deltaMovement.add(lv.x * cos - lv.z * sin, lv.y, lv.z * cos + lv.x * sin);
+//            }
+//
+//            if (ctx.player().noPhysics) {
+//                return ctx.player().position().add(deltaMovement);
+//            } else {
+//
+//            }
+//        }
 //    }
+
+    static boolean shouldSneakOnMagma(IPlayerContext ctx) {
+        LocalPlayer copy = ctx.player();
+//        LocalPlayer copy = new LocalPlayer(
+//                ctx.minecraft(),
+//                ctx.player().clientLevel,
+//                new EmptyPacketListener(
+//                        ctx.minecraft(),
+//                        ctx.minecraft().screen,
+//                        ctx.minecraft().getConnection().getConnection(),
+//                        ctx.minecraft().getConnection().getServerData(),
+//                        ctx.minecraft().getConnection().getLocalGameProfile(),
+//                        null
+//                ),
+//                ctx.player().getStats(),
+//                ctx.player().getRecipeBook(),
+//                ctx.player().isShiftKeyDown(),
+//                ctx.player().isSprinting()
+//        );
+        copy.setPos(ctx.player().position());
+        copy.setDeltaMovement(ctx.player().getDeltaMovement());
+        copy.input = ctx.player().input;
+        copy.noPhysics = ctx.player().noPhysics;
+//        copy.serverAiStep();
+        copy.aiStep();
+//        copy.tick();
+        return (Baritone.settings().allowWalkOnMagmaBlocks.value &&
+                !EnchantmentHelper.hasFrostWalker(ctx.player()) &&
+                !ctx.player().isPassenger() &&
+                ctx.world().getBlockState(copy.getOnPosLegacy()).is(Blocks.MAGMA_BLOCK));
+    }
+
+    static boolean steppingOnBlock(IPlayerContext ctx, Block block) {
+        if (!ctx.player().isOnGround()) {
+            return false;
+        }
+        for (int x = (int)(ctx.player().getX() - (ctx.player().getBlockX() + 0.5) - ctx.player().getBbWidth()); x <= (int)(ctx.player().getX() - (ctx.player().getBlockX() + 0.5) + ctx.player().getBbWidth()); x++) {
+            for (int z = (int)(ctx.player().getZ() - (ctx.player().getBlockZ() + 0.5) - ctx.player().getBbWidth()); z <= (int)(ctx.player().getZ() - (ctx.player().getBlockZ() + 0.5) + ctx.player().getBbWidth()); z++) {
+                if (ctx.world().getBlockState(new BetterBlockPos(ctx.player().getBlockX() + x, ctx.player().getBlockY() - 1, ctx.player().getBlockZ() + z)).is(block)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
