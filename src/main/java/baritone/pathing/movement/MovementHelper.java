@@ -29,6 +29,8 @@ import baritone.pathing.movement.MovementState.MovementTarget;
 import baritone.pathing.precompute.Ternary;
 import baritone.utils.BlockStateInterface;
 import baritone.utils.ToolSet;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -655,12 +657,20 @@ public interface MovementHelper extends ActionCosts, Helper {
     }
 
     static void moveTowards(IPlayerContext ctx, MovementState state, BlockPos pos) {
-        state.setTarget(new MovementTarget(
-                RotationUtils.calcRotationFromVec3d(ctx.playerHead(),
-                        VecUtils.getBlockPosCenter(pos),
-                        ctx.playerRotations()).withPitch(ctx.playerRotations().getPitch()),
-                false
-        )).setInput(Input.MOVE_FORWARD, true);
+        Rotation faceEntityRotation = MovementHelper.getRotationForEntityInRange(ctx);
+        if (faceEntityRotation != null && Baritone.settings().entityAttackRadius.value != 0d) {
+            state.setTarget(new MovementState.MovementTarget(faceEntityRotation, false));
+            MovementHelper.moveTowardsWithoutRotation(ctx, state, pos);
+            state.setInput(Input.CLICK_LEFT, true);
+        }
+        else {
+            state.setTarget(new MovementTarget(
+                    RotationUtils.calcRotationFromVec3d(ctx.playerHead(),
+                            VecUtils.getBlockPosCenter(pos),
+                            ctx.playerRotations()).withPitch(ctx.playerRotations().getPitch()),
+                    false
+            )).setInput(Input.MOVE_FORWARD, true);
+        }
     }
 
     static void moveTowardsWithoutRotation(IPlayerContext ctx, MovementState state, BlockPos dest) {
@@ -876,29 +886,25 @@ public interface MovementHelper extends ActionCosts, Helper {
 
     static Rotation getRotationForEntityInRange(IPlayerContext ctx) {
         double closestDistance = Double.MAX_VALUE;
-        Entity closestEntity = null;
+        Vec3 closestPosition = null;
         for (Entity entity : ctx.entities()) {
-            if (entity instanceof LivingEntity && entity.isAlive() && entity.isAttackable() && !entity.is(ctx.player())) {
-                double distance = ctx.player().getEyePosition().distanceToSqr(entity.getEyePosition()); // Not most accurate distance calculation, but it doesn't matter for now.
+            if (!entity.is(ctx.player()) && entity instanceof LivingEntity && entity.isAlive() && entity.isAttackable()) {
+                Vec3 attackPoint = new Vec3(
+                        Mth.clamp(ctx.playerHead().x(), entity.getBoundingBox().minX, entity.getBoundingBox().maxX),
+                        Mth.clamp(ctx.playerHead().y(), entity.getBoundingBox().minY, entity.getBoundingBox().maxY),
+                        Mth.clamp(ctx.playerHead().z(), entity.getBoundingBox().minZ, entity.getBoundingBox().maxZ)
+                );
+                double distance = ctx.player().getEyePosition().distanceToSqr(attackPoint);
                 if (distance < closestDistance) {
                     closestDistance = distance;
-                    closestEntity = entity;
+                    closestPosition = attackPoint;
                 }
             }
         }
-        if (closestEntity != null) {
-            // Finds the closest point to attack the entity. Doesn't account for any blocks in the way.
-            Vec3 attackPoint = new Vec3(
-                    Mth.clamp(ctx.playerHead().x(), closestEntity.getBoundingBox().minX, closestEntity.getBoundingBox().maxX),
-                    Mth.clamp(ctx.playerHead().y(), closestEntity.getBoundingBox().minY, closestEntity.getBoundingBox().maxY),
-                    Mth.clamp(ctx.playerHead().z(), closestEntity.getBoundingBox().minZ, closestEntity.getBoundingBox().maxZ)
-            );
-            Rotation rotation = RotationUtils.calcRotationFromVec3d(ctx.playerHead(), attackPoint, ctx.playerRotations());
-            return rotation;
-//            if (RayTraceUtils.rayTraceTowards(ctx.player(), rotation, Baritone.settings().entityAttackRadius.value).getType().equals(HitResult.Type.ENTITY)) {
-//                return rotation;
-//            }
+        if (closestPosition != null && Math.sqrt(closestDistance) <= Baritone.settings().entityAttackRadius.value) {
+            return RotationUtils.calcRotationFromVec3d(ctx.playerHead(), closestPosition, ctx.playerRotations());
+        } else {
+            return null;
         }
-        return null;
     }
 }
