@@ -192,10 +192,6 @@ public class MovementAscend extends Movement {
         }
         MovementHelper.moveTowards(ctx, state, dest);
 
-        if (MovementHelper.shouldSneakOnMagma(ctx)) {
-            state.setInput(Input.SNEAK, true);
-        }
-
         if (MovementHelper.isBottomSlab(jumpingOnto) && !MovementHelper.isBottomSlab(BlockStateInterface.get(ctx, src.below()))) {
             return state; // don't jump while walking from a non double slab into a bottom slab
         }

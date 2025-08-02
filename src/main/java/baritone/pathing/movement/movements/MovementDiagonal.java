@@ -278,9 +278,6 @@ public class MovementDiagonal extends Movement {
         if (sprint()) {
             state.setInput(Input.SPRINT, true);
         }
-        if (MovementHelper.shouldSneakOnMagma(ctx)) {
-            state.setInput(Input.SNEAK, true);
-        }
         MovementHelper.moveTowards(ctx, state, dest);
         return state;
     }

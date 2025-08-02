@@ -82,10 +82,6 @@ public class MovementDownward extends Movement {
             return state;
         }
 
-        if (MovementHelper.shouldSneakOnMagma(ctx)) {
-            state.setInput(Input.SNEAK, true);
-        }
-
         if (ctx.playerFeet().equals(dest)) {
             return state.setStatus(MovementStatus.SUCCESS);
         } else if (!playerInValidPosition()) {

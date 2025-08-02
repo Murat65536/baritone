@@ -258,10 +258,6 @@ public class MovementDescend extends Movement {
         double z = ctx.player().position().z - (src.getZ() + 0.5);
         double fromStart = Math.sqrt(x * x + z * z);
 
-        if (MovementHelper.shouldSneakOnMagma(ctx)) {
-            state.setInput(Input.SNEAK, true);
-        }
-
         if (!playerFeet.equals(dest) || ab > 0.25) {
             if (numTicks++ < 20 && fromStart < 1.25) {
                 MovementHelper.moveTowards(ctx, state, fakeDest);

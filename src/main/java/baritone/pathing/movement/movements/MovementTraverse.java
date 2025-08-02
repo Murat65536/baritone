@@ -221,10 +221,8 @@ public class MovementTraverse extends Movement {
         Block fd = BlockStateInterface.get(ctx, src.below()).getBlock();
         boolean ladder = fd == Blocks.LADDER || fd == Blocks.VINE;
 
-        //sneak may have been set to true in the PREPPING state while mining an adjacent block, but we still want it to be true if the player is about to go on magma
-        if (MovementHelper.shouldSneakOnMagma(ctx)) {
-            state.setInput(Input.SNEAK, true);
-        }
+        //sneak may have been set to true in the PREPPING state while mining an adjacent block
+        state.setInput(Input.SNEAK, false);
 
         if (pb0.getBlock() instanceof DoorBlock || pb1.getBlock() instanceof DoorBlock) {
             boolean notPassable = pb0.getBlock() instanceof DoorBlock && !MovementHelper.isDoorPassable(ctx, src, dest) || pb1.getBlock() instanceof DoorBlock && !MovementHelper.isDoorPassable(ctx, dest, src);

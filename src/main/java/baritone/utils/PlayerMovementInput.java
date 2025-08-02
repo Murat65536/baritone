@@ -51,8 +51,8 @@ public class PlayerMovementInput extends net.minecraft.client.player.Input {
         }
 
         if (this.shiftKeyDown = handler.isInputForcedDown(Input.SNEAK)) {
-            this.leftImpulse *= 0.3D;
-            this.forwardImpulse *= 0.3D;
+            this.leftImpulse *= 0.3F;
+            this.forwardImpulse *= 0.3F;
         }
     }
 }

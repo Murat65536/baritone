@@ -97,10 +97,6 @@ public class MovementFall extends Movement {
         BlockState destState = ctx.world().getBlockState(dest);
         Block destBlock = destState.getBlock();
 
-        if (MovementHelper.shouldSneakOnMagma(ctx)) {
-            state.setInput(Input.SNEAK, true);
-        }
-
         boolean isWater = destState.getFluidState().getType() instanceof WaterFluid;
         if (!isWater && willPlaceBucket() && !playerFeet.equals(dest)) {
             if (!Inventory.isHotbarSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_BUCKET_WATER)) || ctx.world().dimension() == Level.NETHER) {

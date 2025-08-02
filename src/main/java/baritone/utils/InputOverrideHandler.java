@@ -23,7 +23,9 @@ import baritone.api.event.events.TickEvent;
 import baritone.api.utils.IInputOverrideHandler;
 import baritone.api.utils.input.Input;
 import baritone.behavior.Behavior;
+import baritone.pathing.movement.MovementHelper;
 import net.minecraft.client.player.KeyboardInput;
+import net.minecraft.world.level.block.Blocks;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -94,6 +96,9 @@ public final class InputOverrideHandler extends Behavior implements IInputOverri
         blockPlaceHelper.tick(isInputForcedDown(Input.CLICK_RIGHT));
 
         if (inControl()) {
+            if (MovementHelper.shouldSneakOnMagma(ctx, new PlayerMovementInput(this))) {
+                setInputForceState(Input.SNEAK, true);
+            }
             if (ctx.player().input.getClass() != PlayerMovementInput.class) {
                 ctx.player().input = new PlayerMovementInput(this);
             }

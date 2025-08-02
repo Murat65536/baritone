@@ -28,14 +28,14 @@ import baritone.api.utils.input.Input;
 import baritone.pathing.movement.MovementState.MovementTarget;
 import baritone.pathing.precompute.Ternary;
 import baritone.utils.BlockStateInterface;
+import baritone.utils.PathRenderer;
 import baritone.utils.ToolSet;
-import net.minecraft.client.Minecraft;
+import baritone.utils.accessor.ILocalPlayer;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.util.Mth;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.piston.MovingPistonBlock;
@@ -55,8 +55,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static baritone.pathing.movement.Movement.HORIZONTALS_BUT_ALSO_DOWN_____SO_EVERY_DIRECTION_EXCEPT_UP;
@@ -813,79 +811,37 @@ public interface MovementHelper extends ActionCosts, Helper {
                 b == Blocks.WATER;
     }
 
-//    static Vec3 predictPosition(IPlayerContext ctx) {
-//        Vec3 deltaMovement = ctx.player().getDeltaMovement();
-//        Vec3 travelVector = new Vec3(ctx.player().input.leftImpulse * 0.98d, 0d, ctx.player().input.forwardImpulse * 0.98d);
-//        double fallDistance = 0.08;
-//        boolean falling = ctx.player().getDeltaMovement().y <= 0d;
-//        if (falling && ctx.player().hasEffect(MobEffects.SLOW_FALLING)) {
-//            fallDistance = 0.01d;
-//        }
-//
-//        FluidState fluidState = ctx.world().getFluidState(ctx.player().blockPosition());
-//        if (ctx.player().isInWater() && ctx.player().isAffectedByFluids() && !ctx.player().canStandOnFluid(fluidState)) {
-//            double y = ctx.player().getY();
-//            float sprintHelper = ctx.player().isSprinting() ? 0.9f : 0.8f;
-//            float slowness = 0.02f;
-//            float depthStrider = (float) Math.min(EnchantmentHelper.getDepthStrider(ctx.player()), 3);
-//            if (!ctx.player().isOnGround()) {
-//                depthStrider *= 0.5f;
-//            }
-//
-//            if (depthStrider > 0f) {
-//                sprintHelper += (0.54600006f - sprintHelper) * depthStrider / 3f;
-//                slowness += (ctx.player().getSpeed() - slowness) * depthStrider / 3f;
-//            }
-//
-//            if (ctx.player().hasEffect(MobEffects.DOLPHINS_GRACE)) {
-//                sprintHelper = 0.96f;
-//            }
-//
-//            double distance = travelVector.lengthSqr();
-//            if (distance >= 1e-7) {
-//                Vec3 lv = (distance > 1d ? travelVector.normalize() : travelVector).scale(slowness);
-//                double sin = Mth.sin(ctx.player().getYRot() * Mth.DEG_TO_RAD);
-//                double cos = Mth.cos(ctx.player().getYRot() * Mth.DEG_TO_RAD);
-//                deltaMovement = deltaMovement.add(lv.x * cos - lv.z * sin, lv.y, lv.z * cos + lv.x * sin);
-//            }
-//
-//            if (ctx.player().noPhysics) {
-//                return ctx.player().position().add(deltaMovement);
-//            } else {
-//
-//            }
-//        }
-//    }
-
-    static boolean shouldSneakOnMagma(IPlayerContext ctx) {
-        LocalPlayer copy = ctx.player();
-//        LocalPlayer copy = new LocalPlayer(
-//                ctx.minecraft(),
-//                ctx.player().clientLevel,
-//                new EmptyPacketListener(
-//                        ctx.minecraft(),
-//                        ctx.minecraft().screen,
-//                        ctx.minecraft().getConnection().getConnection(),
-//                        ctx.minecraft().getConnection().getServerData(),
-//                        ctx.minecraft().getConnection().getLocalGameProfile(),
-//                        null
-//                ),
-//                ctx.player().getStats(),
-//                ctx.player().getRecipeBook(),
-//                ctx.player().isShiftKeyDown(),
-//                ctx.player().isSprinting()
-//        );
-        copy.setPos(ctx.player().position());
+    static LocalPlayer playerAtNextTick(IPlayerContext ctx, net.minecraft.client.player.Input input) {
+        LocalPlayer copy = new LocalPlayer(
+                ctx.minecraft(),
+                ctx.player().clientLevel,
+                new EmptyPacketListener(ctx.player().getGameProfile()),
+                null,
+                null,
+                false,
+                false
+        );
+        copy.input = input;
+        copy.setOnGround(ctx.player().isOnGround());
+        copy.setNoGravity(ctx.player().isNoGravity());
+        copy.moveTo(ctx.player().getX(), ctx.player().getY(), ctx.player().getZ(), ctx.player().getYRot(), ctx.player().getXRot());
         copy.setDeltaMovement(ctx.player().getDeltaMovement());
-        copy.input = ctx.player().input;
-        copy.noPhysics = ctx.player().noPhysics;
-//        copy.serverAiStep();
+        ((ILocalPlayer) copy).baritone$setRun(((ILocalPlayer) ctx.player()).baritone$getRun());
+//        ((ILocalPlayer) copy).baritone$setUUID(ctx.player().getUUID());
+        copy.setJumping(((ILocalPlayer) copy).baritone$getJumping());
         copy.aiStep();
-//        copy.tick();
+        System.out.println("X: " + (ctx.player().getX() - copy.getX()));
+        System.out.println("Y: " + (ctx.player().getY() - copy.getY()));
+        System.out.println("Z: " + (ctx.player().getZ() - copy.getZ()));
+        copy.setPos(copy.position().add(copy.getDeltaMovement()));
+        return copy;
+    }
+
+    static boolean shouldSneakOnMagma(IPlayerContext ctx, net.minecraft.client.player.Input input) {
         return (Baritone.settings().allowWalkOnMagmaBlocks.value &&
                 !EnchantmentHelper.hasFrostWalker(ctx.player()) &&
                 !ctx.player().isPassenger() &&
-                ctx.world().getBlockState(copy.getOnPosLegacy()).is(Blocks.MAGMA_BLOCK));
+                ctx.world().getBlockState(playerAtNextTick(ctx, input).getOnPosLegacy()).is(Blocks.MAGMA_BLOCK));
     }
 
     static boolean steppingOnBlock(IPlayerContext ctx, Block block) {

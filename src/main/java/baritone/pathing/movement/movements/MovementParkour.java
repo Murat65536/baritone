@@ -260,9 +260,7 @@ public class MovementParkour extends Movement {
             logDebug("sorry");
             return state.setStatus(MovementStatus.UNREACHABLE);
         }
-        if (MovementHelper.shouldSneakOnMagma(ctx)) {
-            state.setInput(Input.SNEAK, true);
-        } else if (dist >= 4 || ascend) {
+        if (dist >= 4 || ascend) {
             state.setInput(Input.SPRINT, true);
         }
 
