@@ -36,6 +36,7 @@ import com.google.gson.GsonBuilder;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.piston.MovingPistonBlock;
@@ -848,9 +849,9 @@ public interface MovementHelper extends ActionCosts, Helper {
         if (!ctx.player().isOnGround()) {
             return false;
         }
-        for (int x = (int)(ctx.player().getX() - (ctx.player().getBlockX() + 0.5) - ctx.player().getBbWidth()); x <= (int)(ctx.player().getX() - (ctx.player().getBlockX() + 0.5) + ctx.player().getBbWidth()); x++) {
-            for (int z = (int)(ctx.player().getZ() - (ctx.player().getBlockZ() + 0.5) - ctx.player().getBbWidth()); z <= (int)(ctx.player().getZ() - (ctx.player().getBlockZ() + 0.5) + ctx.player().getBbWidth()); z++) {
-                if (ctx.world().getBlockState(new BetterBlockPos(ctx.player().getBlockX() + x, ctx.player().getBlockY() - 1, ctx.player().getBlockZ() + z)).is(block)) {
+        for (int x = Mth.floor(ctx.player().getBoundingBox().minX); x <= Mth.floor(ctx.player().getBoundingBox().maxX); x++) {
+            for (int z = Mth.floor(ctx.player().getBoundingBox().minZ); z <= Mth.floor(ctx.player().getBoundingBox().maxZ); z++) {
+                if (ctx.world().getBlockState(new BetterBlockPos(x, ctx.player().getBlockY() - 1, z)).is(block)) {
                     return true;
                 }
             }
