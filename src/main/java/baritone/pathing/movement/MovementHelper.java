@@ -657,11 +657,33 @@ public interface MovementHelper extends ActionCosts, Helper {
     }
 
     static void moveTowards(IPlayerContext ctx, MovementState state, BlockPos pos) {
-        Rotation faceEntityRotation = MovementHelper.getRotationForEntityInRange(ctx);
-        if (faceEntityRotation != null && Baritone.settings().entityAttackRadius.value != 0d) {
-            state.setTarget(new MovementState.MovementTarget(faceEntityRotation, false));
+        double closestDistance = Double.MAX_VALUE;
+        Vec3 closestPosition = null;
+        for (Entity entity : ctx.entities()) {
+            if (!entity.is(ctx.player()) && entity instanceof LivingEntity && entity.isAlive() && entity.isAttackable()) {
+                Vec3 attackPoint = new Vec3(
+                        Mth.clamp(ctx.playerHead().x(), entity.getBoundingBox().minX, entity.getBoundingBox().maxX),
+                        Mth.clamp(ctx.playerHead().y(), entity.getBoundingBox().minY, entity.getBoundingBox().maxY),
+                        Mth.clamp(ctx.playerHead().z(), entity.getBoundingBox().minZ, entity.getBoundingBox().maxZ)
+                );
+                double distance = ctx.player().getEyePosition().distanceToSqr(attackPoint);
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestPosition = attackPoint;
+                }
+            }
+        }
+        if (Baritone.settings().entityAttackRadius.value != 0d &&
+                closestPosition != null &&
+                Math.sqrt(closestDistance) <= Baritone.settings().entityAttackRadius.value) {
+            state.setTarget(new MovementState.MovementTarget(
+                    RotationUtils.calcRotationFromVec3d(ctx.playerHead(), closestPosition, ctx.playerRotations()),
+                    false
+            ));
             MovementHelper.moveTowardsWithoutRotation(ctx, state, pos);
-            state.setInput(Input.CLICK_LEFT, true);
+            if (Math.sqrt(closestDistance) <= 3) { // 4.5 for blocks, 3 for entities while in survival.
+                state.setInput(Input.CLICK_LEFT, true);
+            }
         }
         else {
             state.setTarget(new MovementTarget(
@@ -882,29 +904,5 @@ public interface MovementHelper extends ActionCosts, Helper {
             }
         }
         return blocks;
-    }
-
-    static Rotation getRotationForEntityInRange(IPlayerContext ctx) {
-        double closestDistance = Double.MAX_VALUE;
-        Vec3 closestPosition = null;
-        for (Entity entity : ctx.entities()) {
-            if (!entity.is(ctx.player()) && entity instanceof LivingEntity && entity.isAlive() && entity.isAttackable()) {
-                Vec3 attackPoint = new Vec3(
-                        Mth.clamp(ctx.playerHead().x(), entity.getBoundingBox().minX, entity.getBoundingBox().maxX),
-                        Mth.clamp(ctx.playerHead().y(), entity.getBoundingBox().minY, entity.getBoundingBox().maxY),
-                        Mth.clamp(ctx.playerHead().z(), entity.getBoundingBox().minZ, entity.getBoundingBox().maxZ)
-                );
-                double distance = ctx.player().getEyePosition().distanceToSqr(attackPoint);
-                if (distance < closestDistance) {
-                    closestDistance = distance;
-                    closestPosition = attackPoint;
-                }
-            }
-        }
-        if (closestPosition != null && Math.sqrt(closestDistance) <= Baritone.settings().entityAttackRadius.value) {
-            return RotationUtils.calcRotationFromVec3d(ctx.playerHead(), closestPosition, ctx.playerRotations());
-        } else {
-            return null;
-        }
     }
 }

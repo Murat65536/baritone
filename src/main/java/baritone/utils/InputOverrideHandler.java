@@ -59,8 +59,8 @@ public final class InputOverrideHandler extends Behavior implements IInputOverri
      * @return Whether or not it is being forced down
      */
     @Override
-    public final boolean isInputForcedDown(Input input) {
-        return input == null ? false : this.inputForceStateMap.getOrDefault(input, false);
+    public boolean isInputForcedDown(Input input) {
+        return input != null && this.inputForceStateMap.getOrDefault(input, false);
     }
 
     /**
@@ -78,22 +78,22 @@ public final class InputOverrideHandler extends Behavior implements IInputOverri
      * Clears the override state for all keys
      */
     @Override
-    public final void clearAllKeys() {
+    public void clearAllKeys() {
         this.inputForceStateMap.clear();
     }
 
     @Override
-    public final void onTick(TickEvent event) {
+    public void onTick(TickEvent event) {
         if (event.getType() == TickEvent.Type.OUT) {
             return;
         }
-        if (isInputForcedDown(Input.CLICK_LEFT)) {
-            setInputForceState(Input.CLICK_RIGHT, false);
-        }
-        blockBreakHelper.tick(isInputForcedDown(Input.CLICK_LEFT));
-        blockPlaceHelper.tick(isInputForcedDown(Input.CLICK_RIGHT));
 
         if (inControl()) {
+            if (isInputForcedDown(Input.CLICK_LEFT)) {
+                setInputForceState(Input.CLICK_RIGHT, false);
+            }
+            blockBreakHelper.tick(isInputForcedDown(Input.CLICK_LEFT));
+            blockPlaceHelper.tick(isInputForcedDown(Input.CLICK_RIGHT));
             if (ctx.player().input.getClass() != PlayerMovementInput.class) {
                 ctx.player().input = new PlayerMovementInput(this);
             }
