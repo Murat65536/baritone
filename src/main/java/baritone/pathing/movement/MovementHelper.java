@@ -29,8 +29,6 @@ import baritone.pathing.movement.MovementState.MovementTarget;
 import baritone.pathing.precompute.Ternary;
 import baritone.utils.BlockStateInterface;
 import baritone.utils.ToolSet;
-import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -681,7 +679,8 @@ public interface MovementHelper extends ActionCosts, Helper {
                     false
             ));
             MovementHelper.moveTowardsWithoutRotation(ctx, state, pos);
-            if (Math.sqrt(closestDistance) <= 3) { // 4.5 for blocks, 3 for entities while in survival.
+            if (ctx.minecraft().hitResult.getType().equals(HitResult.Type.ENTITY) &&
+                    !ctx.player().getCooldowns().isOnCooldown(ctx.player().getMainHandItem().getItem())) {
                 state.setInput(Input.CLICK_LEFT, true);
             }
         }
@@ -701,7 +700,7 @@ public interface MovementHelper extends ActionCosts, Helper {
         Rotation blockRotation = RotationUtils.calcRotationFromVec3d(ctx.playerHead(),
                 VecUtils.getBlockPosCenter(dest),
                 ctx.playerRotations());
-        int selection = getSelection(blockRotation, ax, az);
+        int selection = getDirectionSelection(blockRotation, ax, az);
         switch (selection) {
             case 0 -> state.setInput(Input.MOVE_FORWARD, true);
             case 1 -> state.setInput(Input.MOVE_BACK, true);
@@ -714,10 +713,10 @@ public interface MovementHelper extends ActionCosts, Helper {
         }
     }
 
-    private static int getSelection(Rotation blockRotation, float ax, float az) {
+    private static int getDirectionSelection(Rotation blockRotation, float ax, float az) {
         float targetAx = Mth.sin(blockRotation.getYaw() * DEG_TO_RAD_F);
         float targetAz = Mth.cos(blockRotation.getYaw() * DEG_TO_RAD_F);
-        float[][] options = getOptions(ax, az);
+        float[][] options = getDirectionOptions(ax, az);
         int selection = -1;
         float closestX = 100000;
         float closestZ = 100000;
@@ -731,7 +730,7 @@ public interface MovementHelper extends ActionCosts, Helper {
         return selection;
     }
 
-    private static float[][] getOptions(float ax, float az) {
+    private static float[][] getDirectionOptions(float ax, float az) {
         boolean canSprint = Baritone.settings().allowSprint.value;
         return new float[][]{
                 {canSprint ? ax * 1.3f : ax, canSprint ? az * 1.3f : az}, // W
