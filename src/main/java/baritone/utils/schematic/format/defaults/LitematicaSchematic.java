@@ -29,8 +29,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -44,8 +44,7 @@ import java.util.Optional;
 public final class LitematicaSchematic extends CompositeSchematic implements IStaticSchematic {
 
     /**
-     * @param nbtTagCompound a decompressed file stream aka nbt data.
-     * @param rotated        if the schematic is rotated by 90°.
+     * @param nbt a decompressed file stream aka nbt data.
      */
     public LitematicaSchematic(CompoundTag nbt) {
         super(0, 0, 0);
@@ -225,7 +224,7 @@ public final class LitematicaSchematic extends CompositeSchematic implements ISt
          */
         private final long arraySize;
 
-        public LitematicaBitArray(int bitsPerEntryIn, long arraySizeIn, @Nullable long[] longArrayIn) {
+        public LitematicaBitArray(int bitsPerEntryIn, long arraySizeIn, long @Nullable [] longArrayIn) {
             Validate.inclusiveBetween(1L, 32L, bitsPerEntryIn);
             this.arraySize = arraySizeIn;
             this.bitsPerEntry = bitsPerEntryIn;

@@ -17,11 +17,11 @@
 
 package baritone.api.utils;
 
-import javax.annotation.Nonnull;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.Mth;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A better BlockPos that has fewer hash collisions (and slightly more performant offsets)
@@ -225,7 +225,7 @@ public final class BetterBlockPos extends BlockPos {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public String toString() {
         return String.format(
                 "BetterBlockPos{x=%s,y=%s,z=%s}",

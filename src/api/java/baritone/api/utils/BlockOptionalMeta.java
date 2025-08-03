@@ -52,9 +52,9 @@ import net.minecraft.world.level.storage.loot.PredicateManager;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
-import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -84,7 +84,7 @@ public final class BlockOptionalMeta {
     private static PredicateManager predicate = new PredicateManager();
     private static Map<Block, List<Item>> drops = new HashMap<>();
 
-    public BlockOptionalMeta(@Nonnull Block block) {
+    public BlockOptionalMeta(@NotNull Block block) {
         this.block = block;
         this.propertiesDescription = "{}";
         this.blockstates = getStates(block, Collections.emptyMap());
@@ -92,7 +92,7 @@ public final class BlockOptionalMeta {
         this.stackHashes = getStackHashes(blockstates);
     }
 
-    public BlockOptionalMeta(@Nonnull String selector) {
+    public BlockOptionalMeta(@NotNull String selector) {
         Matcher matcher = PATTERN.matcher(selector);
 
         if (!matcher.find()) {
@@ -135,7 +135,7 @@ public final class BlockOptionalMeta {
         return builder.build();
     }
 
-    private static Set<BlockState> getStates(@Nonnull Block block, @Nonnull Map<Property<?>, ?> properties) {
+    private static Set<BlockState> getStates(@NotNull Block block, @NotNull Map<Property<?>, ?> properties) {
         return block.getStateDefinition().getPossibleStates().stream()
                 .filter(blockstate -> properties.entrySet().stream().allMatch(entry ->
                         blockstate.getValue(entry.getKey()) == entry.getValue()
@@ -168,11 +168,11 @@ public final class BlockOptionalMeta {
         return block;
     }
 
-    public boolean matches(@Nonnull Block block) {
+    public boolean matches(@NotNull Block block) {
         return block == this.block;
     }
 
-    public boolean matches(@Nonnull BlockState blockstate) {
+    public boolean matches(@NotNull BlockState blockstate) {
         Block block = blockstate.getBlock();
         return block == this.block && stateHashes.contains(blockstate.hashCode());
     }

@@ -19,13 +19,10 @@ package baritone.gradle.task;
 
 import baritone.gradle.util.Determinizer;
 import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.api.tasks.TaskCollection;
-import org.gradle.api.tasks.compile.ForkOptions;
-import org.gradle.api.tasks.compile.JavaCompile;
-import org.gradle.internal.jvm.Jvm;
 import org.gradle.jvm.toolchain.JavaLanguageVersion;
 import org.gradle.jvm.toolchain.JavaLauncher;
 import org.gradle.jvm.toolchain.JavaToolchainService;
@@ -112,10 +109,8 @@ public class ProguardTask extends BaritoneGradleTask {
     }
 
     private JavaLauncher getJavaLauncherForProguard() {
-        var toolchains = getProject().getExtensions().getByType(JavaToolchainService.class);
-        var toolchain = toolchains.launcherFor((spec) -> {
-            spec.getLanguageVersion().set(JavaLanguageVersion.of(getProject().findProperty("java_version").toString()));
-        }).getOrNull();
+        JavaToolchainService toolchains = getProject().getExtensions().getByType(JavaToolchainService.class);
+        JavaLauncher toolchain = toolchains.launcherFor((spec) -> spec.getLanguageVersion().set(JavaLanguageVersion.of(getProject().findProperty("java_version").toString()))).getOrNull();
 
         if (toolchain == null) {
             throw new IllegalStateException("Java toolchain not found");
@@ -127,7 +122,7 @@ public class ProguardTask extends BaritoneGradleTask {
     private void generateConfigs() throws Exception {
         Files.copy(getRootRelativeFile(PROGUARD_CONFIG_TEMPLATE), getTemporaryFile(PROGUARD_CONFIG_DEST), StandardCopyOption.REPLACE_EXISTING);
 
-        // Setup the template that will be used to derive the API and Standalone configs
+        // Set up the template that will be used to derive the API and Standalone configs
         List<String> template = Files.readAllLines(getTemporaryFile(PROGUARD_CONFIG_DEST));
         template.add(0, "-injars '" + this.artifactPath.toString() + "'");
         template.add(1, "-outjars '" + this.getTemporaryFile(PROGUARD_EXPORT_PATH) + "'");
@@ -146,7 +141,7 @@ public class ProguardTask extends BaritoneGradleTask {
             }
 
             {
-                // Discover all of the libraries that we will need to acquire from gradle
+                // Discover all the libraries that we will need to acquire from gradle
                 final Stream<File> dependencies = acquireDependencies()
                         // remove MCP mapped jar, and nashorn
                         .filter(f -> !f.toString().endsWith("-recomp.jar") && !f.getName().startsWith("nashorn") && !f.getName().startsWith("coremods"));
@@ -190,25 +185,6 @@ public class ProguardTask extends BaritoneGradleTask {
         Determinizer.determinize(this.proguardOut.toString(), this.artifactStandalonePath.toString(), List.of(), false);
     }
 
-    private static final class Pair<A, B> {
-        public final A a;
-        public final B b;
-
-        private Pair(final A a, final B b) {
-            this.a = a;
-            this.b = b;
-        }
-
-        @Override
-        public String toString() {
-            return "Pair{" +
-                    "a=" + this.a +
-                    ", " +
-                    "b=" + this.b +
-                    '}';
-        }
-    }
-
     private void cleanup() {
         try {
             Files.delete(this.proguardOut);
@@ -235,5 +211,4 @@ public class ProguardTask extends BaritoneGradleTask {
             spec.executable(getJavaLauncherForProguard().getExecutablePath().getAsFile());
         }).assertNormalExitValue().rethrowFailure();
     }
-
 }
