@@ -77,12 +77,12 @@ components.java {
     }
 }
 
-tasks.register('proguard', ProguardTask) {
+tasks.register("proguard", ProguardTask) {
     proguardVersion "7.2.1"
     compType "fabric"
 }
 
-tasks.register('createDist', CreateDistTask) {
+tasks.register("createDist", CreateDistTask) {
     dependsOn proguard
     compType "fabric"
 }

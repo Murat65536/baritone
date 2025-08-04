@@ -16,7 +16,7 @@
  */
 
 allprojects {
-    apply plugin: 'java'
+    apply plugin: "java"
     apply plugin: "xyz.wagyourtail.unimined"
     apply plugin: "maven-publish"
 
@@ -24,7 +24,7 @@ allprojects {
 
     def vers = ""
     try {
-        vers = 'git describe --always --tags --first-parent --dirty'.execute().text.trim()
+        vers = "git describe --always --tags --first-parent --dirty".execute().text.trim()
     } catch (Exception e) {
         println "Version detection failed: " + e
     }
@@ -45,16 +45,16 @@ allprojects {
 
     repositories {
         maven {
-            name = 'spongepowered-repo'
-            url = 'https://repo.spongepowered.org/repository/maven-public/'
+            name = "spongepowered-repo"
+            url = "https://repo.spongepowered.org/repository/maven-public/"
         }
         maven {
-            name = 'fabric-maven'
-            url = 'https://maven.fabricmc.net/'
+            name = "fabric-maven"
+            url = "https://maven.fabricmc.net/"
         }
         maven {
-            name = 'impactdevelopment-repo'
-            url = 'https://impactdevelopment.github.io/maven/'
+            name = "impactdevelopment-repo"
+            url = "https://impactdevelopment.github.io/maven/"
         }
         maven {
             name = "ldtteam"
@@ -70,8 +70,8 @@ allprojects {
         }
         mavenCentral()
         maven {
-            name = 'babbaj-repo'
-            url = 'https://babbaj.github.io/maven/'
+            name = "babbaj-repo"
+            url = "https://babbaj.github.io/maven/"
         }
     }
 
@@ -137,7 +137,7 @@ sourceSets {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.13.2'
+    testImplementation "junit:junit:4.13.2"
 }
 
 jar {
@@ -145,7 +145,7 @@ jar {
 }
 
 javadoc {
-    options.addStringOption('Xwerror', '-quiet') // makes the build fail on travis when there is a javadoc error
+    options.addStringOption("Xwerror", "-quiet") // makes the build fail on travis when there is a javadoc error
     options.linkSource true
     options.encoding "UTF-8" // allow emoji in comments :^)
     source = sourceSets.api.allJava

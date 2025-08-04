@@ -19,16 +19,16 @@ pluginManagement {
     repositories {
         mavenLocal()
         maven {
-            name = 'WagYourMaven'
-            url = 'https://maven.wagyourtail.xyz/snapshots'
+            name = "WagYourMaven"
+            url = "https://maven.wagyourtail.xyz/snapshots"
         }
         maven {
-            name = 'ForgeMaven'
-            url = 'https://maven.minecraftforge.net/'
+            name = "ForgeMaven"
+            url = "https://maven.minecraftforge.net/"
         }
         maven {
-            name = 'FabricMaven'
-            url = 'https://maven.fabricmc.net/'
+            name = "FabricMaven"
+            url = "https://maven.fabricmc.net/"
         }
         mavenCentral()
         gradlePluginPortal() {
@@ -39,7 +39,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'baritone'
+rootProject.name = "baritone"
 
 include("tweaker")
 if (System.getProperty("Baritone.enabled_platforms") == null) {

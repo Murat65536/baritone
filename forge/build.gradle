@@ -37,7 +37,7 @@ unimined.minecraft {
 
 //loom {
 //    forge {
-//        mixinConfig 'mixins.baritone.json'
+//        mixinConfig "mixins.baritone.json"
 //    }
 //}
 
@@ -83,11 +83,11 @@ jar {
 
     manifest {
         attributes(
-                'MixinConfigs': 'mixins.baritone.json',
+                "MixinConfigs": "mixins.baritone.json",
                 "MixinConnector": "baritone.launch.BaritoneMixinConnector",
 
-                'Implementation-Title': 'Baritone',
-                'Implementation-Version': version,
+                "Implementation-Title": "Baritone",
+                "Implementation-Version": version,
         )
     }
 }
@@ -98,12 +98,13 @@ components.java {
     }
 }
 
-task proguard(type: ProguardTask) {
+tasks.register("proguard", ProguardTask) {
     proguardVersion "7.2.1"
     compType "forge"
 }
 
-task createDist(type: CreateDistTask, dependsOn: proguard) {
+tasks.register("createDist", CreateDistTask) {
+    dependsOn proguard
     compType "forge"
 }
 
