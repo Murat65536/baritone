@@ -18,9 +18,9 @@
 package baritone.gradle.task;
 
 import baritone.gradle.util.Determinizer;
-import org.gradle.api.plugins.JavaPluginConvention;
-import org.gradle.api.provider.Provider;
+import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.jvm.toolchain.JavaLanguageVersion;
@@ -36,6 +36,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -170,7 +171,13 @@ public class ProguardTask extends BaritoneGradleTask {
     }
 
     private Stream<File> acquireDependencies() {
-        return getProject().getConvention().getPlugin(JavaPluginConvention.class).getSourceSets().findByName("main").getCompileClasspath().getFiles()
+        return getProject()
+                .getExtensions()
+                .getByType(JavaPluginExtension.class)
+                .getSourceSets()
+                .getByName("main")
+                .getCompileClasspath()
+                .getFiles()
                 .stream()
                 .filter(File::isFile);
     }
@@ -203,12 +210,10 @@ public class ProguardTask extends BaritoneGradleTask {
 
         Path workingDirectory = getTemporaryFile("");
 
-        getProject().javaexec(spec -> {
-            spec.workingDir(workingDirectory.toFile());
-            spec.args("@" + workingDirectory.relativize(config));
-            spec.classpath(getTemporaryFile(String.format(PROGUARD_JAR, proguardVersion)));
-
-            spec.executable(getJavaLauncherForProguard().getExecutablePath().getAsFile());
-        }).assertNormalExitValue().rethrowFailure();
+        JavaExec javaExecTask = getProject().getObjects().newInstance(JavaExec.class);
+        javaExecTask.workingDir(workingDirectory.toFile());
+        javaExecTask.args("@" + workingDirectory.relativize(config));
+        javaExecTask.classpath(getTemporaryFile(String.format(PROGUARD_JAR, proguardVersion)));
+        javaExecTask.executable(getJavaLauncherForProguard().getExecutablePath().getAsFile());
     }
 }

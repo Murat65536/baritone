@@ -36,8 +36,6 @@ allprojects {
         println "Detected version " + version
     }
     group = rootProject.maven_group
-
-    sourceCompatibility = targetCompatibility = JavaVersion.toVersion(project.java_version)
     
     java {
         toolchain {
