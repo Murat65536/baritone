@@ -43,12 +43,12 @@ public final class InputOverrideHandler extends Behavior implements IInputOverri
      */
     private final Map<Input, Boolean> inputForceStateMap = new HashMap<>();
 
-    private final BlockBreakHelper blockBreakHelper;
+    private final LeftClickHelper leftClickHelper;
     private final BlockPlaceHelper blockPlaceHelper;
 
     public InputOverrideHandler(Baritone baritone) {
         super(baritone);
-        this.blockBreakHelper = new BlockBreakHelper(baritone.getPlayerContext());
+        this.leftClickHelper = new LeftClickHelper(baritone.getPlayerContext());
         this.blockPlaceHelper = new BlockPlaceHelper(baritone.getPlayerContext());
     }
 
@@ -70,7 +70,7 @@ public final class InputOverrideHandler extends Behavior implements IInputOverri
      * @param forced Whether or not the state is being forced
      */
     @Override
-    public final void setInputForceState(Input input, boolean forced) {
+    public void setInputForceState(Input input, boolean forced) {
         this.inputForceStateMap.put(input, forced);
     }
 
@@ -92,7 +92,7 @@ public final class InputOverrideHandler extends Behavior implements IInputOverri
             if (isInputForcedDown(Input.CLICK_LEFT)) {
                 setInputForceState(Input.CLICK_RIGHT, false);
             }
-            blockBreakHelper.tick(isInputForcedDown(Input.CLICK_LEFT));
+            leftClickHelper.tick(isInputForcedDown(Input.CLICK_LEFT));
             blockPlaceHelper.tick(isInputForcedDown(Input.CLICK_RIGHT));
             if (ctx.player().input.getClass() != PlayerMovementInput.class) {
                 ctx.player().input = new PlayerMovementInput(this);
@@ -116,7 +116,7 @@ public final class InputOverrideHandler extends Behavior implements IInputOverri
         return baritone.getPathingBehavior().isPathing() || baritone != BaritoneAPI.getProvider().getPrimaryBaritone();
     }
 
-    public BlockBreakHelper getBlockBreakHelper() {
-        return blockBreakHelper;
+    public LeftClickHelper getLeftClickHelper() {
+        return leftClickHelper;
     }
 }
