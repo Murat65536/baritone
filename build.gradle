@@ -34,7 +34,7 @@ allprojects {
         println "Version detection failed: " + e
     }
     if (!vers.startsWith("v")) {
-        println "using version number: " + rootProject.mod_version
+        println "using version number: ${rootProject.mod_version}"
         version = rootProject.mod_version
     } else {
         version = vers.substring(1)
@@ -142,7 +142,7 @@ sourceSets {
 }
 
 dependencies {
-    testImplementation "junit:junit:4.13.2"
+    testImplementation 'junit:junit:4.13.2'
 }
 
 jar {
