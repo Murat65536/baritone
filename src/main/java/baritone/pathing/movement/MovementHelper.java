@@ -655,43 +655,49 @@ public interface MovementHelper extends ActionCosts, Helper {
     }
 
     static void moveTowards(IPlayerContext ctx, MovementState state, BlockPos pos) {
-        double closestDistance = Double.MAX_VALUE;
-        Vec3 closestPosition = null;
-        for (Entity entity : ctx.entities()) {
-            if (!entity.is(ctx.player()) && entity instanceof LivingEntity && entity.isAlive() && entity.isAttackable()) {
-                Vec3 attackPoint = new Vec3(
-                        Mth.clamp(ctx.playerHead().x(), entity.getBoundingBox().minX, entity.getBoundingBox().maxX),
-                        Mth.clamp(ctx.playerHead().y(), entity.getBoundingBox().minY, entity.getBoundingBox().maxY),
-                        Mth.clamp(ctx.playerHead().z(), entity.getBoundingBox().minZ, entity.getBoundingBox().maxZ)
-                );
-                double distance = ctx.player().getEyePosition().distanceToSqr(attackPoint);
-                if (distance < closestDistance) {
-                    closestDistance = distance;
-                    closestPosition = attackPoint;
+        if (Baritone.settings().entityAttackRadius.value != 0d) {
+            double closestDistance = Double.MAX_VALUE;
+            Vec3 closestPosition = null;
+            for (Entity entity : ctx.entities()) {
+                if (!entity.is(ctx.player()) && entity instanceof LivingEntity && entity.isAlive() && entity.isAttackable()) {
+                    Vec3 attackPoint = new Vec3(
+                            Mth.clamp(ctx.playerHead().x(), entity.getBoundingBox().minX, entity.getBoundingBox().maxX),
+                            Mth.clamp(ctx.playerHead().y(), entity.getBoundingBox().minY, entity.getBoundingBox().maxY),
+                            Mth.clamp(ctx.playerHead().z(), entity.getBoundingBox().minZ, entity.getBoundingBox().maxZ)
+                    );
+                    double distance = ctx.player().getEyePosition().distanceToSqr(attackPoint);
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestPosition = attackPoint;
+                    }
                 }
             }
-        }
-        if (Baritone.settings().entityAttackRadius.value != 0d &&
-                closestPosition != null &&
-                Math.sqrt(closestDistance) <= Baritone.settings().entityAttackRadius.value) {
-            state.setTarget(new MovementState.MovementTarget(
-                    RotationUtils.calcRotationFromVec3d(ctx.playerHead(), closestPosition, ctx.playerRotations()),
-                    false
-            ));
-            MovementHelper.moveTowardsWithoutRotation(ctx, state, pos);
-            if (ctx.minecraft().hitResult.getType().equals(HitResult.Type.ENTITY) &&
-                    !ctx.player().getCooldowns().isOnCooldown(ctx.player().getMainHandItem().getItem())) {
-                state.setInput(Input.CLICK_LEFT, true);
+            if (closestPosition != null &&
+                    Math.sqrt(closestDistance) <= Baritone.settings().entityAttackRadius.value) {
+                state.setTarget(new MovementState.MovementTarget(
+                        RotationUtils.calcRotationFromVec3d(ctx.playerHead(), closestPosition, ctx.playerRotations()),
+                        false
+                ));
+                MovementHelper.moveTowardsWithoutRotation(ctx, state, pos);
+                HitResult hitResult = ctx.minecraft().hitResult;
+                if (hitResult != null && hitResult.getType().equals(HitResult.Type.ENTITY)) {
+                    state.setInput(Input.CLICK_LEFT, true);
+                }
+            } else {
+                moveTowardsWithRotation(ctx, state, pos);
             }
+        } else {
+            moveTowardsWithRotation(ctx, state, pos);
         }
-        else {
-            state.setTarget(new MovementTarget(
-                    RotationUtils.calcRotationFromVec3d(ctx.playerHead(),
-                            VecUtils.getBlockPosCenter(pos),
-                            ctx.playerRotations()).withPitch(ctx.playerRotations().getPitch()),
-                    false
-            )).setInput(Input.MOVE_FORWARD, true);
-        }
+    }
+
+    static void moveTowardsWithRotation(IPlayerContext ctx, MovementState state, BlockPos pos) {
+        state.setTarget(new MovementTarget(
+                RotationUtils.calcRotationFromVec3d(ctx.playerHead(),
+                        VecUtils.getBlockPosCenter(pos),
+                        ctx.playerRotations()).withPitch(ctx.playerRotations().getPitch()),
+                false
+        )).setInput(Input.MOVE_FORWARD, true);
     }
 
     static void moveTowardsWithoutRotation(IPlayerContext ctx, MovementState state, BlockPos dest) {
