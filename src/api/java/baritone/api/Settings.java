@@ -422,6 +422,16 @@ public final class Settings {
     public final Setting<Integer> leftClickSpeed = new Setting<>(6);
 
     /**
+     * Assume external aiming functionality
+     */
+    public final Setting<Boolean> assumeExternalAutoAim = new Setting<>(false);
+
+    /**
+     * Assume external attacking functionality
+     */
+    public final Setting<Boolean> assumeExternalKillAura = new Setting<>(false);
+
+    /**
      * How many degrees to randomize the pitch and yaw every tick. Set to 0 to disable
      */
     public final Setting<Double> randomLooking = new Setting<>(0.01d);

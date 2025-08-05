@@ -674,14 +674,18 @@ public interface MovementHelper extends ActionCosts, Helper {
             }
             if (closestPosition != null &&
                     Math.sqrt(closestDistance) <= Baritone.settings().entityAttackRadius.value) {
-                state.setTarget(new MovementState.MovementTarget(
-                        RotationUtils.calcRotationFromVec3d(ctx.playerHead(), closestPosition, ctx.playerRotations()),
-                        false
-                ));
+                if (!Baritone.settings().assumeExternalAutoAim.value) {
+                    state.setTarget(new MovementState.MovementTarget(
+                            RotationUtils.calcRotationFromVec3d(ctx.playerHead(), closestPosition, ctx.playerRotations()),
+                            false
+                    ));
+                }
                 MovementHelper.moveTowardsWithoutRotation(ctx, state, pos);
-                HitResult hitResult = ctx.minecraft().hitResult;
-                if (hitResult != null && hitResult.getType().equals(HitResult.Type.ENTITY)) {
-                    state.setInput(Input.CLICK_LEFT, true);
+                if (!Baritone.settings().assumeExternalKillAura.value) {
+                    HitResult hitResult = ctx.minecraft().hitResult;
+                    if (hitResult != null && hitResult.getType().equals(HitResult.Type.ENTITY)) {
+                        state.setInput(Input.CLICK_LEFT, true);
+                    }
                 }
             } else {
                 moveTowardsWithRotation(ctx, state, pos);
