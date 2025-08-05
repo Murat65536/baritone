@@ -17,7 +17,7 @@
 
 package baritone.utils;
 
-import baritone.api.BaritoneAPI;
+import baritone.Baritone;
 import baritone.api.utils.IPlayerContext;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.world.phys.HitResult;
@@ -33,6 +33,7 @@ public final class LeftClickHelper {
     private final IPlayerContext ctx;
     private boolean isBreaking = false;
     private int breakDelayTimer = 0;
+    private int leftClickTimer = 0;
 
     LeftClickHelper(IPlayerContext ctx) {
         this.ctx = ctx;
@@ -44,38 +45,38 @@ public final class LeftClickHelper {
     }
 
     public void tick(boolean isLeftClick) {
-        if (breakDelayTimer > 0) {
-            breakDelayTimer--;
-            return;
-        }
-        if (isLeftClick) {
-            HitResult trace = ctx.objectMouseOver();
+        HitResult trace = ctx.minecraft().hitResult;
+        if (isLeftClick && trace != null) {
             switch (trace.getType()) {
                 case ENTITY:
-                    isBreaking = false;
-                    if (ctx.player().getAttackStrengthScale(0f) == 1f) {
+                    stopBreakingBlock();
+                    if (leftClickTimer > 0) {
+                        leftClickTimer--;
+                    } else if (!Baritone.settings().timedAttacks.value || ctx.player().getAttackStrengthScale(0f) == 1f) {
+                        leftClickTimer = Baritone.settings().leftClickSpeed.value;
                         KeyMapping.click(ctx.minecraft().options.keyAttack.getDefaultKey());
-                        ctx.minecraft().options.keyAttack.setDown(true);
                     }
                     break;
                 case BLOCK:
-                    if (!isBreaking) {
-                        isBreaking = true;
-                        KeyMapping.click(ctx.minecraft().options.keyAttack.getDefaultKey());
-                    }
-                    ctx.minecraft().options.keyAttack.setDown(true);
-                    if (ctx.playerController().hasBrokenBlock()) {
-                        breakDelayTimer = BaritoneAPI.getSettings().blockBreakSpeed.value - BASE_BREAK_DELAY;
+                    if (breakDelayTimer > 0) {
+                        breakDelayTimer--;
+                    } else {
+                        if (!isBreaking) {
+                            isBreaking = true;
+                            KeyMapping.click(ctx.minecraft().options.keyAttack.getDefaultKey());
+                        }
+                        ctx.minecraft().options.keyAttack.setDown(true);
+                        if (ctx.playerController().hasBrokenBlock()) {
+                            breakDelayTimer = Baritone.settings().blockBreakSpeed.value - BASE_BREAK_DELAY;
+                        }
                     }
                     break;
                 default:
-                    isBreaking = false;
-                    ctx.minecraft().options.keyAttack.setDown(false);
+                    stopBreakingBlock();
                     break;
             }
         } else {
-            isBreaking = false;
-            ctx.minecraft().options.keyAttack.setDown(false);
+            stopBreakingBlock();
         }
     }
 }

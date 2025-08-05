@@ -412,6 +412,16 @@ public final class Settings {
     public final Setting<Integer> blockBreakSpeed = new Setting<>(6);
 
     /**
+     * Determines if Baritone waits for the attack cooldown to recharge completely before attacking
+     */
+    public final Setting<Boolean> timedAttacks = new Setting<>(true);
+
+    /**
+     * Determines how many ticks between left clicks are allowed.
+     */
+    public final Setting<Integer> leftClickSpeed = new Setting<>(6);
+
+    /**
      * How many degrees to randomize the pitch and yaw every tick. Set to 0 to disable
      */
     public final Setting<Double> randomLooking = new Setting<>(0.01d);
