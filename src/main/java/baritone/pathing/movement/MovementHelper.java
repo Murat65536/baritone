@@ -677,7 +677,7 @@ public interface MovementHelper extends ActionCosts, Helper {
                 if (!Baritone.settings().assumeExternalAutoAim.value) {
                     state.setTarget(new MovementState.MovementTarget(
                             RotationUtils.calcRotationFromVec3d(ctx.playerHead(), closestPosition, ctx.playerRotations()),
-                            false
+                            true
                     ));
                 }
                 MovementHelper.moveTowardsWithoutRotation(ctx, state, pos);
