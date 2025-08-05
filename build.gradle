@@ -107,7 +107,7 @@ unimined.minecraft {
     defaultRemapJar = false
 }
 
-archivesBaseName = archivesBaseName + "-common"
+//archivesBaseName = archivesBaseName + "-common"
 
 sourceSets {
     api {

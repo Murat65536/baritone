@@ -19,10 +19,7 @@ package baritone.gradle.task;
 
 import baritone.gradle.util.Determinizer;
 import org.gradle.api.plugins.JavaPluginExtension;
-import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.JavaExec;
-import org.gradle.api.tasks.SourceSetContainer;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.*;
 import org.gradle.jvm.toolchain.JavaLanguageVersion;
 import org.gradle.jvm.toolchain.JavaLauncher;
 import org.gradle.jvm.toolchain.JavaToolchainService;
@@ -210,10 +207,11 @@ public class ProguardTask extends BaritoneGradleTask {
 
         Path workingDirectory = getTemporaryFile("");
 
-        JavaExec javaExecTask = getProject().getObjects().newInstance(JavaExec.class);
-        javaExecTask.workingDir(workingDirectory.toFile());
-        javaExecTask.args("@" + workingDirectory.relativize(config));
-        javaExecTask.classpath(getTemporaryFile(String.format(PROGUARD_JAR, proguardVersion)));
-        javaExecTask.executable(getJavaLauncherForProguard().getExecutablePath().getAsFile());
+        getProject().javaexec(javaExecSpec -> {
+            javaExecSpec.workingDir(workingDirectory.toFile());
+            javaExecSpec.args("@" + workingDirectory.relativize(config));
+            javaExecSpec.classpath(getTemporaryFile(String.format(PROGUARD_JAR, proguardVersion)));
+            javaExecSpec.executable(getJavaLauncherForProguard().getExecutablePath().getAsFile());
+        });
     }
 }
