@@ -45,22 +45,24 @@ public final class LeftClickHelper {
     }
 
     public void tick(boolean isLeftClick) {
+        if (leftClickTimer > 0) {
+            leftClickTimer--;
+        }
+        if (breakDelayTimer > 0) {
+            breakDelayTimer--;
+        }
         HitResult trace = ctx.minecraft().hitResult;
         if (isLeftClick && trace != null) {
             switch (trace.getType()) {
                 case ENTITY:
                     stopBreakingBlock();
-                    if (leftClickTimer > 0) {
-                        leftClickTimer--;
-                    } else if (!Baritone.settings().timedAttacks.value || ctx.player().getAttackStrengthScale(0f) == 1f) {
+                    if (leftClickTimer <= 0 && (!Baritone.settings().timedAttacks.value || ctx.player().getAttackStrengthScale(0f) == 1f)) {
                         leftClickTimer = Baritone.settings().leftClickSpeed.value;
                         KeyMapping.click(ctx.minecraft().options.keyAttack.getDefaultKey());
                     }
                     break;
                 case BLOCK:
-                    if (breakDelayTimer > 0) {
-                        breakDelayTimer--;
-                    } else {
+                    if (breakDelayTimer <= 0) {
                         if (!isBreaking) {
                             isBreaking = true;
                             KeyMapping.click(ctx.minecraft().options.keyAttack.getDefaultKey());
