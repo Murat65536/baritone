@@ -47,6 +47,7 @@ public final class FollowProcess extends BaritoneProcessHelper implements IFollo
     private Predicate<Entity> filter;
     private List<Entity> cache;
     private boolean into; // walk straight into the target, regardless of settings
+    private float currentCircleDegrees = 0;
 
     public FollowProcess(Baritone baritone) {
         super(baritone);
@@ -56,6 +57,8 @@ public final class FollowProcess extends BaritoneProcessHelper implements IFollo
     public PathingCommand onTick(boolean calcFailed, boolean isSafeToCancel) {
         scanWorld();
         Goal goal = new GoalComposite(cache.stream().map(this::towards).toArray(Goal[]::new));
+        currentCircleDegrees += Baritone.settings().followCircleIncrement.value;
+        currentCircleDegrees %= 360;
         return new PathingCommand(goal, PathingCommandType.REVALIDATE_GOAL_AND_PATH);
     }
 
@@ -64,7 +67,11 @@ public final class FollowProcess extends BaritoneProcessHelper implements IFollo
         if (Baritone.settings().followOffsetDistance.value == 0 || into) {
             pos = following.blockPosition();
         } else {
-            GoalXZ g = GoalXZ.fromDirection(following.position(), Baritone.settings().followOffsetDirection.value, Baritone.settings().followOffsetDistance.value);
+            GoalXZ g = GoalXZ.fromDirection(
+                    following.position(),
+                    Baritone.settings().followCircle.value ? currentCircleDegrees : Baritone.settings().followOffsetDirection.value,
+                    Baritone.settings().followOffsetDistance.value
+            );
             pos = new BetterBlockPos(g.getX(), following.position().y, g.getZ());
         }
         if (into) {

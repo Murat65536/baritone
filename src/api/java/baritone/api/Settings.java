@@ -1253,6 +1253,17 @@ public final class Settings {
     public final Setting<Double> followOffsetDistance = new Setting<>(0D);
 
     /**
+     * The actual GoalNear is set to circle around your selected entity instead of remaining in one place.
+     * This disregards {@link #followOffsetDirection} when enabled.
+     */
+    public final Setting<Boolean> followCircle = new Setting<>(false);
+
+    /**
+     * The amount the circle offset is shifted each tick
+     */
+    public final Setting<Float> followCircleIncrement = new Setting<>(5F);
+
+    /**
      * The actual GoalNear is set in this direction from the entity you're following. This value is in degrees.
      */
     public final Setting<Float> followOffsetDirection = new Setting<>(0F);
