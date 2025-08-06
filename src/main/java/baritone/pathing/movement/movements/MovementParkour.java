@@ -74,10 +74,10 @@ public class MovementParkour extends Movement {
             return;
         }
         BlockState adj = context.get(x + xDiff, y - 1, z + zDiff);
-        if (MovementHelper.canWalkOn(context, x + xDiff, y - 1, z + zDiff, adj)) { // don't parkour if we could just traverse (for now)
-            // second most common case -- we could just traverse not parkour
-            return;
-        }
+//        if (MovementHelper.canWalkOn(context, x + xDiff, y - 1, z + zDiff, adj)) { // don't parkour if we could just traverse (for now)
+//            // second most common case -- we could just traverse not parkour
+//            return;
+//        }
         if (MovementHelper.avoidWalkingInto(adj) && !(adj.getFluidState().getType() instanceof WaterFluid)) { // magma sucks
             return;
         }
@@ -112,18 +112,18 @@ public class MovementParkour extends Movement {
             maxJump = 3;
         }
 
-        // check parkour jumps from smallest to largest for obstacles/walls and landing positions
+        // check parkour jumps from largest to smallest for obstacles/walls and landing positions
         int verifiedMaxJump = 1; // i - 1 (when i = 2)
-        for (int i = 2; i <= maxJump; i++) {
+        for (int i = maxJump; i >= 2; i--) {
             int destX = x + xDiff * i;
             int destZ = z + zDiff * i;
 
             // check head/feet
             if (!MovementHelper.fullyPassable(context, destX, y + 1, destZ)) {
-                break;
+                continue;
             }
             if (!MovementHelper.fullyPassable(context, destX, y + 2, destZ)) {
-                break;
+                continue;
             }
 
             // check for ascend landing position
@@ -136,7 +136,7 @@ public class MovementParkour extends Movement {
                     res.cost = i * SPRINT_ONE_BLOCK_COST + context.jumpPenalty;
                     return;
                 }
-                break;
+                continue;
             }
 
             // check for flat landing position
@@ -153,11 +153,11 @@ public class MovementParkour extends Movement {
                     res.cost = costFromJumpDistance(i) + context.jumpPenalty;
                     return;
                 }
-                break;
+                continue;
             }
 
             if (!MovementHelper.fullyPassable(context, destX, y + 3, destZ)) {
-                break;
+                continue;
             }
 
             verifiedMaxJump = i;
@@ -208,11 +208,11 @@ public class MovementParkour extends Movement {
     private static double costFromJumpDistance(int dist) {
         switch (dist) {
             case 2:
-                return WALK_ONE_BLOCK_COST * 2; // IDK LOL
+                return WALK_ONE_BLOCK_COST * 2 / 2; // IDK LOL
             case 3:
-                return WALK_ONE_BLOCK_COST * 3;
+                return WALK_ONE_BLOCK_COST * 3 / 2;
             case 4:
-                return SPRINT_ONE_BLOCK_COST * 4;
+                return SPRINT_ONE_BLOCK_COST * 4 / 2;
             default:
                 throw new IllegalStateException("LOL " + dist);
         }
@@ -299,14 +299,15 @@ public class MovementParkour extends Movement {
                 }
 
                 state.setInput(Input.JUMP, true);
-            } else if (!ctx.playerFeet().equals(dest.relative(direction, -1))) {
-                state.setInput(Input.SPRINT, false);
-                if (ctx.playerFeet().equals(src.relative(direction, -1))) {
-                    MovementHelper.moveTowards(ctx, state, src);
-                } else {
-                    MovementHelper.moveTowards(ctx, state, src.relative(direction, -1));
-                }
             }
+//            else if (!ctx.playerFeet().equals(dest.relative(direction, -1))) {
+//                state.setInput(Input.SPRINT, false);
+//                if (ctx.playerFeet().equals(src.relative(direction, -1))) {
+//                    MovementHelper.moveTowards(ctx, state, src);
+//                } else {
+//                    MovementHelper.moveTowards(ctx, state, src.relative(direction, -1));
+//                }
+//            }
         }
         return state;
     }
