@@ -75,7 +75,8 @@ public final class FollowProcess extends BaritoneProcessHelper implements IFollo
                     following.position(),
                     // I love me some ternary operators
                     Baritone.settings().followCircle.value ?
-                            RotationUtils.calcRotationFromVec3d(following.getEyePosition(),
+                            RotationUtils.calcRotationFromVec3d(
+                                    following.getEyePosition(),
                                     ctx.playerHead(),
                                     ctx.playerRotations()).getYaw() +
                                     (switchDirection ? -Baritone.settings().followCircleIncrement.value :
