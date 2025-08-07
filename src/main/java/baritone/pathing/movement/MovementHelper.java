@@ -662,9 +662,9 @@ public interface MovementHelper extends ActionCosts, Helper {
             for (Entity entity : ctx.entities()) {
                 if (!entity.is(ctx.player()) && entity instanceof LivingEntity && entity.isAlive() && entity.isAttackable()) {
                     Vec3 attackPoint = new Vec3(
-                            Mth.clamp(ctx.playerHead().x(), entity.getBoundingBox().minX, entity.getBoundingBox().maxX),
+                            entity.getBoundingBox().getCenter().x(),//Mth.clamp(ctx.playerHead().x(), entity.getBoundingBox().minX, entity.getBoundingBox().maxX),
                             Mth.clamp(ctx.playerHead().y(), entity.getBoundingBox().minY, entity.getBoundingBox().maxY),
-                            Mth.clamp(ctx.playerHead().z(), entity.getBoundingBox().minZ, entity.getBoundingBox().maxZ)
+                            entity.getBoundingBox().getCenter().z()//Mth.clamp(ctx.playerHead().z(), entity.getBoundingBox().minZ, entity.getBoundingBox().maxZ)
                     );
                     double distance = ctx.player().getEyePosition().distanceToSqr(attackPoint);
                     if (distance < closestDistance) {
@@ -673,8 +673,7 @@ public interface MovementHelper extends ActionCosts, Helper {
                     }
                 }
             }
-            if (closestPosition != null &&
-                    Math.sqrt(closestDistance) <= Baritone.settings().entityAttackRadius.value) {
+            if (closestPosition != null && Math.sqrt(closestDistance) <= Baritone.settings().entityAttackRadius.value) {
                 if (!Baritone.settings().assumeExternalAutoAim.value) {
                     state.setTarget(new MovementState.MovementTarget(
                             RotationUtils.calcRotationFromVec3d(ctx.playerHead(), closestPosition, ctx.playerRotations()),
