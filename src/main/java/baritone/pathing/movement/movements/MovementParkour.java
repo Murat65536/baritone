@@ -168,7 +168,7 @@ public class MovementParkour extends Movement {
             return;
         }
         // check parkour jumps from largest to smallest for positions to place blocks
-        for (int i = verifiedMaxJump; i > 1; i--) {
+        for (int i = verifiedMaxJump; i >= 2; i--) {
             int destX = x + i * xDiff;
             int destZ = z + i * zDiff;
             BlockState toReplace = context.get(destX, y - 1, destZ);
@@ -182,10 +182,10 @@ public class MovementParkour extends Movement {
             if (!checkOvershootSafety(context.bsi, destX + xDiff, y, destZ + zDiff)) {
                 continue;
             }
-            for (int j = 0; j < 5; j++) {
-                int againstX = destX + HORIZONTALS_BUT_ALSO_DOWN_____SO_EVERY_DIRECTION_EXCEPT_UP[j].getStepX();
-                int againstY = y - 1 + HORIZONTALS_BUT_ALSO_DOWN_____SO_EVERY_DIRECTION_EXCEPT_UP[j].getStepY();
-                int againstZ = destZ + HORIZONTALS_BUT_ALSO_DOWN_____SO_EVERY_DIRECTION_EXCEPT_UP[j].getStepZ();
+            for (Direction direction : HORIZONTALS_BUT_ALSO_DOWN_____SO_EVERY_DIRECTION_EXCEPT_UP) {
+                int againstX = destX + direction.getStepX();
+                int againstY = y - 1 + direction.getStepY();
+                int againstZ = destZ + direction.getStepZ();
                 if (againstX == destX - xDiff && againstZ == destZ - zDiff) { // we can't turn around that fast
                     continue;
                 }
