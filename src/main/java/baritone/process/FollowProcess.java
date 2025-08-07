@@ -27,6 +27,7 @@ import baritone.api.process.IFollowProcess;
 import baritone.api.process.PathingCommand;
 import baritone.api.process.PathingCommandType;
 import baritone.api.utils.BetterBlockPos;
+import baritone.api.utils.RotationUtils;
 import baritone.utils.BaritoneProcessHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
@@ -47,7 +48,6 @@ public final class FollowProcess extends BaritoneProcessHelper implements IFollo
     private Predicate<Entity> filter;
     private List<Entity> cache;
     private boolean into; // walk straight into the target, regardless of settings
-    private float currentCircleDegrees = 0;
 
     public FollowProcess(Baritone baritone) {
         super(baritone);
@@ -57,8 +57,6 @@ public final class FollowProcess extends BaritoneProcessHelper implements IFollo
     public PathingCommand onTick(boolean calcFailed, boolean isSafeToCancel) {
         scanWorld();
         Goal goal = new GoalComposite(cache.stream().map(this::towards).toArray(Goal[]::new));
-        currentCircleDegrees += Baritone.settings().followCircleIncrement.value;
-        currentCircleDegrees %= 360;
         return new PathingCommand(goal, PathingCommandType.REVALIDATE_GOAL_AND_PATH);
     }
 
@@ -69,7 +67,11 @@ public final class FollowProcess extends BaritoneProcessHelper implements IFollo
         } else {
             GoalXZ g = GoalXZ.fromDirection(
                     following.position(),
-                    Baritone.settings().followCircle.value ? currentCircleDegrees : Baritone.settings().followOffsetDirection.value,
+                    Baritone.settings().followCircle.value ?
+                            RotationUtils.calcRotationFromVec3d(following.getEyePosition(),
+                                    ctx.playerHead(),
+                                    ctx.playerRotations()).getYaw() + Baritone.settings().followCircleIncrement.value :
+                            Baritone.settings().followOffsetDirection.value,
                     Baritone.settings().followOffsetDistance.value
             );
             pos = new BetterBlockPos(g.getX(), following.position().y, g.getZ());

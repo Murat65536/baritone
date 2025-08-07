@@ -1259,9 +1259,9 @@ public final class Settings {
     public final Setting<Boolean> followCircle = new Setting<>(false);
 
     /**
-     * The amount the circle offset is shifted each tick
+     * The yaw amount the target is shifted by
      */
-    public final Setting<Float> followCircleIncrement = new Setting<>(5F);
+    public final Setting<Float> followCircleIncrement = new Setting<>(90F);
 
     /**
      * The actual GoalNear is set in this direction from the entity you're following. This value is in degrees.
