@@ -1264,6 +1264,11 @@ public final class Settings {
     public final Setting<Float> followCircleIncrement = new Setting<>(90F);
 
     /**
+     * The chance every tick that the follow circle direction is switched from 0 to 100
+     */
+    public final Setting<Double> followCircleSwitchDirectionChance = new Setting<>(2.5D);
+
+    /**
      * The actual GoalNear is set in this direction from the entity you're following. This value is in degrees.
      */
     public final Setting<Float> followOffsetDirection = new Setting<>(0F);

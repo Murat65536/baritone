@@ -35,6 +35,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
+import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -48,6 +49,8 @@ public final class FollowProcess extends BaritoneProcessHelper implements IFollo
     private Predicate<Entity> filter;
     private List<Entity> cache;
     private boolean into; // walk straight into the target, regardless of settings
+    private boolean switchDirection = false;
+    private static final Random random = new Random(); // TODO global random instance
 
     public FollowProcess(Baritone baritone) {
         super(baritone);
@@ -57,6 +60,9 @@ public final class FollowProcess extends BaritoneProcessHelper implements IFollo
     public PathingCommand onTick(boolean calcFailed, boolean isSafeToCancel) {
         scanWorld();
         Goal goal = new GoalComposite(cache.stream().map(this::towards).toArray(Goal[]::new));
+        if (Baritone.settings().followCircleSwitchDirectionChance.value >= random.nextDouble(0, 100)) {
+            switchDirection = !switchDirection;
+        }
         return new PathingCommand(goal, PathingCommandType.REVALIDATE_GOAL_AND_PATH);
     }
 
@@ -67,10 +73,13 @@ public final class FollowProcess extends BaritoneProcessHelper implements IFollo
         } else {
             GoalXZ g = GoalXZ.fromDirection(
                     following.position(),
+                    // I love me some ternary operators
                     Baritone.settings().followCircle.value ?
                             RotationUtils.calcRotationFromVec3d(following.getEyePosition(),
                                     ctx.playerHead(),
-                                    ctx.playerRotations()).getYaw() + Baritone.settings().followCircleIncrement.value :
+                                    ctx.playerRotations()).getYaw() +
+                                    (switchDirection ? -Baritone.settings().followCircleIncrement.value :
+                                            Baritone.settings().followCircleIncrement.value) :
                             Baritone.settings().followOffsetDirection.value,
                     Baritone.settings().followOffsetDistance.value
             );
