@@ -161,6 +161,7 @@ public class MovementParkour extends Movement {
             }
 
             verifiedMaxJump = i;
+            break;
         }
 
         // parkour place starts here
@@ -206,16 +207,12 @@ public class MovementParkour extends Movement {
     }
 
     private static double costFromJumpDistance(int dist) {
-        switch (dist) {
-            case 2:
-                return WALK_ONE_BLOCK_COST * 2 / 2; // IDK LOL
-            case 3:
-                return WALK_ONE_BLOCK_COST * 3 / 2;
-            case 4:
-                return SPRINT_ONE_BLOCK_COST * 4 / 2;
-            default:
-                throw new IllegalStateException("LOL " + dist);
-        }
+        return switch (dist) {
+            case 2 -> WALK_ONE_BLOCK_COST * 2 / 2; // IDK LOL
+            case 3 -> WALK_ONE_BLOCK_COST * 3 / 2;
+            case 4 -> SPRINT_ONE_BLOCK_COST * 4 / 2;
+            default -> throw new IllegalStateException("LOL " + dist);
+        };
     }
 
 
@@ -266,17 +263,10 @@ public class MovementParkour extends Movement {
             state.setInput(Input.SNEAK, true);
         }
 
-        MovementHelper.moveTowards(ctx, state, dest);
+        MovementHelper.moveTowards(src.getCenter().add(0d, 0.5d + ctx.player().getEyeY(), 0d), ctx.playerRotations(), state, dest.getCenter());
+//        MovementHelper.moveTowards(ctx, state, dest);
         if (ctx.playerFeet().equals(dest)) {
-            Block d = BlockStateInterface.getBlock(ctx, dest);
-            if (d == Blocks.VINE || d == Blocks.LADDER) {
-                // it physically hurt me to add support for parkour jumping onto a vine
-                // but i did it anyway
-                return state.setStatus(MovementStatus.SUCCESS);
-            }
-            if (ctx.player().position().y - ctx.playerFeet().getY() < 0.094) { // lilypads
-                state.setStatus(MovementStatus.SUCCESS);
-            }
+            state.setStatus(MovementStatus.SUCCESS);
         } else if (!ctx.playerFeet().equals(src)) {
             if (ctx.playerFeet().equals(src.relative(direction)) || ctx.player().position().y - src.y > 0.0001) {
                 if (Baritone.settings().allowPlace.value // see PR #3775
